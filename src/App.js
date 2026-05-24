@@ -473,7 +473,7 @@ function HeroSection() {
 
       id="hero"
 
-      className="relative overflow-hidden min-h-[92vh] flex items-center"
+      className="relative overflow-hidden min-h-[100svh] lg:min-h-[92vh] flex items-center"
 
     >
 
@@ -513,9 +513,7 @@ function HeroSection() {
 
       <div
 
-        className="absolute inset-0"
-
-        style={{ transform: 'scale(1.04)' }}
+        className="absolute inset-0 scale-[1.02] lg:scale-[1.04]"
 
       >
 
@@ -541,7 +539,7 @@ function HeroSection() {
 
           alt="Eshelon Cover"
 
-          className="block lg:hidden w-full h-full object-cover object-right"
+          className="block lg:hidden w-full h-full object-cover object-[62%_20%]"
 
           style={{ animation: 'coverReveal 2.4s cubic-bezier(0.22,1,0.36,1) both' }}
 
@@ -553,10 +551,11 @@ function HeroSection() {
 
       {/* Multi-layer blending to avoid hard image edges */}
 
-      <div className="absolute inset-0 bg-gradient-to-r from-[#0d0d0d] via-[#0d0d0d]/82 to-[#0d0d0d]/15" />
-      <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-[#0d0d0d]/65 via-[#0d0d0d]/30 to-transparent" />
-      <div className="absolute bottom-0 left-0 right-0 h-72 bg-gradient-to-t from-[#0d0d0d] via-[#0d0d0d]/90 to-transparent" />
-      <div className="absolute inset-y-0 right-0 w-48 bg-gradient-to-l from-[#0d0d0d]/45 via-[#0d0d0d]/18 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-r from-[#0d0d0d]/74 via-[#0d0d0d]/42 to-[#0d0d0d]/12 lg:from-[#0d0d0d] lg:via-[#0d0d0d]/82 lg:to-[#0d0d0d]/15" />
+      <div className="absolute inset-x-0 top-0 h-36 sm:h-40 bg-gradient-to-b from-[#0d0d0d]/62 via-[#0d0d0d]/26 to-transparent" />
+      <div className="absolute bottom-0 left-0 right-0 h-72 sm:h-80 bg-gradient-to-t from-[#0d0d0d] via-[#0d0d0d]/92 to-transparent" />
+      <div className="absolute inset-y-0 right-0 w-40 lg:w-48 bg-gradient-to-l from-[#0d0d0d]/45 via-[#0d0d0d]/18 to-transparent" />
+      <div className="absolute inset-0 lg:hidden bg-[radial-gradient(95%_58%_at_25%_46%,rgba(13,13,13,0.52),rgba(13,13,13,0)_75%)] pointer-events-none" />
       <div className="absolute inset-0 bg-[radial-gradient(110%_70%_at_50%_10%,rgba(229,9,20,0.08),rgba(13,13,13,0)_58%)] pointer-events-none" />
       <div className="absolute inset-0 opacity-8 pointer-events-none [background-image:radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.1)_0,rgba(255,255,255,0)_40%),radial-gradient(circle_at_80%_0,rgba(229,9,20,0.12)_0,rgba(229,9,20,0)_35%)]" />
 
@@ -564,25 +563,21 @@ function HeroSection() {
 
       {/* Content */}
 
-      <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-16">
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-14 sm:py-20 lg:py-16">
 
-        <div className="max-w-[620px] space-y-8">
+        <div className="max-w-[620px] space-y-7 sm:space-y-8">
 
 
 
           {/* Headline PNG — entrance + glow pulse */}
-
-          <img
-
-            src="https://i.postimg.cc/gj0h2dyY/teqsst1.png"
-
-            alt="Headline"
-
-            className="w-full max-w-lg -mt-8 lg:-mt-12"
-
-            style={{ animation: 'headlineIn 1s 0.4s cubic-bezier(0.22,1,0.36,1) both' }}
-
-          />
+          <div className="inline-block rounded-xl p-1.5 bg-black/26 border border-white/10 backdrop-blur-[1.5px] sm:bg-transparent sm:p-0 sm:border-0 sm:backdrop-blur-0">
+            <img
+              src="https://i.postimg.cc/gj0h2dyY/teqsst1.png"
+              alt="Headline"
+              className="w-full max-w-[90vw] sm:max-w-lg mt-1 sm:-mt-4 lg:-mt-12 drop-shadow-[0_10px_30px_rgba(0,0,0,0.75)]"
+              style={{ animation: 'headlineIn 1s 0.4s cubic-bezier(0.22,1,0.36,1) both' }}
+            />
+          </div>
 
 
 
