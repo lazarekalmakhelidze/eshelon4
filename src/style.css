@@ -1,0 +1,281 @@
+@font-face {
+  font-family: "Mersad Black";
+  src: url("./fonts/MERSAD-BLACK.TTF") format("truetype");
+  font-style: normal;
+  font-weight: 900;
+  font-display: swap;
+}
+
+.mersad-heading {
+  font-family: "Mersad Black", "Helvetica Neue", Arial, sans-serif;
+  font-weight: 900;
+}
+
+:root {
+  color-scheme: dark;
+  --scroll-progress: 0;
+}
+
+html,
+body {
+  background: #0d0d0d;
+  overflow-x: hidden;
+}
+
+#root {
+  position: relative;
+  min-height: 100vh;
+  isolation: isolate;
+}
+
+#root > * {
+  position: relative;
+  z-index: 1;
+}
+
+#root::before,
+#root::after {
+  content: "";
+  position: fixed;
+  inset: -18% -12%;
+  pointer-events: none;
+  z-index: 0;
+  will-change: transform;
+}
+
+#root::before {
+  opacity: 0.22;
+  background:
+    radial-gradient(46% 36% at 16% 18%, rgba(229, 9, 20, 0.16), transparent 70%),
+    radial-gradient(40% 30% at 84% 72%, rgba(229, 9, 20, 0.1), transparent 72%);
+  animation: redAmbientDrift 34s ease-in-out infinite alternate;
+}
+
+#root::after {
+  opacity: 0.15;
+  background:
+    radial-gradient(34% 28% at 72% 12%, rgba(255, 58, 58, 0.1), transparent 70%),
+    radial-gradient(38% 28% at 24% 78%, rgba(153, 14, 24, 0.14), transparent 75%);
+  animation: redAmbientDriftB 42s ease-in-out infinite alternate;
+}
+
+.scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  z-index: 70;
+  transform-origin: left center;
+  transform: scaleX(var(--scroll-progress));
+  background: linear-gradient(90deg, #e50914 0%, #ff6a00 55%, #ffffff 100%);
+  opacity: 0.85;
+  pointer-events: none;
+  transition: transform 120ms linear;
+}
+
+.nav-glass {
+  background: rgba(13, 13, 13, 0.82);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.section-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(229, 9, 20, 0.28);
+  background: linear-gradient(180deg, rgba(229, 9, 20, 0.16), rgba(229, 9, 20, 0.06));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+.surface-card {
+  background-image: linear-gradient(
+    165deg,
+    rgba(255, 255, 255, 0.04) 0%,
+    rgba(255, 255, 255, 0.015) 45%,
+    rgba(229, 9, 20, 0.08) 140%
+  );
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 16px 40px -28px rgba(0, 0, 0, 0.85);
+}
+
+@keyframes redAmbientDrift {
+  0% {
+    transform: translate3d(-2%, -1.5%, 0) scale(1);
+  }
+  100% {
+    transform: translate3d(2%, 1.5%, 0) scale(1.05);
+  }
+}
+
+@keyframes redAmbientDriftB {
+  0% {
+    transform: translate3d(1.5%, -1%, 0) scale(1.02);
+  }
+  100% {
+    transform: translate3d(-1.5%, 1.8%, 0) scale(1);
+  }
+}
+
+/* Smooth and clean modal scrolling */
+.custom-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(229, 9, 20, 0.6) rgba(255, 255, 255, 0.08);
+}
+
+.custom-scroll::-webkit-scrollbar {
+  width: 10px;
+}
+
+.custom-scroll::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.custom-scroll::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgba(229, 9, 20, 0.9), rgba(173, 23, 31, 0.9));
+  border-radius: 999px;
+  border: 2px solid rgba(255, 255, 255, 0.06);
+}
+
+.reveal-section {
+  opacity: 0;
+  transform: translate3d(0, 28px, 0);
+  transition:
+    opacity 620ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 620ms cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
+
+.reveal-section.reveal-visible {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+  will-change: auto;
+}
+
+.reveal-stagger > * {
+  opacity: 0;
+  transform: translate3d(0, 18px, 0);
+  transition:
+    opacity 520ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 520ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.reveal-section.reveal-visible .reveal-stagger > * {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+.reveal-section.reveal-visible .reveal-stagger > *:nth-child(1) { transition-delay: 40ms; }
+.reveal-section.reveal-visible .reveal-stagger > *:nth-child(2) { transition-delay: 90ms; }
+.reveal-section.reveal-visible .reveal-stagger > *:nth-child(3) { transition-delay: 140ms; }
+.reveal-section.reveal-visible .reveal-stagger > *:nth-child(4) { transition-delay: 190ms; }
+.reveal-section.reveal-visible .reveal-stagger > *:nth-child(5) { transition-delay: 240ms; }
+.reveal-section.reveal-visible .reveal-stagger > *:nth-child(6) { transition-delay: 290ms; }
+
+@media (prefers-reduced-motion: reduce) {
+  .logo-marquee {
+    animation: none !important;
+  }
+
+  .reveal-section {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+
+  .reveal-stagger > * {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+
+  .scroll-progress {
+    transition: none !important;
+  }
+
+  #root::before,
+  #root::after {
+    animation: none !important;
+  }
+
+  * {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+.logo-marquee {
+  --logo-speed: 34s;
+  --logo-gap: 1rem;
+  display: flex;
+  width: max-content;
+  animation: logoMarquee var(--logo-speed) linear infinite;
+  will-change: transform;
+}
+
+.logo-marquee.is-reverse {
+  animation-direction: reverse;
+}
+
+.logo-group {
+  display: flex;
+  align-items: center;
+  gap: var(--logo-gap);
+  padding-right: var(--logo-gap);
+  flex-shrink: 0;
+}
+
+.logo-tile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 208px;
+  height: 84px;
+  padding: 0 10px;
+  overflow: hidden;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.02);
+  transition: border-color 220ms ease, background-color 220ms ease, transform 220ms ease;
+}
+
+.logo-tile:hover {
+  border-color: rgba(229, 9, 20, 0.45);
+  background: rgba(229, 9, 20, 0.05);
+  transform: translateY(-1px);
+}
+
+.logo-mark {
+  width: auto;
+  max-width: 176px;
+  max-height: 56px;
+  height: auto;
+  object-fit: contain;
+  transform: scale(var(--logo-scale, 1));
+  transform-origin: center;
+  opacity: 0.58;
+  filter: grayscale(100%) saturate(0.6) contrast(0.95);
+  transition: opacity 220ms ease, filter 220ms ease, transform 220ms ease;
+}
+
+.logo-tile:hover .logo-mark {
+  opacity: 0.88;
+  filter: grayscale(20%) saturate(1);
+  transform: scale(calc(var(--logo-scale, 1) * 1.03));
+}
+
+@keyframes logoMarquee {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
