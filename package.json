@@ -9,7 +9,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "build": "react-scripts build && mkdir -p build/collaboration && cp build/index.html build/collaboration/index.html",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
   },
