@@ -1381,7 +1381,7 @@ function App() {
 
     if (customServices.logo) base += 500;
 
-    if (customServices.guidelines) base += 1200;
+    if (customServices.guidelines) base += 3000;
 
     base += customServices.posts * SMM_POST_UNIT_PRICE;
 
@@ -2847,7 +2847,7 @@ Keep the style bold, youthful, and highly confident (as a top-tier digital agenc
 
                 <div className="flex items-center justify-between">
 
-                  <label className="text-xs font-bold text-gray-300 uppercase">ბრენდბუქი & გრიდები (+1200 ₾)</label>
+                  <label className="text-xs font-bold text-gray-300 uppercase">ბრენდბუქი & გრიდები (+3000 ₾)</label>
 
                   <input
 
