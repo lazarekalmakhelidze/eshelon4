@@ -1,0 +1,186 @@
+.section {
+  position: relative;
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  overflow: hidden;
+}
+
+.viewport {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  perspective: 1800px;
+  transform-style: preserve-3d;
+  mask-image: linear-gradient(to right, transparent 0, black 8%, black 92%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, transparent 0, black 8%, black 92%, transparent 100%);
+}
+
+.rail {
+  position: relative;
+  transform-style: preserve-3d;
+  transform-origin: 50% 52%;
+  transform: rotateZ(-1.4deg) rotateX(0.5deg);
+}
+
+.rail::after {
+  content: "";
+  position: absolute;
+  right: -4%;
+  bottom: 30px;
+  left: -4%;
+  height: 24px;
+  background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.84), transparent 72%);
+  filter: blur(9px);
+  pointer-events: none;
+}
+
+.track {
+  --folio-duration: 42s;
+  --card-size: clamp(190px, 19vw, 286px);
+  --overlap: clamp(24px, 2.6vw, 42px);
+
+  display: flex;
+  align-items: flex-end;
+  width: max-content;
+  padding: 68px 0 72px;
+  animation: folioScroll var(--folio-duration) linear infinite;
+  will-change: transform;
+}
+
+.viewport:hover .track,
+.viewport:focus-within .track {
+  animation-play-state: paused;
+}
+
+.card {
+  position: relative;
+  flex: 0 0 auto;
+  width: var(--card-size);
+  height: var(--card-size);
+  margin-left: calc(var(--overlap) * -1);
+  border-radius: 3px;
+  transform-style: preserve-3d;
+  transform-origin: left center;
+  transform: rotateY(-12deg) rotateX(0.4deg);
+  transition:
+    transform 520ms cubic-bezier(0.2, 0.75, 0.1, 1),
+    box-shadow 420ms ease,
+    opacity 320ms ease,
+    z-index 120ms linear;
+  box-shadow:
+    18px 22px 28px rgba(0, 0, 0, 0.48),
+    0 0 0 1px rgba(255, 255, 255, 0.14);
+  opacity: 0.98;
+  background: #0b0b0b;
+}
+
+.card::before {
+  content: "";
+  position: absolute;
+  top: 1px;
+  bottom: 1px;
+  left: -8px;
+  width: 9px;
+  border-radius: 3px 0 0 3px;
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.38), rgba(18, 18, 18, 0.7)),
+    repeating-linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.28) 0 2px,
+      rgba(0, 0, 0, 0.22) 2px 4px
+    );
+  transform-origin: right center;
+  transform: rotateY(-76deg);
+  pointer-events: none;
+}
+
+.card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(120deg, rgba(255, 255, 255, 0.14), transparent 38%, rgba(0, 0, 0, 0.2));
+  opacity: 0.84;
+  transition: opacity 320ms ease;
+  pointer-events: none;
+}
+
+.poster {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  border-radius: inherit;
+  backface-visibility: hidden;
+  background: #0b0b0b;
+}
+
+.card:hover,
+.card:focus-within {
+  z-index: 999;
+  transform: translateY(-38px) translateZ(96px) rotateY(0deg) rotateX(-0.5deg) rotateZ(1.4deg) scale(1.08);
+  opacity: 1;
+  box-shadow:
+    0 42px 82px rgba(0, 0, 0, 0.72),
+    0 0 0 1px rgba(255, 255, 255, 0.22),
+    0 0 34px rgba(255, 255, 255, 0.12);
+}
+
+.card:hover::after,
+.card:focus-within::after {
+  opacity: 0.3;
+}
+
+@keyframes folioScroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@media (max-width: 920px) {
+  .rail {
+    transform: rotateZ(-1.2deg) rotateX(0.4deg);
+  }
+
+  .track {
+    --card-size: clamp(148px, 42vw, 190px);
+    --overlap: clamp(18px, 5vw, 28px);
+    animation-duration: calc(var(--folio-duration) * 0.8);
+    padding: 44px 0 48px;
+  }
+
+  .card:hover,
+  .card:focus-within {
+    transform: translateY(-24px) translateZ(64px) rotateY(0deg) rotateX(0deg) rotateZ(1.2deg) scale(1.06);
+  }
+
+  .rail::after {
+    filter: blur(5px);
+  }
+
+  .card {
+    box-shadow:
+      12px 16px 20px rgba(0, 0, 0, 0.42),
+      0 0 0 1px rgba(255, 255, 255, 0.11);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rail {
+    transform: none;
+  }
+
+  .track {
+    animation: none;
+  }
+
+  .card,
+  .card:hover,
+  .card:focus-within {
+    transition: none;
+    transform: rotateY(0deg) translateY(0);
+  }
+}

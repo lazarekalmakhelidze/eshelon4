@@ -40,7 +40,6 @@ body {
   inset: -18% -12%;
   pointer-events: none;
   z-index: 0;
-  will-change: transform;
 }
 
 #root::before {
@@ -122,6 +121,7 @@ body {
   }
 }
 
+
 /* Smooth and clean modal scrolling */
 .custom-scroll {
   scrollbar-width: thin;
@@ -145,10 +145,11 @@ body {
 .reveal-section {
   opacity: 0;
   transform: translate3d(0, 28px, 0);
+  content-visibility: auto;
+  contain-intrinsic-size: auto 720px;
   transition:
     opacity 620ms cubic-bezier(0.22, 1, 0.36, 1),
     transform 620ms cubic-bezier(0.22, 1, 0.36, 1);
-  will-change: opacity, transform;
 }
 
 .reveal-section.reveal-visible {
@@ -220,6 +221,22 @@ body {
   will-change: transform;
 }
 
+@media (max-width: 720px) {
+  #root::before {
+    opacity: 0.16;
+    animation-duration: 48s;
+  }
+
+  #root::after {
+    display: none;
+  }
+
+  .nav-glass {
+    backdrop-filter: blur(7px);
+    -webkit-backdrop-filter: blur(7px);
+  }
+}
+
 .logo-marquee.is-reverse {
   animation-direction: reverse;
 }
@@ -260,8 +277,9 @@ body {
   object-fit: contain;
   transform: scale(var(--logo-scale, 1));
   transform-origin: center;
-  opacity: 0.58;
-  filter: grayscale(100%) saturate(0.6) contrast(0.95);
+  opacity: 0.56;
+  /* Keep all logos in one neutral tone before hover for consistent visual weight */
+  filter: grayscale(100%) saturate(0) brightness(0) invert(82%) contrast(0.86);
   transition: opacity 220ms ease, filter 220ms ease, transform 220ms ease;
 }
 

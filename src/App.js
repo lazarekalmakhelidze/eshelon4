@@ -3,6 +3,7 @@ import './style.css';
 
 
 import React, { useEffect, useState } from 'react';
+import PosterFolio from './components/PosterFolio';
 
 import {
 
@@ -82,7 +83,7 @@ const portfolioData = [
 
     bgClass: 'bg-emerald-950/40 border-emerald-500/30 text-emerald-400',
 
-    coverImage: 'https://i.postimg.cc/Kv4pBCHc/lok2.jpg',
+    coverImage: '/optimized/portfolio/lokross-cover.jpg',
 
     tags: ['Brand Guidelines', 'Logo Design', 'Grid System', '3D Drape Concept'],
 
@@ -106,7 +107,7 @@ const portfolioData = [
 
     bgClass: 'bg-amber-950/40 border-amber-500/30 text-amber-400',
 
-    coverImage: 'https://i.postimg.cc/Prkn4X1v/West1.jpg',
+    coverImage: '/optimized/portfolio/west.jpg',
 
     tags: ['Industrial Design', 'Bebas Neue', '3D Container Rendering', 'Caution Tape Theme'],
 
@@ -130,7 +131,7 @@ const portfolioData = [
 
     bgClass: 'bg-blue-950/40 border-blue-500/30 text-blue-400',
 
-    coverImage: 'https://i.postimg.cc/QxP4b0LZ/foodly1.jpg',
+    coverImage: '/optimized/portfolio/foodly.jpg',
 
     tags: ['App UI/UX', 'Mascot Design', 'Vibrant Contrast', 'Brand Mascot'],
 
@@ -154,7 +155,7 @@ const portfolioData = [
 
     bgClass: 'bg-fuchsia-950/40 border-fuchsia-500/30 text-fuchsia-400',
 
-    coverImage: 'https://i.postimg.cc/X7DhPnC1/panorama1.jpg',
+    coverImage: '/optimized/portfolio/panorama.jpg',
 
     tags: ['Premium Marketing', 'Historical Collage', '3D Render Presentation', 'Solo Collaboration'],
 
@@ -178,7 +179,7 @@ const portfolioData = [
 
     bgClass: 'bg-red-950/40 border-red-500/30 text-red-400',
 
-    coverImage: 'https://i.postimg.cc/hGRCFvPw/lok1.jpg',
+    coverImage: '/optimized/portfolio/education.jpg',
 
     tags: ['Copywriting', 'Storytelling', 'Dramatic Lighting', 'Typography Art'],
 
@@ -202,9 +203,9 @@ const portfolioData = [
 
     bgClass: 'bg-cyan-950/40 border-cyan-500/30 text-cyan-300',
 
-    coverImage: '/portfolio/b1-qav.jpg',
+    coverImage: '/optimized/portfolio/b1-qav.jpg',
 
-    modalImage: '/portfolio/b1.jpg',
+    modalImage: '/optimized/portfolio/b1.jpg',
 
     modalImageScrollable: true,
 
@@ -216,6 +217,166 @@ const portfolioData = [
 
 ];
 
+
+
+const extraPortfolioData = [
+
+  {
+
+    id: 'athome-ge',
+
+    title: 'Athome.ge',
+
+    category: 'სოციალური მედია კამპანია',
+
+    description: 'ატ ჰოუმისთვის შესრულებული ენერგიული სარეკლამო ვიზუალები ტექნოლოგიური შეთავაზებების კომუნიკაციისთვის.',
+
+    longDescription: 'Athome.ge-სთვის შევქმენით მაღალჩართულობაზე ორიენტირებული ქარდების სერია, სადაც ერთ სივრცეში ერთიანდება შეთავაზება, პროდუქტი და მკაფიო ქოლ-თუ-ექშენი. ვიზუალები შექმნილია სწრაფი აღქმისა და მობილურ არხებში უკეთესი შესრულებისთვის.',
+
+    color: '#ef4444',
+
+    bgClass: 'bg-red-950/40 border-red-500/30 text-red-400',
+
+    coverImage: '/optimized/portfolio/athome-ge.jpg',
+
+    modalImage: '/optimized/portfolio/athome-ge.jpg',
+
+    tags: ['SMM Campaign', 'Promo Visual', 'Performance Creative'],
+
+    features: ['სარეკლამო ქარდების სერია', 'შეთავაზებაზე ორიენტირებული ვიზუალი', 'მობილურზე ადაპტირებული ფორმატი']
+
+  },
+
+  {
+
+    id: 'mochiko',
+
+    title: 'მოჩიკო',
+
+    category: 'კონტენტის დიზაინი & SMM',
+
+    description: 'დესერტის ბრენდისთვის ფერადი, ემოციური და პროდუქტისადმი ორიენტირებული კონტენტ-ქარდების პაკეტი.',
+
+    longDescription: 'მოჩიკოსთვის შევქმენით კონტენტის ერთიანი ვიზუალური სისტემა: აქცენტები გემოზე, სეზონურ შეთავაზებებზე და დელივერის არხებზე. თითოეული ქარდი გათვლილია როგორც ბრენდის ცნობადობაზე, ისე შეკვეთების ზრდაზე.',
+
+    color: '#a855f7',
+
+    bgClass: 'bg-violet-950/40 border-violet-500/30 text-violet-300',
+
+    coverImage: '/optimized/portfolio/mochiko.jpg',
+
+    modalImage: '/optimized/portfolio/mochiko.jpg',
+
+    modalImages: Array.from({ length: 20 }, (_, i) => `/optimized/portfolio/mochiko/${i + 1}.jpg`),
+
+    tags: ['Food Content', 'Brand Visuals', 'Social Media'],
+
+    features: ['პროდუქტზე ფოკუსირებული კომუნიკაცია', 'შეთავაზებების ვიზუალური პაკეტი', 'ბრენდთან შესაბამისი ფერთა სტილი']
+
+  },
+
+  {
+
+    id: 'hakken-restaurant',
+
+    title: 'რესტორანი ჰაკენი',
+
+    category: 'რესტორნის სარეკლამო კამპანია',
+
+    description: 'რესტორნის კონტენტისთვის შექმნილი დრამატული, კონტრასტული და გამორჩეული სოციალური მედიის დიზაინები.',
+
+    longDescription: 'ჰაკენის პროექტში მთავარი აქცენტი გაკეთდა ძლიერი პერსონაჟული სტილისა და პროდუქტის ვიზუალური დრამატიზაციის კომბინაციაზე. შედეგად მივიღეთ ქარდების სერია, რომელიც აუდიტორიის ყურადღებას სწრაფად იპყრობს და მენიუს პოზიციებს ეფექტურად ყიდის.',
+
+    color: '#f97316',
+
+    bgClass: 'bg-orange-950/40 border-orange-500/30 text-orange-300',
+
+    coverImage: '/optimized/portfolio/hakken-restaurant.jpg',
+
+    modalImage: '/optimized/portfolio/hakken-restaurant.jpg',
+
+    tags: ['Restaurant Creative', 'SMM Design', 'Promo Posters'],
+
+    features: ['რესტორნის მენიუს ვიზუალური შეფუთვა', 'ბრენდტონის დაცვით შექმნილი ქარდები', 'გაყიდვებზე ორიენტირებული მესიჯინგი']
+
+  }
+
+];
+
+const workTypeByProjectId = {
+  lokross: 'ვიზუალური იდენტობა',
+  'west-dev': 'ვიზუალური იდენტობა',
+  foodly: 'ვიზუალური იდენტობა',
+  panorama: 'სოც. მედია',
+  education: 'სოც. მედია',
+  'beone-apres-ski': 'სოც. მედია',
+  'athome-ge': 'სოც. მედია',
+  mochiko: 'სოც. მედია',
+  'hakken-restaurant': 'სოც. მედია'
+};
+
+function getWorkTypeLabel(project) {
+  return workTypeByProjectId[project.id] || 'სოც. მედია';
+}
+
+
+function PortfolioCard({ project, onSelect }) {
+  return (
+    <div
+      onClick={() => onSelect(project)}
+      className="surface-card group relative cursor-pointer bg-[#121212] border border-white/5 rounded-2xl overflow-hidden hover:border-[#E50914]/40 transition duration-500 hover:-translate-y-1 hover:shadow-[0_24px_60px_-28px_rgba(229,9,20,0.45)] flex flex-col justify-between"
+    >
+      <div className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition duration-500 bg-[radial-gradient(100%_60%_at_50%_0%,rgba(229,9,20,0.18),rgba(229,9,20,0)_65%)]" />
+      <div className="pointer-events-none absolute -left-1/2 top-0 h-full w-1/3 -skew-x-12 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-0 group-hover:translate-x-[420%] transition-transform duration-700" />
+
+      <div className="aspect-video relative border-b border-white/5 overflow-hidden">
+        {project.coverImage ? (
+          <>
+            <img
+              src={project.coverImage}
+              alt={`${project.title} cover`}
+              className="w-full h-full object-cover transition duration-700 group-hover:scale-110"
+              loading="lazy"
+              decoding="async"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+            <div className="absolute bottom-4 left-4 z-10">
+              <div className="inline-block px-3 py-1 rounded-md text-[10px] font-mono tracking-widest uppercase bg-black/55 border border-white/20 text-white">
+                {project.title}
+              </div>
+            </div>
+          </>
+        ) : (
+          <div className="w-full h-full bg-gradient-to-br from-[#1c1c1c] to-[#0f0f0f] relative flex items-center justify-center p-6">
+            <div className="absolute inset-0 bg-radial-gradient from-red-600/5 to-transparent opacity-0 group-hover:opacity-100 transition duration-300" />
+            <div className="relative z-10 text-center space-y-3">
+              <div className="inline-block px-3 py-1 rounded-md text-[10px] font-mono tracking-widest uppercase bg-black/50 border border-white/10 text-white">
+                {project.title}
+              </div>
+              <p className="text-lg font-black tracking-tight text-white group-hover:text-[#E50914] transition duration-200">
+                {project.category}
+              </p>
+            </div>
+            <div className="absolute -bottom-10 -right-10 w-24 h-24 rounded-full bg-[#E50914]/10 blur-xl group-hover:bg-[#E50914]/20 transition duration-300" />
+          </div>
+        )}
+      </div>
+
+      <div className="p-6 space-y-4">
+        <div className="inline-flex items-center px-2.5 py-1 rounded-md bg-white/[0.02] border border-white/5 text-[10px] font-medium tracking-wide text-gray-500">
+          {getWorkTypeLabel(project)}
+        </div>
+
+        <p className="text-sm text-gray-400 line-clamp-3">{project.description}</p>
+
+        <div className="pt-4 border-t border-white/5 flex items-center justify-between">
+          <span className="text-xs font-bold text-white group-hover:text-[#E50914] transition duration-200">ქეისის დეტალები</span>
+          <ChevronRight className="w-4 h-4 text-gray-500 group-hover:translate-x-1 group-hover:text-[#E50914] transition duration-200" />
+        </div>
+      </div>
+    </div>
+  );
+}
 
 
 // Pricing Data matching the exact PDF content, fully corrected
@@ -232,13 +393,13 @@ const brandingPackages = [
 
     features: [
 
-      { text: "ლოგოს 2 ვარიაცია", included: true },
+      { text: "ლოგოს დიზაინი ერთ ენაზე (ქართული ან ინგლისური)", included: true },
 
-      { text: "ლოგოს ადაპტაციები (ვერტიკალური, ჰორიზონტალური)", included: true },
+      { text: "ლოგოს ადაპტაცია: ჰორიზონტალური, ვერტიკალური და ავატარის ფორმატი", included: true },
 
       { text: "ძირითადი ფერების პალიტრა", included: true },
 
-      { text: "ტიპოგრაფიის სახელმძღვანელო", included: true },
+      { text: "ლოგოს გამოყენების მოკლე წესები (სივრცე, ზომა, ფონი)", included: true },
 
       { text: "ვიზუალური სტილის აღწერა", included: false },
 
@@ -260,17 +421,19 @@ const brandingPackages = [
 
     features: [
 
-      { text: "ლოგოს 3 ვარიაცია", included: true },
+      { text: "ლოგოს სრული ფორმა (ძირითადი ნიშანი + ტექსტური ბლოკი)", included: true },
 
-      { text: "სრული ფერთა პალიტრა & კოდები", included: true },
+      { text: "ლოგოს ადაპტაცია: ჰორიზონტალური, ვერტიკალური და სოციალური მედიის ავატარი", included: true },
+
+      { text: "სრული ფერთა პალიტრა", included: true },
+
+      { text: "ლოგო ორივე ენაზე (ქართული და ინგლისური)", included: true },
+
+      { text: "ლოგოს გამოყენების წესები", included: true },
 
       { text: "ბრენდის ტიპოგრაფიის სისტემა", included: true },
 
       { text: "ვიზუალური სტილი & ელემენტები", included: true },
-
-      { text: "შეფუთვის სტილი ან სავიზიტო ბარათები", included: true },
-
-      { text: "ბრენდბუქი (Brand Guidelines)", included: true }
 
     ],
 
@@ -282,7 +445,7 @@ const brandingPackages = [
 
   {
 
-    title: "ბრენდინგი (სრული არქიტექტურა)",
+    title: "სრული ბრენდინგი",
 
     price: "3,900 ₾",
 
@@ -294,7 +457,7 @@ const brandingPackages = [
 
       { text: "ბრენდის ტონი (Tone of Voice) & სტრატეგია", included: true },
 
-      { text: "ლოგოს 4 ვარიაცია & სრული ადაპტაციები", included: true },
+      { text: "ლოგოს სრული არქიტექტურა და ყველა საჭირო ადაპტაცია (ციფრული + ბეჭდური)", included: true },
 
       { text: "ფერები, ტიპოგრაფია & უნიკალური გრიდები", included: true },
 
@@ -302,7 +465,7 @@ const brandingPackages = [
 
       { text: "სრული ბრენდ-არქიტექტურის წიგნი", included: true },
 
-      { text: "სოციალური მედიის პაკეტი (Basic) — 1 თვე ჩართული", included: true }
+      { text: "ნებისმიერ სოციალური მედიის პაკეტზე", included: true, discount: true }
 
     ],
 
@@ -320,23 +483,24 @@ const smmPackages = [
 
     title: "Basic",
 
-    price: "1,350 ₾ / თვეში",
+    price: "2,400 ₾ / თვეში",
 
     desc: "სტაბილური ონლაინ ყოფნისთვის და სოციალური ქსელების მოწესრიგებისთვის.",
+    compareHint: "საწყისი დონე მცირე მოცულობით.",
 
     features: [
 
-      { text: "12 პოსტის დიზაინი & ქოფირაითინგი", included: true },
+      { text: "პოსტები / თვე: 8", included: true },
 
-      { text: "სთორის დიზაინი (ძირითადი)", included: true },
+      { text: "სთორი / თვე: 6", included: true },
 
-      { text: "ედვერთაიზინგი (რეკლამის მართვა)", included: true },
-
-      { text: "ლოგო საჩუქრად", included: true },
+      { text: "რეკლამის მართვა", included: true },
 
       { text: "კონტენტ კალენდარი", included: false },
 
-      { text: "შადოუ კამპანიები & ტესტირება", included: false }
+      { text: "Shadow რეკლამების ტესტირება", included: false },
+
+      { text: "ყოველთვიური დეტალური რეპორტინგი", included: false }
 
     ],
 
@@ -348,27 +512,33 @@ const smmPackages = [
 
     title: "Premium",
 
-    price: "2,000 ₾ / თვეში",
+    price: "3,000 ₾ / თვეში",
 
-    desc: "მაღალი ჩართულობისა და გაყიდვების სტიმულირებისთვის განკუთვნილი ოპტიმალური პაკეტი.",
+    desc: "ოპტიმალური პაკეტი: 10 პოსტი + 10 სთორი რედიზაინი და რეკლამის სრული მართვა.",
+    compareHint: "Basic-ზე მეტი მოცულობა და დაგეგმვა.",
 
     features: [
 
-      { text: "15 პოსტის დიზაინი & ქოფირაითინგი", included: true },
+      { text: "პოსტები / თვე: 10", included: true },
 
-      { text: "5 სთორის რედიზაინი (ყოველკვირეულად)", included: true },
+      { text: "სთორი / თვე: 10", included: true },
 
-      { text: "ედვერთაიზინგის სრული მართვა", included: true },
+      { text: "რეკლამის მართვა", included: true },
 
-      { text: "ლოგო საჩუქრად", included: true },
+      { text: "კონტენტ კალენდარი", included: true },
 
-      { text: "კონტენტ კალენდარი (დაგეგმვა)", included: true },
+      { text: "Shadow რეკლამების ტესტირება", included: false },
 
-      { text: "შადოუ კამპანიები (ტესტირებისთვის)", included: false }
+      { text: "ყოველთვიური დეტალური რეპორტინგი", included: false }
 
     ],
 
     badge: "რეკომენდებული",
+    deltaFromPrev: [
+      "+2 პოსტი Basic-თან შედარებით",
+      "+4 სთორი Basic-თან შედარებით",
+      "კონტენტ კალენდარი ჩართული"
+    ],
 
     featured: true
 
@@ -378,48 +548,60 @@ const smmPackages = [
 
     title: "Ultimate",
 
-    price: "2,200 ₾ / თვეში",
+    price: "4,450 ₾ / თვეში",
 
     desc: "სრული მარკეტინგული მხარდაჭერა და მაქსიმალური წვდომა უახლესი სტრატეგიებით.",
+    compareHint: "Premium-ის სრული ვერსია, სრული მონიტორინგით.",
 
     features: [
 
-      { text: "17 პოსტის დიზაინი & ქოფირაითინგი", included: true },
+      { text: "პოსტები / თვე: 14", included: true },
 
-      { text: "10 სთორის რედიზაინი & ინტერაქტივი", included: true },
+      { text: "სთორი / თვე: 18", included: true },
 
-      { text: "ედვერთაიზინგის მოწინავე მართვა", included: true },
+      { text: "რეკლამის მართვა", included: true },
 
-      { text: "შადოუ რეკლამების მუდმივი ტესტირება", included: true },
+      { text: "კონტენტ კალენდარი", included: true },
 
-      { text: "კონტენტ კალენდარი & სეზონური გეგმა", included: true },
+      { text: "Shadow რეკლამების ტესტირება", included: true },
 
-      { text: "სრული ყოველთვიური რეპორტინგი", included: true }
+      { text: "ყოველთვიური დეტალური რეპორტინგი", included: true }
 
     ],
 
-    badge: "მაქსიმალური"
+    badge: "მაქსიმალური",
+    deltaFromPrev: [
+      "+4 პოსტი Premium-თან შედარებით",
+      "+8 სთორი Premium-თან შედარებით",
+      "Shadow ტესტირება ჩართული",
+      "რეპორტინგი ჩართული"
+    ]
 
   }
 
 ];
 
-
 const partnerLogos = [
-  { name: 'Lokross', src: '/logos/lokross.svg' },
-  { name: 'West Development', src: '/logos/west.svg' },
-  { name: 'Foodly', src: '/logos/foodly.svg' },
-  { name: 'Panorama Group', src: '/logos/panorama.svg' },
-  { name: 'Solo CH 51', src: '/logos/solo.svg' },
-  { name: 'Edu Campaign', src: '/logos/educampaign.svg' }
+  { name: 'Ase', src: '/logos/experience/ase1.png', scale: 0.85 },
+  { name: 'AtHome', src: '/logos/experience/athome1.png', scale: 0.82 },
+  { name: 'Zen', src: '/logos/experience/zen1.png', scale: 0.88 },
+  { name: 'Info', src: '/logos/experience/info1.png', scale: 0.88 },
+  { name: 'Mor', src: '/logos/experience/mor1.png', scale: 0.83 },
+  { name: 'Mochi', src: '/logos/experience/moch1.png?v=20260529a', scale: 0.81 },
+  { name: 'Foodly', src: '/logos/experience/foodl1.png', scale: 0.82 },
+  { name: 'Hakken', src: '/logos/experience/hak1.png?v=20260529a', scale: 0.84 },
+  { name: 'Split', src: '/logos/experience/spli1.png', scale: 0.8 }
 ];
 
+const collaboratorMarqueeSpeed = '110s';
+const partnerMarqueeSpeed = '200s';
+
 const collaboratorLogos = [
-  { name: 'Collaborator 1', src: '/logos/log1.png', scale: 0.84 },
-  { name: 'Collaborator 2', src: '/logos/log2.png', scale: 0.88 },
-  { name: 'Collaborator 3', src: '/logos/log3.png', scale: 0.84 },
+  { name: 'Collaborator 1', src: '/logos/log1.png', scale: 0.8 },
+  { name: 'Collaborator 2', src: '/logos/log2.png?v=20260529a', scale: 0.84 },
+  { name: 'Collaborator 3', src: '/logos/log3.png', scale: 0.82 },
   { name: 'Collaborator 4', src: '/logos/log4.png', scale: 0.9 },
-  { name: 'Collaborator 5', src: '/logos/log5.png', scale: 0.8 }
+  { name: 'Collaborator 5', src: '/logos/log5.png', scale: 0.86 }
 ];
 
 const facebookNewsPosts = [
@@ -429,7 +611,7 @@ const facebookNewsPosts = [
     excerpt: 'ემოციური ვიზუალი, ძლიერი ხასიათი და მკაფიო მესიჯი - კონტენტი, რომელიც პირველივე წამში იჭერს ყურადღებას.',
     date: '2026-05-18',
     readTime: '2 წთ',
-    image: '/facebook/p1.jpg',
+    image: '/optimized/facebook/p1.jpg',
     url: 'https://www.facebook.com/'
   },
   {
@@ -438,7 +620,7 @@ const facebookNewsPosts = [
     excerpt: 'DYNOCONCEPT-ის ესთეტიკა და არტ-დირექშენი ერთ კამპანიაში, სადაც ბრენდის ხმა და ვიზუალი ერთ ხაზზე მუშაობს.',
     date: '2026-05-12',
     readTime: '3 წთ',
-    image: '/facebook/p2-new.jpg',
+    image: '/optimized/facebook/p2-new.jpg',
     url: 'https://www.facebook.com/'
   },
   {
@@ -447,7 +629,7 @@ const facebookNewsPosts = [
     excerpt: 'შოკ-მესიჯი, წითელი დინამიკა და კონვერსიაზე მორგებული კოპირაითინგი, რომელიც აუდიტორიას მოქმედებაზე გადაჰყავს.',
     date: '2026-05-07',
     readTime: '2 წთ',
-    image: '/facebook/p3.jpg',
+    image: '/optimized/facebook/p3.jpg',
     url: 'https://www.facebook.com/'
   },
   {
@@ -456,7 +638,7 @@ const facebookNewsPosts = [
     excerpt: 'მინიმალისტური, კინემატოგრაფიული კადრი და ღრმა აზრი - პოსტი, რომელიც ბრენდის ფილოსოფიას მშვიდად, მაგრამ ძლიერად გადმოსცემს.',
     date: '2026-04-29',
     readTime: '4 წთ',
-    image: '/facebook/p4.jpg',
+    image: '/optimized/facebook/p4.jpg',
     url: 'https://www.facebook.com/'
   }
 ];
@@ -517,33 +699,17 @@ function HeroSection() {
 
       >
 
-        {/* Desktop */}
-
-        <img
-
-          src="https://i.postimg.cc/y6mTNYF0/cover-landscape.jpg"
-
-          alt="Eshelon Cover"
-
-          className="hidden lg:block w-full h-full object-cover object-right"
-
-          style={{ animation: 'coverReveal 2.4s cubic-bezier(0.22,1,0.36,1) both' }}
-
-        />
-
-        {/* Mobile */}
-
-        <img
-
-          src="https://i.postimg.cc/7ZW3RCkT/cover-portrait.jpg"
-
-          alt="Eshelon Cover"
-
-          className="block lg:hidden w-full h-full object-cover object-[62%_20%]"
-
-          style={{ animation: 'coverReveal 2.4s cubic-bezier(0.22,1,0.36,1) both' }}
-
-        />
+        <picture className="block w-full h-full">
+          <source media="(min-width: 1024px)" srcSet="/cover-landscape.jpg" />
+          <img
+            src="/cover-portrait.jpg"
+            alt="Eshelon Cover"
+            className="w-full h-full object-cover object-[62%_20%] lg:object-right"
+            style={{ animation: 'coverReveal 2.4s cubic-bezier(0.22,1,0.36,1) both' }}
+            fetchPriority="high"
+            decoding="async"
+          />
+        </picture>
 
       </div>
 
@@ -551,10 +717,10 @@ function HeroSection() {
 
       {/* Multi-layer blending to avoid hard image edges */}
 
-      <div className="absolute inset-0 bg-gradient-to-r from-[#0d0d0d]/74 via-[#0d0d0d]/42 to-[#0d0d0d]/12 lg:from-[#0d0d0d] lg:via-[#0d0d0d]/82 lg:to-[#0d0d0d]/15" />
-      <div className="absolute inset-x-0 top-0 h-36 sm:h-40 bg-gradient-to-b from-[#0d0d0d]/62 via-[#0d0d0d]/26 to-transparent" />
-      <div className="absolute bottom-0 left-0 right-0 h-72 sm:h-80 bg-gradient-to-t from-[#0d0d0d] via-[#0d0d0d]/92 to-transparent" />
-      <div className="absolute inset-y-0 right-0 w-40 lg:w-48 bg-gradient-to-l from-[#0d0d0d]/45 via-[#0d0d0d]/18 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-r from-[#0d0d0d]/70 via-[#0d0d0d]/40 to-[#0d0d0d]/10 lg:from-[#0d0d0d]/74 lg:via-[#0d0d0d]/56 lg:to-[#0d0d0d]/10" />
+      <div className="absolute inset-x-0 top-0 h-36 sm:h-40 bg-gradient-to-b from-[#0d0d0d]/58 via-[#0d0d0d]/22 to-transparent lg:from-[#0d0d0d]/45 lg:via-[#0d0d0d]/12" />
+      <div className="absolute bottom-0 left-0 right-0 h-72 sm:h-80 bg-gradient-to-t from-[#0d0d0d]/95 via-[#0d0d0d]/84 to-transparent lg:from-[#0d0d0d]/74 lg:via-[#0d0d0d]/56" />
+      <div className="absolute inset-y-0 right-0 w-40 lg:w-48 bg-gradient-to-l from-[#0d0d0d]/36 via-[#0d0d0d]/14 to-transparent lg:from-[#0d0d0d]/24 lg:via-[#0d0d0d]/6" />
       <div className="absolute inset-0 lg:hidden bg-[radial-gradient(95%_58%_at_25%_46%,rgba(13,13,13,0.52),rgba(13,13,13,0)_75%)] pointer-events-none" />
       <div className="absolute inset-0 bg-[radial-gradient(110%_70%_at_50%_10%,rgba(229,9,20,0.08),rgba(13,13,13,0)_58%)] pointer-events-none" />
       <div className="absolute inset-0 opacity-8 pointer-events-none [background-image:radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.1)_0,rgba(255,255,255,0)_40%),radial-gradient(circle_at_80%_0,rgba(229,9,20,0.12)_0,rgba(229,9,20,0)_35%)]" />
@@ -570,12 +736,17 @@ function HeroSection() {
 
 
           {/* Headline PNG — entrance + glow pulse */}
-          <div className="inline-block rounded-xl p-1.5 bg-black/26 border border-white/10 backdrop-blur-[1.5px] sm:bg-transparent sm:p-0 sm:border-0 sm:backdrop-blur-0">
+          <div className="inline-block">
             <img
-              src="https://i.postimg.cc/gj0h2dyY/teqsst1.png"
+              src="/hero-headline.png"
               alt="Headline"
               className="w-full max-w-[90vw] sm:max-w-lg mt-1 sm:-mt-4 lg:-mt-12 drop-shadow-[0_10px_30px_rgba(0,0,0,0.75)]"
-              style={{ animation: 'headlineIn 1s 0.4s cubic-bezier(0.22,1,0.36,1) both' }}
+              fetchPriority="high"
+              decoding="async"
+              style={{
+                animation: 'headlineIn 1s 0.4s cubic-bezier(0.22,1,0.36,1) both',
+                filter: 'drop-shadow(0 0 14px rgba(229,9,20,0.22))'
+              }}
             />
           </div>
 
@@ -607,7 +778,7 @@ function HeroSection() {
 
             <div>
 
-              <div className="text-2xl sm:text-3xl font-black text-white">98%</div>
+              <div className="text-2xl sm:text-3xl font-black text-white">100%</div>
 
               <div className="text-xs text-gray-400 uppercase tracking-wider">კმაყოფილი კლიენტი</div>
 
@@ -623,9 +794,9 @@ function HeroSection() {
 
             <div>
 
-              <div className="text-2xl sm:text-3xl font-black text-white">2.5X</div>
+              <div className="text-2xl sm:text-3xl font-black text-white">250%</div>
 
-              <div className="text-xs text-gray-400 uppercase tracking-wider">ROI გაყიდვებში</div>
+              <div className="text-xs text-gray-400 uppercase tracking-wider">ზრდა გაყიდვებში</div>
 
             </div>
 
@@ -697,13 +868,13 @@ function PartnersStrip() {
 
   return (
     <section data-reveal className="reveal-section relative overflow-hidden bg-[#0b0b0b] border-y border-[#1a1a1a]">
-      <LogoMarqueeRow title="პარტნიორი კომპანიები" logos={partnerLogos} speed="110s" />
+      <LogoMarqueeRow title="გუნდის გამოცდილება" logos={partnerLogos} speed={partnerMarqueeSpeed} />
       <div className="border-t border-white/5" />
       <LogoMarqueeRow
         title="კოლაბორატორი კომპანიები"
         logos={collaboratorLogos}
         reverse
-        speed="110s"
+        speed={collaboratorMarqueeSpeed}
         rowClass="bg-[#101013] border-t border-[#25252b]"
         titleClass="text-gray-400"
       />
@@ -760,18 +931,14 @@ function AboutSection() {
             <div className="surface-card h-full bg-[#121212] border border-white/10 rounded-2xl p-3 sm:p-4">
               <div className="relative rounded-xl overflow-hidden border border-white/10">
                 <img
-                  src="/about/team-story.jpg"
-                  onError={(e) => { e.currentTarget.src = '/facebook/p3.jpg'; }}
+                  src="/optimized/about/team-story.jpg"
+                  onError={(e) => { e.currentTarget.src = '/optimized/facebook/p3.jpg'; }}
                   alt="ESHELON founders and team story visual"
                   className="w-full h-[420px] sm:h-[500px] object-cover"
                   loading="lazy"
                   decoding="async"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/72 via-black/25 to-transparent" />
-                <div className="absolute bottom-4 left-4 right-4">
-                  <p className="text-[10px] uppercase tracking-widest text-red-300">ESHELON PERSPECTIVE</p>
-                  <p className="text-white font-bold text-sm sm:text-base">ᲡᲘᲚᲐᲛᲐᲖᲔ, ᲡᲢᲠᲐᲢᲔᲒᲘᲐ, ᲠᲝᲡᲢᲘ</p>
-                </div>
               </div>
             </div>
           </div>
@@ -817,6 +984,8 @@ function FacebookNewsSection() {
                   src={post.image}
                   alt={post.title}
                   className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
+                  loading="lazy"
+                  decoding="async"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
               </div>
@@ -840,12 +1009,203 @@ function FacebookNewsSection() {
   );
 }
 
+const collaborationOffers = [
+  {
+    id: 'full',
+    title: 'სრული SMM მომსახურება',
+    subtitle: 'დიზაინი + კონტენტი + რეკლამის მართვა',
+    accent: 'from-[#E50914]/25 to-transparent',
+    rows: [
+      { pack: 'Basic', partner: '1,650 ₾', public: '1,485 ₾', benefit: '+915 ₾' },
+      { pack: 'Premium', partner: '2,100 ₾', public: '1,890 ₾', benefit: '+1,110 ₾', featured: true },
+      { pack: 'Ultimate', partner: '3,100 ₾', public: '2,790 ₾', benefit: '+1,660 ₾' }
+    ]
+  },
+  {
+    id: 'design',
+    title: 'გრაფიკული დიზაინის გუნდი',
+    subtitle: 'მხოლოდ დიზაინის მხარდაჭერა',
+    accent: 'from-cyan-500/20 to-transparent',
+    rows: [
+      { pack: 'Basic', partner: '800 ₾', public: '720 ₾', benefit: '+1,600 ₾' },
+      { pack: 'Premium', partner: '1,050 ₾', public: '945 ₾', benefit: '+1,950 ₾' },
+      { pack: 'Ultimate', partner: '1,480 ₾', public: '1,332 ₾', benefit: '+2,970 ₾' }
+    ]
+  },
+  {
+    id: 'marketing',
+    title: 'მარკეტინგული გუნდი',
+    subtitle: 'მხოლოდ რეკლამა + ოპტიმიზაცია',
+    accent: 'from-amber-500/20 to-transparent',
+    rows: [
+      { pack: 'Basic', partner: '850 ₾', public: '765 ₾', benefit: '+1,550 ₾' },
+      { pack: 'Premium', partner: '1,150 ₾', public: '1,035 ₾', benefit: '+1,850 ₾' },
+      { pack: 'Ultimate', partner: '1,750 ₾', public: '1,575 ₾', benefit: '+2,700 ₾' }
+    ]
+  }
+];
+
+const collaborationTerms = [
+  'მხოლოდ სააგენტო-აგენტთან კომუნიკაცია (კლიენტთან პირდაპირი კონტაქტის გარეშე)',
+  'თვეში მაქსიმუმ 2 რედაქტირების რაუნდი',
+  '100% წინასწარი გადახდა ყოველი თვის დაწყებამდე',
+  '12-თვიანი ანტი-პოაჩინგი თანამშრომლობის დასრულების შემდეგ',
+  'კოლაბორაციის საჯარო აღნიშვნა + პარტნიორისთვის -10% ფასდაკლება'
+];
+
+const folioPosterImages = [
+  '/optimized/posters/harmonica-main-01.jpg',
+  '/optimized/posters/showcase/post-28-square.jpg',
+  '/optimized/posters/showcase/post-23.jpg',
+  '/optimized/posters/showcase/post-26-square.jpg',
+  '/optimized/posters/showcase/post-04-square.jpg',
+  '/optimized/posters/showcase/post-20.jpg',
+  '/optimized/posters/harmonica-botbagh-04.jpg',
+  '/optimized/posters/showcase/post-18-square.jpg',
+  '/optimized/posters/showcase/post-13.jpg',
+  '/optimized/posters/showcase/post-02.jpg',
+  '/optimized/posters/showcase/post-12-square.jpg',
+  '/optimized/posters/harmonica-pres-03.jpg',
+  '/optimized/posters/showcase/post-25.jpg',
+  '/optimized/posters/showcase/post-33.jpg',
+  '/optimized/posters/showcase/post-31-square.jpg',
+  '/optimized/posters/showcase/post-34-square.jpg'
+];
+
+function CollaborationPage() {
+  return (
+    <div className="min-h-screen bg-[#0d0d0d] text-[#f2f2f2] font-sans antialiased selection:bg-[#E50914] selection:text-white">
+      <nav className="nav-glass sticky top-0 z-40 border-b border-[#262626]/80">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+          <a href="/" className="flex items-center space-x-3 group">
+            <div className="relative">
+              <div className="absolute -inset-1 bg-gradient-to-r from-[#E50914] to-orange-600 rounded-lg blur opacity-60 group-hover:opacity-100 transition duration-300" />
+              <div className="relative w-12 h-12 rounded-lg overflow-hidden border border-[#E50914]/50">
+                <img src="/logod.jpg" alt="Eshelon Logo" className="w-full h-full object-cover" />
+              </div>
+            </div>
+            <div>
+              <span className="text-xl font-black tracking-widest text-white block">ESHELON</span>
+              <span className="text-[10px] tracking-widest text-[#E50914] font-bold block -mt-1 uppercase">Collaboration</span>
+            </div>
+          </a>
+
+          <div className="flex items-center gap-3">
+            <a href="/" className="px-4 py-2 rounded-lg border border-white/15 text-sm text-gray-200 hover:border-white/35 transition">მთავარი</a>
+            <a href="/#contact" className="px-4 py-2 rounded-lg bg-[#E50914] text-sm font-bold text-white hover:bg-red-700 transition">დაკავშირება</a>
+          </div>
+        </div>
+      </nav>
+
+      <main className="relative">
+        <div className="absolute inset-x-0 top-0 h-[360px] bg-gradient-to-b from-[#E50914]/15 via-transparent to-transparent pointer-events-none" />
+
+        <section className="py-16 sm:py-20 border-b border-[#1e1e1e]">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="max-w-3xl space-y-5">
+              <p className="section-eyebrow text-xs font-bold text-[#E50914] tracking-widest uppercase">B2B გვერდი</p>
+              <h1 className="mersad-heading text-4xl sm:text-5xl text-white leading-tight">კოლაბორაცია სააგენტოებისთვის</h1>
+              <p className="text-gray-300 text-sm sm:text-base">
+                გამჭვირვალე პირობები, წინასწარ განსაზღვრული ფასები და მარტივი სტრუქტურა. 
+                ეს გვერდი შექმნილია ისე, რომ 1 წუთში ნახოთ რეალური მოდელი და თქვენი სარგებელი.
+              </p>
+              <div className="flex flex-wrap gap-2.5 pt-2">
+                <span className="px-3 py-1 rounded-full text-[11px] font-semibold bg-green-500/15 text-green-300 border border-green-500/35">-10% პარტნიორული ფასდაკლება</span>
+                <span className="px-3 py-1 rounded-full text-[11px] font-semibold bg-white/5 text-gray-300 border border-white/15">თეთრი ლეიბლი (White Label)</span>
+                <span className="px-3 py-1 rounded-full text-[11px] font-semibold bg-white/5 text-gray-300 border border-white/15">ფიქსირებული SLA</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="py-14 sm:py-16 border-b border-[#1e1e1e]">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+            <div className="grid grid-cols-1 xl:grid-cols-3 gap-5">
+              {collaborationOffers.map((offer) => (
+                <div key={offer.id} className="surface-card relative overflow-hidden bg-[#121212] border border-white/10 rounded-2xl p-5 sm:p-6">
+                  <div className={`pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b ${offer.accent}`} />
+                  <div className="relative space-y-4">
+                    <div>
+                      <h2 className="text-xl font-black text-white">{offer.title}</h2>
+                      <p className="text-xs text-gray-400 mt-1">{offer.subtitle}</p>
+                    </div>
+
+                    <div className="space-y-2">
+                      {offer.rows.map((row) => (
+                        <div key={`${offer.id}-${row.pack}`} className={`rounded-xl border p-3 ${row.featured ? 'border-[#E50914]/45 bg-[#E50914]/8' : 'border-white/10 bg-white/[0.02]'}`}>
+                          <div className="flex items-center justify-between mb-1.5">
+                            <p className="text-sm font-bold text-white">{row.pack}</p>
+                            <span className="text-[11px] px-2 py-0.5 rounded-full bg-green-500/15 text-green-300 border border-green-500/30">თქვენი სარგებელი {row.benefit}</span>
+                          </div>
+                          <div className="grid grid-cols-2 gap-2 text-[11px]">
+                            <div className="rounded-lg bg-black/35 border border-white/10 px-2.5 py-2">
+                              <p className="text-[10px] text-gray-500 uppercase tracking-wide">პარტნიორის ფასი</p>
+                              <p className="text-sm font-bold text-white mt-0.5">{row.partner}</p>
+                            </div>
+                            <div className="rounded-lg bg-black/35 border border-white/10 px-2.5 py-2">
+                              <p className="text-[10px] text-gray-500 uppercase tracking-wide">საჯარო ფასი</p>
+                              <p className="text-sm font-bold text-white mt-0.5">{row.public}</p>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="py-14 sm:py-16 border-b border-[#1e1e1e]">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="surface-card bg-[#121212] border border-white/10 rounded-2xl p-5 sm:p-6">
+              <div className="flex items-center gap-2 mb-4">
+                <Lock className="w-4 h-4 text-[#E50914]" />
+                <p className="text-sm font-bold text-white">თანამშრომლობის ძირითადი პირობები</p>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
+                {collaborationTerms.map((term, index) => (
+                  <div key={term} className="rounded-xl border border-white/10 bg-white/[0.02] px-3.5 py-3 flex items-start gap-2.5">
+                    <span className="mt-0.5 text-[10px] font-bold text-[#E50914]">{String(index + 1).padStart(2, '0')}</span>
+                    <p className="text-sm text-gray-300 leading-relaxed">{term}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer className="bg-black border-t border-[#1a1a1a] py-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row gap-4 sm:items-center sm:justify-between">
+          <p className="text-xs text-gray-500">© {new Date().getFullYear()} ESHELON DIGITAL AGENCY</p>
+          <a href="/#contact" className="inline-flex items-center justify-center px-5 py-2.5 rounded-lg text-xs font-bold bg-[#E50914] text-white hover:bg-red-700 transition">
+            კოლაბორაციის დაწყება
+          </a>
+        </div>
+      </footer>
+    </div>
+  );
+}
 
 function App() {
+
+  const SMM_POST_UNIT_PRICE = 220;
+  const SMM_STORY_UNIT_PRICE = 40;
+  const ORDER_RECIPIENTS = [
+    "tazo.gochelashvili.3@gmail.com",
+    "kalmakhelidzelazare@gmail.com"
+  ];
+  const normalizedPath = typeof window !== 'undefined'
+    ? (window.location.pathname.replace(/\/+$/, '') || '/')
+    : '/';
+  const isCollaborationPage = normalizedPath === '/collaboration';
 
   const [activeTab, setActiveTab] = useState('smm'); // branding vs smm
 
   const [selectedProject, setSelectedProject] = useState(null);
+  const [showMorePortfolio, setShowMorePortfolio] = useState(false);
 
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -855,13 +1215,13 @@ function App() {
 
   const [customServices, setCustomServices] = useState({
 
-    logo: true,
+    logo: false,
 
     guidelines: false,
 
-    posts: 12,
+    posts: 10,
 
-    stories: 5,
+    stories: 10,
 
     advertising: true,
 
@@ -929,7 +1289,6 @@ function App() {
     revealSections.forEach((section) => observer.observe(section));
     return () => observer.disconnect();
   }, []);
-
 
   useEffect(() => {
 
@@ -1024,9 +1383,9 @@ function App() {
 
     if (customServices.guidelines) base += 1200;
 
-    base += customServices.posts * 90;
+    base += customServices.posts * SMM_POST_UNIT_PRICE;
 
-    base += customServices.stories * 25;
+    base += customServices.stories * SMM_STORY_UNIT_PRICE;
 
     if (customServices.advertising) base += 400;
 
@@ -1217,6 +1576,18 @@ Keep the style bold, youthful, and highly confident (as a top-tier digital agenc
   const handleOrderSubmit = (e) => {
 
     e.preventDefault();
+    if (!orderModal) return;
+
+    const subject = `ESHELON შეკვეთა: ${orderModal.title}`;
+    const body = [
+      `პაკეტი: ${orderModal.title}`,
+      `ფასი: ${orderModal.price}`,
+      `სახელი: ${orderForm.name || '-'}`,
+      `ტელეფონი: ${orderForm.phone || '-'}`,
+      `შენიშვნა: ${orderForm.note || '-'}`
+    ].join('\n');
+    const mailtoLink = `mailto:${ORDER_RECIPIENTS[0]}?cc=${encodeURIComponent(ORDER_RECIPIENTS.slice(1).join(','))}&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    window.location.href = mailtoLink;
 
     setOrderSuccess(true);
 
@@ -1232,7 +1603,34 @@ Keep the style bold, youthful, and highly confident (as a top-tier digital agenc
 
   };
 
+  const handleContactSubmit = (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const name = (formData.get('name') || '').toString().trim();
+    const phone = (formData.get('phone') || '').toString().trim();
+    const company = (formData.get('company') || '').toString().trim();
+    const message = (formData.get('message') || '').toString().trim();
 
+    const subject = "ESHELON: ახალი შეტყობინება საიტიდან";
+    const body = [
+      `სახელი: ${name || '-'}`,
+      `ტელეფონი: ${phone || '-'}`,
+      `კომპანია: ${company || '-'}`,
+      `შეტყობინება: ${message || '-'}`
+    ].join('\n');
+    const mailtoLink = `mailto:${ORDER_RECIPIENTS[0]}?cc=${encodeURIComponent(ORDER_RECIPIENTS.slice(1).join(','))}&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    window.location.href = mailtoLink;
+
+    setOrderSuccess(true);
+    e.currentTarget.reset();
+    setTimeout(() => setOrderSuccess(false), 3000);
+  };
+
+
+
+  if (isCollaborationPage) {
+    return <CollaborationPage />;
+  }
 
   return (
 
@@ -1276,7 +1674,7 @@ Keep the style bold, youthful, and highly confident (as a top-tier digital agenc
 
                   <div className="relative w-12 h-12 rounded-lg overflow-hidden border border-[#E50914]/50">
 
-                    <img src="https://i.postimg.cc/KcB5nxGh/logod.jpg" alt="Eshelon Logo" className="w-full h-full object-cover" />
+                    <img src="/logod.jpg" alt="Eshelon Logo" className="w-full h-full object-cover" />
 
                   </div>
 
@@ -1307,6 +1705,8 @@ Keep the style bold, youthful, and highly confident (as a top-tier digital agenc
               <a href="#portfolio" className="text-sm font-medium text-gray-300 hover:text-[#E50914] transition-colors">პორტფოლიო</a>
 
               <a href="#pricing" className="text-sm font-medium text-gray-300 hover:text-[#E50914] transition-colors">ფასები</a>
+
+              <a href="/collaboration" className="text-sm font-medium text-gray-300 hover:text-[#E50914] transition-colors">კოლაბორაცია</a>
 
               <a href="#ai-strategist" className="text-sm font-medium flex items-center space-x-1 text-red-400 hover:text-red-300 transition-colors bg-red-950/40 px-3 py-1 rounded-full border border-red-500/20">
 
@@ -1370,6 +1770,8 @@ Keep the style bold, youthful, and highly confident (as a top-tier digital agenc
 
             <a href="#pricing" onClick={() => setMenuOpen(false)} className="block text-base font-medium text-gray-300 hover:text-[#E50914]">ფასები</a>
 
+            <a href="/collaboration" onClick={() => setMenuOpen(false)} className="block text-base font-medium text-gray-300 hover:text-[#E50914]">კოლაბორაცია</a>
+
             <a href="#ai-strategist" onClick={() => setMenuOpen(false)} className="flex items-center space-x-2 text-base font-medium text-red-400">
 
               <BrainCircuit className="w-5 h-5" />
@@ -1389,8 +1791,6 @@ Keep the style bold, youthful, and highly confident (as a top-tier digital agenc
         )}
 
       </nav>
-
-
 
       {/* HERO SECTION */}
 
@@ -1481,7 +1881,7 @@ Keep the style bold, youthful, and highly confident (as a top-tier digital agenc
 
               </div>
 
-              <h3 className="text-xl font-bold text-white mb-3">სოციალური მედიის მართვა (SMM)</h3>
+              <h3 className="text-xl font-bold text-white mb-3">სოციალური მედიის მართვა</h3>
 
               <p className="text-gray-400 text-sm leading-relaxed mb-4">
 
@@ -1527,7 +1927,7 @@ Keep the style bold, youthful, and highly confident (as a top-tier digital agenc
 
               <p className="text-gray-400 text-sm leading-relaxed mb-4">
 
-                სარეკლამო კამპანიები, რომლებიც მიმართულია ზუსტ აუდიტორიაზე. შადოუ რეკლამების (Shadow Ads/Dark Posts) გამოყენება ტესტირებისა და ოპტიმალური ROI-სთვის.
+                სარეკლამო კამპანიები, რომლებიც მიმართულია ზუსტ აუდიტორიაზე. შადოუ რეკლამების გამოყენება ტესტირებისა და ოპტიმალური ROI-სთვის.
 
               </p>
 
@@ -1597,136 +1997,60 @@ Keep the style bold, youthful, and highly confident (as a top-tier digital agenc
 
 
 
+          <div className="mb-14">
+            <PosterFolio
+              posters={folioPosterImages}
+              speedSeconds={62}
+            />
+          </div>
+
           {/* GRID OF CASE STUDIES */}
 
           <div className="reveal-stagger grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-
             {portfolioData.map((project) => (
-
-              <div
-
+              <PortfolioCard
                 key={project.id}
-
-                onClick={() => setSelectedProject(project)}
-
-                className="surface-card group relative cursor-pointer bg-[#121212] border border-white/5 rounded-2xl overflow-hidden hover:border-[#E50914]/40 transition duration-500 hover:-translate-y-1 hover:shadow-[0_24px_60px_-28px_rgba(229,9,20,0.45)] flex flex-col justify-between"
-
-              >
-
-                <div className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition duration-500 bg-[radial-gradient(100%_60%_at_50%_0%,rgba(229,9,20,0.18),rgba(229,9,20,0)_65%)]" />
-                <div className="pointer-events-none absolute -left-1/2 top-0 h-full w-1/3 -skew-x-12 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-0 group-hover:translate-x-[420%] transition-transform duration-700" />
-
-                {/* Visual / Cover */}
-
-                <div className="aspect-video relative border-b border-white/5 overflow-hidden">
-
-                  {project.coverImage ? (
-
-                    <>
-
-                      <img
-
-                        src={project.coverImage}
-
-                        alt={`${project.title} cover`}
-
-                        className="w-full h-full object-cover transition duration-700 group-hover:scale-110"
-
-                      />
-
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-
-                      <div className="absolute bottom-4 left-4 z-10">
-
-                        <div className="inline-block px-3 py-1 rounded-md text-[10px] font-mono tracking-widest uppercase bg-black/55 border border-white/20 text-white">
-
-                          {project.title}
-
-                        </div>
-
-                      </div>
-
-                    </>
-
-                  ) : (
-
-                    <div className="w-full h-full bg-gradient-to-br from-[#1c1c1c] to-[#0f0f0f] relative flex items-center justify-center p-6">
-
-                      <div className="absolute inset-0 bg-radial-gradient from-red-600/5 to-transparent opacity-0 group-hover:opacity-100 transition duration-300" />
-
-
-
-                      <div className="relative z-10 text-center space-y-3">
-
-                        <div className="inline-block px-3 py-1 rounded-md text-[10px] font-mono tracking-widest uppercase bg-black/50 border border-white/10 text-white">
-
-                          {project.title}
-
-                        </div>
-
-                        <p className="text-lg font-black tracking-tight text-white group-hover:text-[#E50914] transition duration-200">
-
-                          {project.category}
-
-                        </p>
-
-                      </div>
-
-
-
-                      <div className="absolute -bottom-10 -right-10 w-24 h-24 rounded-full bg-[#E50914]/10 blur-xl group-hover:bg-[#E50914]/20 transition duration-300" />
-
-                    </div>
-
-                  )}
-
-                </div>
-
-
-
-                <div className="p-6 space-y-4">
-
-                  <div className="flex flex-wrap gap-2">
-
-                    {project.tags.slice(0, 2).map((tag, idx) => (
-
-                      <span key={idx} className="text-[10px] uppercase font-mono px-2 py-0.5 rounded-md bg-[#1a1a1a] text-gray-400 border border-white/5">
-
-                        {tag}
-
-                      </span>
-
-                    ))}
-
-                  </div>
-
-
-
-                  <p className="text-sm text-gray-400 line-clamp-3">
-
-                    {project.description}
-
-                  </p>
-
-
-
-                  <div className="pt-4 border-t border-white/5 flex items-center justify-between">
-
-                    <span className="text-xs font-bold text-white group-hover:text-[#E50914] transition duration-200">ქეისის დეტალები</span>
-
-                    <ChevronRight className="w-4 h-4 text-gray-500 group-hover:translate-x-1 group-hover:text-[#E50914] transition duration-200" />
-
-                  </div>
-
-                </div>
-
-              </div>
-
+                project={project}
+                onSelect={setSelectedProject}
+              />
             ))}
-
           </div>
 
+          <div
+            className={`overflow-hidden transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+              showMorePortfolio ? 'max-h-[1600px] opacity-100 mt-8' : 'max-h-0 opacity-0 mt-0'
+            }`}
+            aria-hidden={!showMorePortfolio}
+          >
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 pb-1">
+              {extraPortfolioData.map((project, idx) => (
+                <div
+                  key={project.id}
+                  className={`transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+                    showMorePortfolio ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'
+                  }`}
+                  style={{ transitionDelay: `${idx * 90}ms` }}
+                >
+                  <PortfolioCard
+                    project={project}
+                    onSelect={setSelectedProject}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
 
+          <div className="mt-10 flex justify-center">
+            <button
+              type="button"
+              onClick={() => setShowMorePortfolio((prev) => !prev)}
+              className="group relative inline-flex items-center gap-2 px-6 py-3.5 rounded-xl border border-red-300/20 bg-gradient-to-r from-[#E50914] via-red-600 to-[#E50914] text-white text-xs font-black tracking-wider shadow-[0_18px_38px_-20px_rgba(229,9,20,0.95)] hover:scale-[1.02] active:scale-[0.985] transition"
+            >
+              <span className="absolute inset-0 rounded-xl bg-white/0 group-hover:bg-white/10 transition" />
+              <span className="relative">{showMorePortfolio ? 'ნაკლების ჩვენება' : 'მეტის ჩვენება'}</span>
+              <ChevronDown className={`relative w-4 h-4 transition-transform duration-300 ${showMorePortfolio ? 'rotate-180' : ''}`} />
+            </button>
+          </div>
 
         </div>
 
@@ -1762,7 +2086,7 @@ Keep the style bold, youthful, and highly confident (as a top-tier digital agenc
 
             <div
 
-              className="surface-card bg-[#121212] border border-white/10 rounded-2xl max-w-2xl w-full shadow-[0_32px_100px_-36px_rgba(0,0,0,0.9)] relative max-h-[88vh] overflow-hidden flex flex-col"
+              className={`surface-card bg-[#121212] border border-white/10 rounded-2xl w-full shadow-[0_32px_100px_-36px_rgba(0,0,0,0.9)] relative h-[88vh] overflow-hidden flex flex-col ${selectedProject.modalImages?.length ? 'max-w-6xl' : 'max-w-2xl'}`}
 
               onClick={(e) => e.stopPropagation()}
 
@@ -1788,7 +2112,7 @@ Keep the style bold, youthful, and highly confident (as a top-tier digital agenc
 
               {/* Cover image — full width */}
 
-              {(selectedProject.modalImage || selectedProject.coverImage) && !selectedProject.modalImageScrollable && (
+              {(selectedProject.modalImage || selectedProject.coverImage) && !selectedProject.modalImageScrollable && !selectedProject.modalImages?.length && (
 
                 <div className="w-full rounded-t-2xl overflow-hidden">
 
@@ -1808,9 +2132,30 @@ Keep the style bold, youthful, and highly confident (as a top-tier digital agenc
 
 
 
-              <div className="overflow-y-auto custom-scroll">
+              <div className="flex-1 min-h-0 overflow-y-auto custom-scroll">
 
-              {selectedProject.modalImageScrollable && (selectedProject.modalImage || selectedProject.coverImage) && (
+              {selectedProject.modalImages?.length > 0 && (
+                <div className="w-full border-b border-white/10 p-3 sm:p-4 lg:p-5">
+                  <div className="columns-1 sm:columns-2 xl:columns-3 gap-3 sm:gap-4 [column-fill:_balance]">
+                    {selectedProject.modalImages.map((imageSrc, imageIdx) => (
+                      <div
+                        key={`${imageSrc}-${imageIdx}`}
+                        className="mb-3 sm:mb-4 break-inside-avoid rounded-xl overflow-hidden border border-white/10 bg-black/30 shadow-[0_10px_28px_-20px_rgba(0,0,0,0.9)]"
+                      >
+                        <img
+                          src={imageSrc}
+                          alt={`${selectedProject.title} ${imageIdx + 1}`}
+                          className="w-full h-auto object-cover"
+                          loading="lazy"
+                          decoding="async"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {selectedProject.modalImageScrollable && (selectedProject.modalImage || selectedProject.coverImage) && !selectedProject.modalImages?.length && (
                 <div className="w-full rounded-t-2xl overflow-hidden border-b border-white/10">
                   <img
                     src={selectedProject.modalImage || selectedProject.coverImage}
@@ -1862,24 +2207,8 @@ Keep the style bold, youthful, and highly confident (as a top-tier digital agenc
 
 
 
-                <div className="space-y-2">
-
-                  <h4 className="text-xs font-mono text-gray-400 uppercase tracking-widest">ტეგები:</h4>
-
-                  <div className="flex flex-wrap gap-2">
-
-                    {selectedProject.tags.map((tag, idx) => (
-
-                      <span key={idx} className="text-xs font-mono px-3 py-1 rounded-md bg-[#1a1a1a] text-white border border-[#333] uppercase tracking-wider">
-
-                        {tag}
-
-                      </span>
-
-                    ))}
-
-                  </div>
-
+                <div className="inline-flex items-center px-2.5 py-1 rounded-md bg-white/[0.02] border border-white/5 text-[10px] font-medium tracking-wide text-gray-500">
+                  {getWorkTypeLabel(selectedProject)}
                 </div>
 
               </div>
@@ -2168,7 +2497,7 @@ Keep the style bold, youthful, and highly confident (as a top-tier digital agenc
 
             <p className="text-gray-400 text-sm sm:text-base">
 
-              ყველა ფასი გამჭვირვალეა. აირჩიეთ ბრენდინგის სრული არქიტექტურა ან ყოველთვიური სოციალური მედიის (SMM) მხარდაჭერა.
+              ყველა ფასი გამჭვირვალეა. აირჩიეთ სრული ბრენდინგი ან ყოველთვიური სოციალური მედიის (SMM) მხარდაჭერა.
 
             </p>
 
@@ -2265,14 +2594,32 @@ Keep the style bold, youthful, and highly confident (as a top-tier digital agenc
 
 
                     <p className="text-xs text-gray-400 leading-relaxed">{pkg.desc}</p>
+                    {pkg.compareHint && (
+                      <p className="text-[11px] text-[#E50914] leading-relaxed">{pkg.compareHint}</p>
+                    )}
+                    {pkg.deltaFromPrev && (
+                      <div className="flex flex-wrap gap-2">
+                        {pkg.deltaFromPrev.map((item, itemIdx) => (
+                          <span
+                            key={itemIdx}
+                            className="text-[10px] uppercase tracking-wide px-2 py-1 rounded-md bg-black/35 border border-white/10 text-gray-200"
+                          >
+                            {item}
+                          </span>
+                        ))}
+                      </div>
+                    )}
 
 
 
                     <div className="border-t border-white/5 pt-6 space-y-4">
 
                       {pkg.features.map((feat, fIdx) => (
+                        (() => {
+                          const isDiscount = Boolean(feat.discount);
+                          return (
 
-                        <div key={fIdx} className="flex items-start space-x-3 text-xs">
+                        <div key={fIdx} className={`flex items-start space-x-3 text-xs ${isDiscount ? 'bg-white/[0.03] border border-[#E50914]/35 rounded-lg px-3 py-2.5' : ''}`}>
 
                           {feat.included ? (
 
@@ -2284,13 +2631,20 @@ Keep the style bold, youthful, and highly confident (as a top-tier digital agenc
 
                           )}
 
-                          <span className={feat.included ? "text-gray-300" : "text-gray-600 line-through"}>
-
-                            {feat.text}
-
-                          </span>
+                          <div className="flex flex-col items-start gap-1.5">
+                            {isDiscount && (
+                              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-black tracking-wide bg-[#E50914] text-white">
+                                -50% ფასდაკლება
+                              </span>
+                            )}
+                            <span className={feat.included ? (isDiscount ? "text-white font-semibold" : "text-gray-300") : "text-gray-600 line-through"}>
+                              {feat.text}
+                            </span>
+                          </div>
 
                         </div>
+                          );
+                        })()
 
                       ))}
 
@@ -2369,14 +2723,20 @@ Keep the style bold, youthful, and highly confident (as a top-tier digital agenc
 
 
                     <p className="text-xs text-gray-400 leading-relaxed">{pkg.desc}</p>
+                    {pkg.compareHint && (
+                      <p className="text-[11px] text-[#E50914] leading-relaxed">{pkg.compareHint}</p>
+                    )}
 
 
 
                     <div className="border-t border-white/5 pt-6 space-y-4">
 
                       {pkg.features.map((feat, fIdx) => (
+                        (() => {
+                          const isDiscount = Boolean(feat.discount);
+                          return (
 
-                        <div key={fIdx} className="flex items-start space-x-3 text-xs">
+                        <div key={fIdx} className={`flex items-start space-x-3 text-xs ${isDiscount ? 'bg-white/[0.03] border border-[#E50914]/35 rounded-lg px-3 py-2.5' : ''}`}>
 
                           {feat.included ? (
 
@@ -2388,13 +2748,20 @@ Keep the style bold, youthful, and highly confident (as a top-tier digital agenc
 
                           )}
 
-                          <span className={feat.included ? "text-gray-300" : "text-gray-600 line-through"}>
-
-                            {feat.text}
-
-                          </span>
+                          <div className="flex flex-col items-start gap-1.5">
+                            {isDiscount && (
+                              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-black tracking-wide bg-[#E50914] text-white">
+                                -50% ფასდაკლება
+                              </span>
+                            )}
+                            <span className={feat.included ? (isDiscount ? "text-white font-semibold" : "text-gray-300") : "text-gray-600 line-through"}>
+                              {feat.text}
+                            </span>
+                          </div>
 
                         </div>
+                          );
+                        })()
 
                       ))}
 
@@ -2504,7 +2871,7 @@ Keep the style bold, youthful, and highly confident (as a top-tier digital agenc
 
                     <label className="text-xs font-bold text-gray-300 uppercase">პოსტების რაოდენობა: {customServices.posts}</label>
 
-                    <span className="text-xs font-mono text-[#E50914]">({customServices.posts * 90} ₾)</span>
+                    <span className="text-xs font-mono text-[#E50914]">({customServices.posts * SMM_POST_UNIT_PRICE} ₾)</span>
 
                   </div>
 
@@ -2534,7 +2901,7 @@ Keep the style bold, youthful, and highly confident (as a top-tier digital agenc
 
                     <label className="text-xs font-bold text-gray-300 uppercase">სთორების რაოდენობა: {customServices.stories}</label>
 
-                    <span className="text-xs font-mono text-[#E50914]">({customServices.stories * 25} ₾)</span>
+                    <span className="text-xs font-mono text-[#E50914]">({customServices.stories * SMM_STORY_UNIT_PRICE} ₾)</span>
 
                   </div>
 
@@ -2700,7 +3067,7 @@ Keep the style bold, youthful, and highly confident (as a top-tier digital agenc
 
                     <div className="text-xs text-gray-500 font-mono uppercase">ოფისი:</div>
 
-                    <div className="text-sm font-bold text-white">თბილისი, საქართველო</div>
+                    <div className="text-sm font-bold text-white">თბილისი და ქუთაისი, საქართველო</div>
 
                   </div>
 
@@ -2720,7 +3087,8 @@ Keep the style bold, youthful, and highly confident (as a top-tier digital agenc
 
                     <div className="text-xs text-gray-500 font-mono uppercase">ელ-ფოსტა:</div>
 
-                    <div className="text-sm font-bold text-white">info@eshelon.ge</div>
+                    <div className="text-sm font-bold text-white">tazo.gochelashvili.3@gmail.com</div>
+                    <div className="text-xs text-gray-400">kalmakhelidzelazare@gmail.com</div>
 
                   </div>
 
@@ -2740,7 +3108,7 @@ Keep the style bold, youthful, and highly confident (as a top-tier digital agenc
 
                     <div className="text-xs text-gray-500 font-mono uppercase">ტელეფონი:</div>
 
-                    <div className="text-sm font-bold text-white">+995 555 XX XX XX</div>
+                    <div className="text-sm font-bold text-white">551 98 15 02</div>
 
                   </div>
 
@@ -2774,7 +3142,7 @@ Keep the style bold, youthful, and highly confident (as a top-tier digital agenc
 
 
 
-                <form onSubmit={(e) => { e.preventDefault(); setOrderSuccess(true); setTimeout(() => setOrderSuccess(false), 3000); }} className="space-y-6">
+                <form onSubmit={handleContactSubmit} className="space-y-6">
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
 
@@ -2785,6 +3153,7 @@ Keep the style bold, youthful, and highly confident (as a top-tier digital agenc
                       <input
 
                         type="text"
+                        name="name"
 
                         className="w-full bg-black/60 border border-white/10 rounded-lg p-3.5 text-white text-sm focus:outline-none focus:border-[#E50914] transition"
 
@@ -2803,6 +3172,7 @@ Keep the style bold, youthful, and highly confident (as a top-tier digital agenc
                       <input
 
                         type="tel"
+                        name="phone"
 
                         className="w-full bg-black/60 border border-white/10 rounded-lg p-3.5 text-white text-sm focus:outline-none focus:border-[#E50914] transition"
 
@@ -2825,6 +3195,7 @@ Keep the style bold, youthful, and highly confident (as a top-tier digital agenc
                     <input
 
                       type="text"
+                      name="company"
 
                       className="w-full bg-black/60 border border-white/10 rounded-lg p-3.5 text-white text-sm focus:outline-none focus:border-[#E50914] transition"
 
@@ -2842,6 +3213,7 @@ Keep the style bold, youthful, and highly confident (as a top-tier digital agenc
 
                     <textarea
 
+                      name="message"
                       className="w-full bg-black/60 border border-white/10 rounded-lg p-3.5 text-white text-sm focus:outline-none focus:border-[#E50914] transition h-32 resize-none"
 
                       placeholder="დაწერეთ თქვენი სურვილები..."
@@ -2910,7 +3282,7 @@ Keep the style bold, youthful, and highly confident (as a top-tier digital agenc
 
               <div className="w-10 h-10 rounded-lg overflow-hidden border border-[#E50914]/30 group-hover:border-[#E50914]/60 transition-colors">
 
-                <img src="https://i.postimg.cc/KcB5nxGh/logod.jpg" alt="Eshelon Logo" className="w-full h-full object-cover" />
+                <img src="/logod.jpg" alt="Eshelon Logo" className="w-full h-full object-cover" />
 
               </div>
 
@@ -2934,18 +3306,8 @@ Keep the style bold, youthful, and highly confident (as a top-tier digital agenc
 
 
 
-            <div className="flex items-center space-x-4">
-
-              <a href="#" className="text-gray-500 hover:text-white transition text-xs">Facebook</a>
-
-              <span className="text-gray-800">•</span>
-
-              <a href="#" className="text-gray-500 hover:text-white transition text-xs">Instagram</a>
-
-              <span className="text-gray-800">•</span>
-
-              <a href="#" className="text-gray-500 hover:text-white transition text-xs">LinkedIn</a>
-
+            <div className="flex items-center">
+              <span className="text-gray-500 hover:text-white transition text-xs font-semibold tracking-wide">@eshelon</span>
             </div>
 
           </div>
