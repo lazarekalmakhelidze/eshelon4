@@ -79,6 +79,11 @@ body {
   -webkit-backdrop-filter: blur(10px);
 }
 
+.nav-glass a,
+.nav-glass button {
+  text-transform: uppercase;
+}
+
 .section-eyebrow {
   display: inline-flex;
   align-items: center;
@@ -178,6 +183,33 @@ body {
 .reveal-section.reveal-visible .reveal-stagger > *:nth-child(5) { transition-delay: 240ms; }
 .reveal-section.reveal-visible .reveal-stagger > *:nth-child(6) { transition-delay: 290ms; }
 
+.portfolio-card-soft-enter {
+  opacity: 0;
+  transform: translate3d(0, 16px, 0) scale(0.99);
+  filter: blur(4px);
+  animation: portfolioCardSoftEnter 560ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  will-change: opacity, transform, filter;
+}
+
+@keyframes portfolioCardSoftEnter {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 16px, 0) scale(0.99);
+    filter: blur(4px);
+  }
+
+  60% {
+    opacity: 0.92;
+    filter: blur(1px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+    filter: blur(0);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .logo-marquee {
     animation: none !important;
@@ -193,6 +225,13 @@ body {
     opacity: 1 !important;
     transform: none !important;
     transition: none !important;
+  }
+
+  .portfolio-card-soft-enter {
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+    animation: none !important;
   }
 
   .scroll-progress {

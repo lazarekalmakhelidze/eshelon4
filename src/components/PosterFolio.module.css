@@ -75,23 +75,7 @@
 }
 
 .card::before {
-  content: "";
-  position: absolute;
-  top: 1px;
-  bottom: 1px;
-  left: -8px;
-  width: 9px;
-  border-radius: 3px 0 0 3px;
-  background:
-    linear-gradient(90deg, rgba(255, 255, 255, 0.38), rgba(18, 18, 18, 0.7)),
-    repeating-linear-gradient(
-      to bottom,
-      rgba(255, 255, 255, 0.28) 0 2px,
-      rgba(0, 0, 0, 0.22) 2px 4px
-    );
-  transform-origin: right center;
-  transform: rotateY(-76deg);
-  pointer-events: none;
+  display: none;
 }
 
 .card::after {

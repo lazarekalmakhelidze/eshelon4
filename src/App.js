@@ -213,6 +213,90 @@ const portfolioData = [
 
     features: ['სეზონური შეთავაზებების შეფუთვა', 'კარუსელისა და ქარდების ერთიანი სისტემა', 'ვიზუალი + გაყიდვითი მესიჯინგი']
 
+  },
+
+  {
+
+    id: 'morika',
+
+    title: 'მორიკა',
+
+    category: 'ბრენდინგი & ვიზუალური იდენტობა',
+
+    description: 'მშვიდი, ინტერიერზე ორიენტირებული ვიზუალური იდენტობა თბილი ტექსტურებით, დახვეწილი ფერთა პალიტრითა და პრეზენტაციული ბრენდ-მასალებით.',
+
+    longDescription: 'მორიკასთვის შექმნილი ვიზუალური სისტემა ეყრდნობა თბილ ტექსტურებს, ინტერიერის ესთეტიკას და ბუნებრივ ფერთა პალიტრას. ქეისში გაერთიანებულია ბრენდის ნიშნები, გარემოს ვიზუალები და გამოყენებითი მასალები, რომლებიც ბრენდს მშვიდ, დახვეწილ და სანდო ხასიათს აძლევს.',
+
+    color: '#8b5e34',
+
+    bgClass: 'bg-stone-950/40 border-stone-500/30 text-stone-300',
+
+    coverImage: '/optimized/portfolio/მორიკა.jpg',
+
+    modalImage: '/optimized/portfolio/მორიკა.jpg',
+
+    modalImageScrollable: true,
+
+    tags: ['Brand Identity', 'Interior Visuals', 'Visual System'],
+
+    features: ['თბილი და ბუნებრივი ფერთა სისტემა', 'ინტერიერზე მორგებული ბრენდის პრეზენტაცია', 'გამოყენებითი მასალების ვიზუალური ერთიანობა']
+
+  },
+
+  {
+
+    id: 'abica',
+
+    title: 'Abica',
+
+    category: 'ბრენდინგი & შეფუთვის დიზაინი',
+
+    description: 'ენერგიული საკვები ბრენდის ვიზუალური იდენტობა გამორჩეული ტიპოგრაფიით, შეფუთვის სისტემითა და სოციალური მედიის ელემენტებით.',
+
+    longDescription: 'Abica-ს ქეისი აგებულია მკაფიო, ხმაურიან და დასამახსოვრებელ ვიზუალურ ენაზე. ნარინჯისფერი და მწვანე ფერების კონტრასტი, გამორჩეული ქართული ტიპოგრაფია, შეფუთვის დიზაინი და ციფრული კომუნიკაციის ელემენტები ბრენდს სწრაფად ცნობად და კომერციულად ძლიერ სახეს აძლევს.',
+
+    color: '#f97316',
+
+    bgClass: 'bg-orange-950/40 border-orange-500/30 text-orange-300',
+
+    coverImage: '/optimized/portfolio/abica.jpg',
+
+    modalImage: '/optimized/portfolio/abica.jpg',
+
+    modalImageScrollable: true,
+
+    tags: ['Brand Identity', 'Packaging Design', 'Food Branding', 'Social Media'],
+
+    features: ['ენერგიული ფერთა კონტრასტი', 'შეფუთვისა და ციფრული ვიზუალების სისტემა', 'დასამახსოვრებელი ტიპოგრაფიული ხასიათი']
+
+  },
+
+  {
+
+    id: 'zenari',
+
+    title: 'ზენარი',
+
+    category: 'ბრენდინგი & დეველოპმენტი',
+
+    description: 'დეველოპმენტის ბრენდისთვის შექმნილი პრემიუმ ვიზუალური იდენტობა მუქი ლურჯი და ოქროსფერი აქცენტებით, არქიტექტურული და ციფრული მატარებლებით.',
+
+    longDescription: 'ზენარის ქეისში მთავარი აქცენტი გაკეთებულია პრემიუმ უძრავი ქონების შეგრძნებაზე: მუქი ლურჯი ფონები, ოქროსფერი ლოგოტიპი, სამშენებლო და ციფრული მატარებლები ქმნის სანდო, მაღალკლასიან და დამახასიათებელ ვიზუალურ ენას. პრეზენტაციაში ერთიანდება ექსტერიერის ვიზუალი, ბრენდირებული სამუშაო მასალები და სოციალური მედიის ფორმატები.',
+
+    color: '#d4af37',
+
+    bgClass: 'bg-blue-950/40 border-yellow-500/30 text-yellow-300',
+
+    coverImage: '/optimized/portfolio/ზენარი.jpg',
+
+    modalImage: '/optimized/portfolio/ზენარი.jpg',
+
+    modalImageScrollable: true,
+
+    tags: ['Real Estate Branding', 'Premium Identity', 'Social Media', 'Brand Applications'],
+
+    features: ['მუქი ლურჯისა და ოქროსფრის პრემიუმ კონტრასტი', 'დეველოპმენტის ბრენდის გამოყენებითი მატარებლები', 'ციფრული და ფიზიკური touchpoint-ების ერთიანი სტილი']
+
   }
 
 ];
@@ -239,7 +323,7 @@ const extraPortfolioData = [
 
     coverImage: '/optimized/portfolio/athome-ge.jpg',
 
-    modalImage: '/optimized/portfolio/athome-ge.jpg',
+    modalImages: Array.from({ length: 15 }, (_, i) => `/optimized/portfolio/athome-ge/at${i + 1}.jpg`),
 
     tags: ['SMM Campaign', 'Promo Visual', 'Performance Creative'],
 
@@ -293,7 +377,7 @@ const extraPortfolioData = [
 
     coverImage: '/optimized/portfolio/hakken-restaurant.jpg',
 
-    modalImage: '/optimized/portfolio/hakken-restaurant.jpg',
+    modalImages: Array.from({ length: 10 }, (_, i) => `/optimized/portfolio/ჰაკენი/ჰ${i + 1}.jpg`),
 
     tags: ['Restaurant Creative', 'SMM Design', 'Promo Posters'],
 
@@ -310,6 +394,9 @@ const workTypeByProjectId = {
   panorama: 'სოც. მედია',
   education: 'სოც. მედია',
   'beone-apres-ski': 'სოც. მედია',
+  morika: 'ვიზუალური იდენტობა',
+  abica: 'ვიზუალური იდენტობა',
+  zenari: 'ვიზუალური იდენტობა',
   'athome-ge': 'სოც. მედია',
   mochiko: 'სოც. მედია',
   'hakken-restaurant': 'სოც. მედია'
@@ -317,6 +404,54 @@ const workTypeByProjectId = {
 
 function getWorkTypeLabel(project) {
   return workTypeByProjectId[project.id] || 'სოც. მედია';
+}
+
+function ModalGalleryImage({ project, imageSrc, imageIdx }) {
+  return (
+    <div className="rounded-xl overflow-hidden border border-white/10 bg-black/30 shadow-[0_10px_28px_-20px_rgba(0,0,0,0.9)]">
+      <img
+        src={imageSrc}
+        alt={`${project.title} ${imageIdx + 1}`}
+        className="block w-full h-auto object-cover"
+        loading={imageIdx < 6 ? 'eager' : 'lazy'}
+        decoding="async"
+      />
+    </div>
+  );
+}
+
+function PortfolioModalGallery({ project }) {
+  const renderColumns = (columnCount) => (
+    Array.from({ length: columnCount }, (_, columnIndex) => (
+      <div key={columnIndex} className="flex min-w-0 flex-col gap-3 sm:gap-4">
+        {project.modalImages
+          .map((imageSrc, imageIdx) => ({ imageSrc, imageIdx }))
+          .filter((_, imageIdx) => imageIdx % columnCount === columnIndex)
+          .map(({ imageSrc, imageIdx }) => (
+            <ModalGalleryImage
+              key={`${imageSrc}-${imageIdx}`}
+              project={project}
+              imageSrc={imageSrc}
+              imageIdx={imageIdx}
+            />
+          ))}
+      </div>
+    ))
+  );
+
+  return (
+    <>
+      <div className="grid grid-cols-1 gap-3 sm:hidden">
+        {renderColumns(1)}
+      </div>
+      <div className="hidden sm:grid sm:grid-cols-2 gap-4 xl:hidden">
+        {renderColumns(2)}
+      </div>
+      <div className="hidden xl:grid xl:grid-cols-3 gap-4">
+        {renderColumns(3)}
+      </div>
+    </>
+  );
 }
 
 
@@ -341,7 +476,7 @@ function PortfolioCard({ project, onSelect }) {
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
             <div className="absolute bottom-4 left-4 z-10">
-              <div className="inline-block px-3 py-1 rounded-md text-[10px] font-mono tracking-widest uppercase bg-black/55 border border-white/20 text-white">
+              <div className="inline-block px-3 py-1 rounded-md text-xs font-semibold tracking-normal bg-black/55 border border-white/20 text-white">
                 {project.title}
               </div>
             </div>
@@ -350,7 +485,7 @@ function PortfolioCard({ project, onSelect }) {
           <div className="w-full h-full bg-gradient-to-br from-[#1c1c1c] to-[#0f0f0f] relative flex items-center justify-center p-6">
             <div className="absolute inset-0 bg-radial-gradient from-red-600/5 to-transparent opacity-0 group-hover:opacity-100 transition duration-300" />
             <div className="relative z-10 text-center space-y-3">
-              <div className="inline-block px-3 py-1 rounded-md text-[10px] font-mono tracking-widest uppercase bg-black/50 border border-white/10 text-white">
+              <div className="inline-block px-3 py-1 rounded-md text-xs font-semibold tracking-normal bg-black/50 border border-white/10 text-white">
                 {project.title}
               </div>
               <p className="text-lg font-black tracking-tight text-white group-hover:text-[#E50914] transition duration-200">
@@ -363,7 +498,7 @@ function PortfolioCard({ project, onSelect }) {
       </div>
 
       <div className="p-6 space-y-4">
-        <div className="inline-flex items-center px-2.5 py-1 rounded-md bg-white/[0.02] border border-white/5 text-[10px] font-medium tracking-wide text-gray-500">
+        <div className="inline-flex items-center px-2.5 py-1 rounded-md bg-white/[0.02] border border-white/5 text-xs font-medium tracking-normal text-gray-500">
           {getWorkTypeLabel(project)}
         </div>
 
@@ -823,7 +958,7 @@ function PartnersStrip() {
     return (
       <div className={`py-6 ${rowClass}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-4">
-          <p className={`text-center text-[11px] uppercase tracking-[0.28em] ${titleClass || 'text-gray-500'}`}>{title}</p>
+          <p className={`text-center text-xs uppercase tracking-[0.28em] ${titleClass || 'text-gray-500'}`}>{title}</p>
         </div>
 
         <div className="relative">
@@ -913,15 +1048,15 @@ function AboutSection() {
 
             <div className="reveal-stagger grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
               <div className="surface-card bg-[#121217] border border-white/10 rounded-xl p-4">
-                <p className="text-[10px] uppercase tracking-widest text-gray-500">პრიორიტეტი</p>
+                <p className="text-xs uppercase tracking-widest text-gray-500">პრიორიტეტი</p>
                 <p className="text-sm font-bold text-white mt-1">ხარისხზე ორიენტაცია</p>
               </div>
               <div className="surface-card bg-[#121217] border border-white/10 rounded-xl p-4">
-                <p className="text-[10px] uppercase tracking-widest text-gray-500">განვითარება</p>
+                <p className="text-xs uppercase tracking-widest text-gray-500">განვითარება</p>
                 <p className="text-sm font-bold text-white mt-1">ინოვაციური სიახლეების ძიება</p>
               </div>
               <div className="surface-card bg-[#121217] border border-white/10 rounded-xl p-4">
-                <p className="text-[10px] uppercase tracking-widest text-gray-500">დისციპლინა</p>
+                <p className="text-xs uppercase tracking-widest text-gray-500">დისციპლინა</p>
                 <p className="text-sm font-bold text-white mt-1">დედლაინების ზუსტი დაცვა</p>
               </div>
             </div>
@@ -963,7 +1098,7 @@ function FacebookNewsSection() {
             href="https://www.facebook.com/"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center justify-center px-4 py-2 rounded-lg text-[11px] font-bold bg-[#E50914] text-white hover:bg-red-700 transition"
+            className="inline-flex items-center justify-center px-4 py-2 rounded-lg text-xs font-bold bg-[#E50914] text-white hover:bg-red-700 transition"
           >
             Facebook-ზე ნახვა
             <ExternalLink className="w-4 h-4 ml-2" />
@@ -991,7 +1126,7 @@ function FacebookNewsSection() {
               </div>
 
               <div className="p-3.5 sm:p-4 space-y-2.5 lg:flex-1 lg:flex lg:flex-col lg:justify-center">
-                <div className="flex items-center gap-2 text-[9px] uppercase tracking-widest text-gray-400">
+                <div className="flex items-center gap-2 text-xs uppercase tracking-widest text-gray-400">
                   <span className="inline-flex items-center gap-1.5">
                     <CalendarDays className="w-3 h-3" />
                     {post.date}
@@ -999,7 +1134,7 @@ function FacebookNewsSection() {
                   <span>{post.readTime}</span>
                 </div>
                 <h3 className="text-sm sm:text-[15px] font-black text-white leading-snug group-hover:text-[#E50914] transition-colors line-clamp-2 lg:line-clamp-3">{post.title}</h3>
-                <p className="text-[11px] text-gray-300 leading-relaxed line-clamp-2 lg:line-clamp-2">{post.excerpt}</p>
+                <p className="text-xs text-gray-300 leading-relaxed line-clamp-2 lg:line-clamp-2">{post.excerpt}</p>
               </div>
             </a>
           ))}
@@ -1086,13 +1221,13 @@ function CollaborationPage() {
             </div>
             <div>
               <span className="text-xl font-black tracking-widest text-white block">ESHELON</span>
-              <span className="text-[10px] tracking-widest text-[#E50914] font-bold block -mt-1 uppercase">Collaboration</span>
+              <span className="text-xs tracking-widest text-[#E50914] font-bold block -mt-1 uppercase">Collaboration</span>
             </div>
           </a>
 
           <div className="flex items-center gap-3">
-            <a href="/" className="px-4 py-2 rounded-lg border border-white/15 text-sm text-gray-200 hover:border-white/35 transition">მთავარი</a>
-            <a href="/#contact" className="px-4 py-2 rounded-lg bg-[#E50914] text-sm font-bold text-white hover:bg-red-700 transition">დაკავშირება</a>
+            <a href="/" className="px-4 py-2 rounded-lg border border-white/15 text-sm text-gray-200 hover:border-white/35 transition">ᲛᲗᲐᲕᲐᲠᲘ</a>
+            <a href="/#contact" className="px-4 py-2 rounded-lg bg-[#E50914] text-sm font-bold text-white hover:bg-red-700 transition">ᲓᲐᲙᲐᲕᲨᲘᲠᲔᲑᲐ</a>
           </div>
         </div>
       </nav>
@@ -1110,9 +1245,9 @@ function CollaborationPage() {
                 ეს გვერდი შექმნილია ისე, რომ 1 წუთში ნახოთ რეალური მოდელი და თქვენი სარგებელი.
               </p>
               <div className="flex flex-wrap gap-2.5 pt-2">
-                <span className="px-3 py-1 rounded-full text-[11px] font-semibold bg-green-500/15 text-green-300 border border-green-500/35">-10% პარტნიორული ფასდაკლება</span>
-                <span className="px-3 py-1 rounded-full text-[11px] font-semibold bg-white/5 text-gray-300 border border-white/15">თეთრი ლეიბლი (White Label)</span>
-                <span className="px-3 py-1 rounded-full text-[11px] font-semibold bg-white/5 text-gray-300 border border-white/15">ფიქსირებული SLA</span>
+                <span className="px-3 py-1 rounded-full text-xs font-semibold bg-green-500/15 text-green-300 border border-green-500/35">-10% პარტნიორული ფასდაკლება</span>
+                <span className="px-3 py-1 rounded-full text-xs font-semibold bg-white/5 text-gray-300 border border-white/15">თეთრი ლეიბლი (White Label)</span>
+                <span className="px-3 py-1 rounded-full text-xs font-semibold bg-white/5 text-gray-300 border border-white/15">ფიქსირებული SLA</span>
               </div>
             </div>
           </div>
@@ -1135,15 +1270,15 @@ function CollaborationPage() {
                         <div key={`${offer.id}-${row.pack}`} className={`rounded-xl border p-3 ${row.featured ? 'border-[#E50914]/45 bg-[#E50914]/8' : 'border-white/10 bg-white/[0.02]'}`}>
                           <div className="flex items-center justify-between mb-1.5">
                             <p className="text-sm font-bold text-white">{row.pack}</p>
-                            <span className="text-[11px] px-2 py-0.5 rounded-full bg-green-500/15 text-green-300 border border-green-500/30">თქვენი სარგებელი {row.benefit}</span>
+                            <span className="text-xs px-2 py-0.5 rounded-full bg-green-500/15 text-green-300 border border-green-500/30">თქვენი სარგებელი {row.benefit}</span>
                           </div>
-                          <div className="grid grid-cols-2 gap-2 text-[11px]">
+                          <div className="grid grid-cols-2 gap-2 text-xs">
                             <div className="rounded-lg bg-black/35 border border-white/10 px-2.5 py-2">
-                              <p className="text-[10px] text-gray-500 uppercase tracking-wide">პარტნიორის ფასი</p>
+                              <p className="text-xs text-gray-500 uppercase tracking-wide">პარტნიორის ფასი</p>
                               <p className="text-sm font-bold text-white mt-0.5">{row.partner}</p>
                             </div>
                             <div className="rounded-lg bg-black/35 border border-white/10 px-2.5 py-2">
-                              <p className="text-[10px] text-gray-500 uppercase tracking-wide">საჯარო ფასი</p>
+                              <p className="text-xs text-gray-500 uppercase tracking-wide">საჯარო ფასი</p>
                               <p className="text-sm font-bold text-white mt-0.5">{row.public}</p>
                             </div>
                           </div>
@@ -1167,7 +1302,7 @@ function CollaborationPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
                 {collaborationTerms.map((term, index) => (
                   <div key={term} className="rounded-xl border border-white/10 bg-white/[0.02] px-3.5 py-3 flex items-start gap-2.5">
-                    <span className="mt-0.5 text-[10px] font-bold text-[#E50914]">{String(index + 1).padStart(2, '0')}</span>
+                    <span className="mt-0.5 text-xs font-bold text-[#E50914]">{String(index + 1).padStart(2, '0')}</span>
                     <p className="text-sm text-gray-300 leading-relaxed">{term}</p>
                   </div>
                 ))}
@@ -1205,7 +1340,10 @@ function App() {
   const [activeTab, setActiveTab] = useState('smm'); // branding vs smm
 
   const [selectedProject, setSelectedProject] = useState(null);
-  const [showMorePortfolio, setShowMorePortfolio] = useState(false);
+  const [visiblePortfolioCount, setVisiblePortfolioCount] = useState(6);
+  const allPortfolioProjects = [...portfolioData, ...extraPortfolioData];
+  const visiblePortfolioProjects = allPortfolioProjects.slice(0, visiblePortfolioCount);
+  const hasMorePortfolioProjects = visiblePortfolioCount < allPortfolioProjects.length;
 
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -1684,7 +1822,7 @@ Keep the style bold, youthful, and highly confident (as a top-tier digital agenc
 
                   <span className="text-xl font-black tracking-widest text-white block">ESHELON</span>
 
-                  <span className="text-[10px] tracking-widest text-[#E50914] font-bold block -mt-1 uppercase">Highest</span>
+                  <span className="text-xs tracking-widest text-[#E50914] font-bold block -mt-1 uppercase">Highest</span>
 
                 </div>
 
@@ -1698,21 +1836,21 @@ Keep the style bold, youthful, and highly confident (as a top-tier digital agenc
 
             <div className="hidden md:flex items-center space-x-8">
 
-              <a href="#about" className="text-sm font-medium text-gray-300 hover:text-[#E50914] transition-colors">ჩვენს შესახებ</a>
+              <a href="#about" className="text-sm font-medium text-gray-300 hover:text-[#E50914] transition-colors">ᲩᲕᲔᲜᲡ ᲨᲔᲡᲐᲮᲔᲑ</a>
 
-              <a href="#services" className="text-sm font-medium text-gray-300 hover:text-[#E50914] transition-colors">სერვისები</a>
+              <a href="#services" className="text-sm font-medium text-gray-300 hover:text-[#E50914] transition-colors">ᲡᲔᲠᲕᲘᲡᲔᲑᲘ</a>
 
-              <a href="#portfolio" className="text-sm font-medium text-gray-300 hover:text-[#E50914] transition-colors">პორტფოლიო</a>
+              <a href="#portfolio" className="text-sm font-medium text-gray-300 hover:text-[#E50914] transition-colors">ᲞᲝᲠᲢᲤᲝᲚᲘᲝ</a>
 
-              <a href="#pricing" className="text-sm font-medium text-gray-300 hover:text-[#E50914] transition-colors">ფასები</a>
+              <a href="#pricing" className="text-sm font-medium text-gray-300 hover:text-[#E50914] transition-colors">ᲤᲐᲡᲔᲑᲘ</a>
 
-              <a href="/collaboration" className="text-sm font-medium text-gray-300 hover:text-[#E50914] transition-colors">კოლაბორაცია</a>
+              <a href="/collaboration" className="text-sm font-medium text-gray-300 hover:text-[#E50914] transition-colors">ᲙᲝᲚᲐᲑᲝᲠᲐᲪᲘᲐ</a>
 
               <a href="#ai-strategist" className="text-sm font-medium flex items-center space-x-1 text-red-400 hover:text-red-300 transition-colors bg-red-950/40 px-3 py-1 rounded-full border border-red-500/20">
 
                 <BrainCircuit className="w-4 h-4" />
 
-                <span>Echelon AI</span>
+                <span>ESHELON AI</span>
 
               </a>
 
@@ -1724,7 +1862,7 @@ Keep the style bold, youthful, and highly confident (as a top-tier digital agenc
 
               >
 
-                კონტაქტი
+                ᲙᲝᲜᲢᲐᲥᲢᲘ
 
               </a>
 
@@ -1762,15 +1900,15 @@ Keep the style bold, youthful, and highly confident (as a top-tier digital agenc
 
           <div className="md:hidden bg-[#0d0d0d] border-b border-[#262626] px-4 py-6 space-y-4">
 
-            <a href="#about" onClick={() => setMenuOpen(false)} className="block text-base font-medium text-gray-300 hover:text-[#E50914]">ჩვენს შესახებ</a>
+            <a href="#about" onClick={() => setMenuOpen(false)} className="block text-base font-medium text-gray-300 hover:text-[#E50914]">ᲩᲕᲔᲜᲡ ᲨᲔᲡᲐᲮᲔᲑ</a>
 
-            <a href="#services" onClick={() => setMenuOpen(false)} className="block text-base font-medium text-gray-300 hover:text-[#E50914]">სერვისები</a>
+            <a href="#services" onClick={() => setMenuOpen(false)} className="block text-base font-medium text-gray-300 hover:text-[#E50914]">ᲡᲔᲠᲕᲘᲡᲔᲑᲘ</a>
 
-            <a href="#portfolio" onClick={() => setMenuOpen(false)} className="block text-base font-medium text-gray-300 hover:text-[#E50914]">პორტფოლიო</a>
+            <a href="#portfolio" onClick={() => setMenuOpen(false)} className="block text-base font-medium text-gray-300 hover:text-[#E50914]">ᲞᲝᲠᲢᲤᲝᲚᲘᲝ</a>
 
-            <a href="#pricing" onClick={() => setMenuOpen(false)} className="block text-base font-medium text-gray-300 hover:text-[#E50914]">ფასები</a>
+            <a href="#pricing" onClick={() => setMenuOpen(false)} className="block text-base font-medium text-gray-300 hover:text-[#E50914]">ᲤᲐᲡᲔᲑᲘ</a>
 
-            <a href="/collaboration" onClick={() => setMenuOpen(false)} className="block text-base font-medium text-gray-300 hover:text-[#E50914]">კოლაბორაცია</a>
+            <a href="/collaboration" onClick={() => setMenuOpen(false)} className="block text-base font-medium text-gray-300 hover:text-[#E50914]">ᲙᲝᲚᲐᲑᲝᲠᲐᲪᲘᲐ</a>
 
             <a href="#ai-strategist" onClick={() => setMenuOpen(false)} className="flex items-center space-x-2 text-base font-medium text-red-400">
 
@@ -1782,7 +1920,7 @@ Keep the style bold, youthful, and highly confident (as a top-tier digital agenc
 
             <a href="#contact" onClick={() => setMenuOpen(false)} className="block w-full text-center py-3 rounded-lg text-base font-bold bg-[#E50914] text-white">
 
-              დაგვიკავშირდით
+              ᲓᲐᲒᲕᲘᲙᲐᲕᲨᲘᲠᲓᲘᲗ
 
             </a>
 
@@ -2007,50 +2145,34 @@ Keep the style bold, youthful, and highly confident (as a top-tier digital agenc
           {/* GRID OF CASE STUDIES */}
 
           <div className="reveal-stagger grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {portfolioData.map((project) => (
-              <PortfolioCard
+            {visiblePortfolioProjects.map((project, idx) => (
+              <div
                 key={project.id}
-                project={project}
-                onSelect={setSelectedProject}
-              />
+                className="portfolio-card-soft-enter transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]"
+                style={{ animationDelay: `${(idx % 3) * 70}ms` }}
+              >
+                <PortfolioCard
+                  project={project}
+                  onSelect={setSelectedProject}
+                />
+              </div>
             ))}
           </div>
 
-          <div
-            className={`overflow-hidden transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${
-              showMorePortfolio ? 'max-h-[1600px] opacity-100 mt-8' : 'max-h-0 opacity-0 mt-0'
-            }`}
-            aria-hidden={!showMorePortfolio}
-          >
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 pb-1">
-              {extraPortfolioData.map((project, idx) => (
-                <div
-                  key={project.id}
-                  className={`transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${
-                    showMorePortfolio ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'
-                  }`}
-                  style={{ transitionDelay: `${idx * 90}ms` }}
-                >
-                  <PortfolioCard
-                    project={project}
-                    onSelect={setSelectedProject}
-                  />
-                </div>
-              ))}
+          {hasMorePortfolioProjects && (
+            <div className="mt-10 flex justify-center">
+              <button
+                type="button"
+                data-testid="portfolio-show-more"
+                onClick={() => setVisiblePortfolioCount((count) => Math.min(count + 3, allPortfolioProjects.length))}
+                className="group relative inline-flex items-center gap-2 px-6 py-3.5 rounded-xl border border-red-300/20 bg-gradient-to-r from-[#E50914] via-red-600 to-[#E50914] text-white text-xs font-black tracking-wider shadow-[0_18px_38px_-20px_rgba(229,9,20,0.95)] hover:scale-[1.02] active:scale-[0.985] transition"
+              >
+                <span className="absolute inset-0 rounded-xl bg-white/0 group-hover:bg-white/10 transition" />
+                <span className="relative">მეტის ჩვენება</span>
+                <ChevronDown className="relative w-4 h-4 transition-transform duration-300" />
+              </button>
             </div>
-          </div>
-
-          <div className="mt-10 flex justify-center">
-            <button
-              type="button"
-              onClick={() => setShowMorePortfolio((prev) => !prev)}
-              className="group relative inline-flex items-center gap-2 px-6 py-3.5 rounded-xl border border-red-300/20 bg-gradient-to-r from-[#E50914] via-red-600 to-[#E50914] text-white text-xs font-black tracking-wider shadow-[0_18px_38px_-20px_rgba(229,9,20,0.95)] hover:scale-[1.02] active:scale-[0.985] transition"
-            >
-              <span className="absolute inset-0 rounded-xl bg-white/0 group-hover:bg-white/10 transition" />
-              <span className="relative">{showMorePortfolio ? 'ნაკლების ჩვენება' : 'მეტის ჩვენება'}</span>
-              <ChevronDown className={`relative w-4 h-4 transition-transform duration-300 ${showMorePortfolio ? 'rotate-180' : ''}`} />
-            </button>
-          </div>
+          )}
 
         </div>
 
@@ -2136,22 +2258,7 @@ Keep the style bold, youthful, and highly confident (as a top-tier digital agenc
 
               {selectedProject.modalImages?.length > 0 && (
                 <div className="w-full border-b border-white/10 p-3 sm:p-4 lg:p-5">
-                  <div className="columns-1 sm:columns-2 xl:columns-3 gap-3 sm:gap-4 [column-fill:_balance]">
-                    {selectedProject.modalImages.map((imageSrc, imageIdx) => (
-                      <div
-                        key={`${imageSrc}-${imageIdx}`}
-                        className="mb-3 sm:mb-4 break-inside-avoid rounded-xl overflow-hidden border border-white/10 bg-black/30 shadow-[0_10px_28px_-20px_rgba(0,0,0,0.9)]"
-                      >
-                        <img
-                          src={imageSrc}
-                          alt={`${selectedProject.title} ${imageIdx + 1}`}
-                          className="w-full h-auto object-cover"
-                          loading="lazy"
-                          decoding="async"
-                        />
-                      </div>
-                    ))}
-                  </div>
+                  <PortfolioModalGallery project={selectedProject} />
                 </div>
               )}
 
@@ -2207,7 +2314,7 @@ Keep the style bold, youthful, and highly confident (as a top-tier digital agenc
 
 
 
-                <div className="inline-flex items-center px-2.5 py-1 rounded-md bg-white/[0.02] border border-white/5 text-[10px] font-medium tracking-wide text-gray-500">
+                <div className="inline-flex items-center px-2.5 py-1 rounded-md bg-white/[0.02] border border-white/5 text-xs font-medium tracking-wide text-gray-500">
                   {getWorkTypeLabel(selectedProject)}
                 </div>
 
@@ -2373,7 +2480,7 @@ Keep the style bold, youthful, and highly confident (as a top-tier digital agenc
 
                   <div className="bg-gradient-to-r from-red-950/20 to-orange-950/20 border border-white/5 rounded-xl p-6 space-y-4">
 
-                    <span className="text-[10px] font-mono tracking-widest text-[#E50914] uppercase">თქვენი საფირმო სლოგანი</span>
+                    <span className="text-xs font-mono tracking-widest text-[#E50914] uppercase">თქვენი საფირმო სლოგანი</span>
 
                     <p className="text-xl sm:text-2xl font-black text-white italic">
 
@@ -2389,7 +2496,7 @@ Keep the style bold, youthful, and highly confident (as a top-tier digital agenc
 
                     <div className="bg-black/40 border border-white/5 p-6 rounded-xl space-y-3">
 
-                      <span className="text-[10px] font-mono tracking-widest text-orange-400 uppercase">ვიზუალური Vibe & სტილი</span>
+                      <span className="text-xs font-mono tracking-widest text-orange-400 uppercase">ვიზუალური Vibe & სტილი</span>
 
                       <p className="text-sm text-gray-300 leading-relaxed">
 
@@ -2403,7 +2510,7 @@ Keep the style bold, youthful, and highly confident (as a top-tier digital agenc
 
                     <div className="bg-black/40 border border-white/5 p-6 rounded-xl space-y-3">
 
-                      <span className="text-[10px] font-mono tracking-widest text-blue-400 uppercase">სუპერ სარეკლამო იდეა</span>
+                      <span className="text-xs font-mono tracking-widest text-blue-400 uppercase">სუპერ სარეკლამო იდეა</span>
 
                       <p className="text-sm text-gray-300 leading-relaxed">
 
@@ -2419,7 +2526,7 @@ Keep the style bold, youthful, and highly confident (as a top-tier digital agenc
 
                   <div className="bg-black/40 border border-white/5 p-6 rounded-xl space-y-4">
 
-                    <span className="text-[10px] font-mono tracking-widest text-green-400 uppercase block">3 ნაბიჯი წარმატებისთვის:</span>
+                    <span className="text-xs font-mono tracking-widest text-green-400 uppercase block">3 ნაბიჯი წარმატებისთვის:</span>
 
                     <ol className="space-y-3">
 
@@ -2559,7 +2666,7 @@ Keep the style bold, youthful, and highly confident (as a top-tier digital agenc
 
                   {pkg.featured && (
 
-                    <div className="absolute top-0 right-8 -translate-y-1/2 px-3 py-1 bg-[#E50914] text-white text-[10px] font-bold tracking-wider rounded-full uppercase">
+                    <div className="absolute top-0 right-8 -translate-y-1/2 px-3 py-1 bg-[#E50914] text-white text-xs font-bold tracking-wider rounded-full uppercase">
 
                       ყველაზე პოპულარული
 
@@ -2575,7 +2682,7 @@ Keep the style bold, youthful, and highly confident (as a top-tier digital agenc
 
                       <div>
 
-                        <span className="text-[10px] uppercase tracking-widest font-mono text-gray-500 block mb-1">{pkg.badge}</span>
+                        <span className="text-xs uppercase tracking-widest font-mono text-gray-500 block mb-1">{pkg.badge}</span>
 
                         <h4 className="text-xl font-bold text-white">{pkg.title}</h4>
 
@@ -2595,14 +2702,14 @@ Keep the style bold, youthful, and highly confident (as a top-tier digital agenc
 
                     <p className="text-xs text-gray-400 leading-relaxed">{pkg.desc}</p>
                     {pkg.compareHint && (
-                      <p className="text-[11px] text-[#E50914] leading-relaxed">{pkg.compareHint}</p>
+                      <p className="text-xs text-[#E50914] leading-relaxed">{pkg.compareHint}</p>
                     )}
                     {pkg.deltaFromPrev && (
                       <div className="flex flex-wrap gap-2">
                         {pkg.deltaFromPrev.map((item, itemIdx) => (
                           <span
                             key={itemIdx}
-                            className="text-[10px] uppercase tracking-wide px-2 py-1 rounded-md bg-black/35 border border-white/10 text-gray-200"
+                            className="text-xs uppercase tracking-wide px-2 py-1 rounded-md bg-black/35 border border-white/10 text-gray-200"
                           >
                             {item}
                           </span>
@@ -2633,7 +2740,7 @@ Keep the style bold, youthful, and highly confident (as a top-tier digital agenc
 
                           <div className="flex flex-col items-start gap-1.5">
                             {isDiscount && (
-                              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-black tracking-wide bg-[#E50914] text-white">
+                              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-black tracking-wide bg-[#E50914] text-white">
                                 -50% ფასდაკლება
                               </span>
                             )}
@@ -2688,7 +2795,7 @@ Keep the style bold, youthful, and highly confident (as a top-tier digital agenc
 
                   {pkg.featured && (
 
-                    <div className="absolute top-0 right-8 -translate-y-1/2 px-3 py-1 bg-[#E50914] text-white text-[10px] font-bold tracking-wider rounded-full uppercase">
+                    <div className="absolute top-0 right-8 -translate-y-1/2 px-3 py-1 bg-[#E50914] text-white text-xs font-bold tracking-wider rounded-full uppercase">
 
                       რეკომენდებული
 
@@ -2704,7 +2811,7 @@ Keep the style bold, youthful, and highly confident (as a top-tier digital agenc
 
                       <div>
 
-                        <span className="text-[10px] uppercase tracking-widest font-mono text-gray-500 block mb-1">{pkg.badge}</span>
+                        <span className="text-xs uppercase tracking-widest font-mono text-gray-500 block mb-1">{pkg.badge}</span>
 
                         <h4 className="text-xl font-bold text-white">{pkg.title}</h4>
 
@@ -2724,7 +2831,7 @@ Keep the style bold, youthful, and highly confident (as a top-tier digital agenc
 
                     <p className="text-xs text-gray-400 leading-relaxed">{pkg.desc}</p>
                     {pkg.compareHint && (
-                      <p className="text-[11px] text-[#E50914] leading-relaxed">{pkg.compareHint}</p>
+                      <p className="text-xs text-[#E50914] leading-relaxed">{pkg.compareHint}</p>
                     )}
 
 
@@ -2750,7 +2857,7 @@ Keep the style bold, youthful, and highly confident (as a top-tier digital agenc
 
                           <div className="flex flex-col items-start gap-1.5">
                             {isDiscount && (
-                              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-black tracking-wide bg-[#E50914] text-white">
+                              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-black tracking-wide bg-[#E50914] text-white">
                                 -50% ფასდაკლება
                               </span>
                             )}
@@ -2973,7 +3080,7 @@ Keep the style bold, youthful, and highly confident (as a top-tier digital agenc
 
                 <div className="space-y-4">
 
-                  <span className="text-[10px] font-mono tracking-widest text-[#E50914] uppercase block">კალკულაციის ჯამი:</span>
+                  <span className="text-xs font-mono tracking-widest text-[#E50914] uppercase block">კალკულაციის ჯამი:</span>
 
                   <div className="text-4xl sm:text-5xl font-black text-white">{calculateCustomPrice()} ₾</div>
 
@@ -3290,7 +3397,7 @@ Keep the style bold, youthful, and highly confident (as a top-tier digital agenc
 
                 <span className="text-md font-bold tracking-widest text-white block group-hover:text-[#E50914] transition-colors">ESHELON</span>
 
-                <span className="text-[9px] tracking-widest text-gray-500 block uppercase -mt-1">Highest</span>
+                <span className="text-xs tracking-widest text-gray-500 block uppercase -mt-1">Highest</span>
 
               </div>
 
@@ -3342,7 +3449,7 @@ Keep the style bold, youthful, and highly confident (as a top-tier digital agenc
 
             <div className="space-y-4 mb-6">
 
-              <span className="text-[10px] font-mono tracking-widest text-[#E50914] uppercase">პაკეტის შეკვეთა</span>
+              <span className="text-xs font-mono tracking-widest text-[#E50914] uppercase">პაკეტის შეკვეთა</span>
 
               <h3 className="text-2xl font-black text-white">{orderModal.title}</h3>
 
