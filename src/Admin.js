@@ -1,12 +1,4 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { createClient } from '@supabase/supabase-js';
-import {
-  SUPABASE_URL,
-  SUPABASE_ANON_KEY,
-  ADMIN_EMAILS,
-  IMAGE_BUCKET,
-  isSupabaseConfigured
-} from './supabaseConfig';
 import {
   portfolioData,
   extraPortfolioData,
@@ -18,7 +10,32 @@ import {
   collaborationTerms
 } from './App';
 
-const supabase = isSupabaseConfigured ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+const PW_KEY = 'eshelon-admin-pw';
+const getPw = () => {
+  try { return window.localStorage.getItem(PW_KEY) || ''; } catch (e) { return ''; }
+};
+const setPw = (v) => {
+  try { if (v) window.localStorage.setItem(PW_KEY, v); else window.localStorage.removeItem(PW_KEY); } catch (e) { /* ignore */ }
+};
+
+async function api(path, { body, raw, type } = {}) {
+  const res = await fetch(path, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${getPw()}`,
+      'Content-Type': raw ? type : 'application/json'
+    },
+    body: raw ? raw : JSON.stringify(body || {})
+  });
+  let data = {};
+  try { data = await res.json(); } catch (e) { /* ignore */ }
+  if (!res.ok) {
+    const err = new Error(data.error || `HTTP ${res.status}`);
+    err.status = res.status;
+    throw err;
+  }
+  return data;
+}
 
 const clone = (v) => JSON.parse(JSON.stringify(v));
 
@@ -76,16 +93,10 @@ async function compressImage(file, maxWidth = 1800, quality = 0.84) {
   return blob.size < file.size ? blob : file;
 }
 
-async function uploadImage(file, folder) {
+async function uploadImage(file) {
   const data = await compressImage(file);
-  const ext = data.type === 'image/jpeg' ? 'jpg' : (file.name.split('.').pop() || 'img').toLowerCase();
-  const path = `${folder}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
-  const { error } = await supabase.storage.from(IMAGE_BUCKET).upload(path, data, {
-    contentType: data.type || file.type,
-    cacheControl: '31536000'
-  });
-  if (error) throw error;
-  return supabase.storage.from(IMAGE_BUCKET).getPublicUrl(path).data.publicUrl;
+  const res = await api('/api/admin/upload', { raw: data, type: data.type || file.type });
+  return res.url;
 }
 
 /* ---------------- small UI pieces ---------------- */
@@ -507,8 +518,7 @@ function normalize(key, data) {
 
 /* ---------------- main ---------------- */
 
-function Login() {
-  const [email, setEmail] = useState('');
+function Login({ onLogin }) {
   const [password, setPassword] = useState('');
   const [err, setErr] = useState('');
   const [busy, setBusy] = useState(false);
@@ -516,8 +526,16 @@ function Login() {
     e.preventDefault();
     setBusy(true);
     setErr('');
-    const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
-    if (error) setErr('ელფოსტა ან პაროლი არასწორია');
+    setPw(password);
+    try {
+      const res = await api('/api/admin/check');
+      onLogin(res.content || {});
+    } catch (ex) {
+      setPw('');
+      setErr(ex.message === 'no-password-set'
+        ? 'პაროლი ჯერ არ არის დაყენებული Cloudflare-ში.'
+        : ex.status === 401 ? 'პაროლი არასწორია' : 'კავშირის შეცდომა, სცადე თავიდან');
+    }
     setBusy(false);
   };
   return (
@@ -527,7 +545,6 @@ function Login() {
           <p className="text-xs font-bold tracking-widest text-[#E50914]">ESHELON</p>
           <h1 className="text-2xl font-black text-white">ადმინ პანელი</h1>
         </div>
-        <Field label="ელფოსტა" type="email" value={email} onChange={setEmail} />
         <Field label="პაროლი" type="password" value={password} onChange={setPassword} />
         {err && <p className="text-sm text-red-400">{err}</p>}
         <Btn kind="primary" type="submit" disabled={busy}>{busy ? 'შესვლა…' : 'შესვლა'}</Btn>
@@ -537,7 +554,7 @@ function Login() {
 }
 
 export default function Admin() {
-  const [session, setSession] = useState(null);
+  const [loggedIn, setLoggedIn] = useState(false);
   const [ready, setReady] = useState(false);
   const [tab, setTab] = useState('portfolio');
   const [data, setData] = useState(null);
@@ -545,33 +562,27 @@ export default function Admin() {
   const [status, setStatus] = useState('');
   const [saving, setSaving] = useState(false);
 
-  useEffect(() => {
-    document.title = 'ადმინ პანელი | ESHELON';
-    if (!supabase) return undefined;
-    supabase.auth.getSession().then(({ data: d }) => {
-      setSession(d.session);
-      setReady(true);
+  const loadContent = (stored) => {
+    const merged = clone(DEFAULTS);
+    Object.keys(DEFAULTS).forEach((k) => {
+      if (stored && stored[k] != null) merged[k] = stored[k];
     });
-    const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => setSession(s));
-    return () => sub.subscription.unsubscribe();
-  }, []);
+    setData(merged);
+    setSaved(clone(merged));
+    setLoggedIn(true);
+  };
 
   useEffect(() => {
-    if (!session) return;
-    (async () => {
-      const { data: rows, error } = await supabase.from('site_content').select('key,data');
-      if (error) {
-        setStatus('მონაცემები ვერ ჩაიტვირთა: ' + error.message);
-        return;
-      }
-      const merged = clone(DEFAULTS);
-      (rows || []).forEach((r) => {
-        if (r.data != null) merged[r.key] = r.data;
-      });
-      setData(merged);
-      setSaved(clone(merged));
-    })();
-  }, [session]);
+    document.title = 'ადმინ პანელი | ESHELON';
+    if (!getPw()) {
+      setReady(true);
+      return;
+    }
+    api('/api/admin/check')
+      .then((res) => loadContent(res.content))
+      .catch(() => setPw(''))
+      .finally(() => setReady(true));
+  }, []);
 
   const dirtyKeys = useMemo(() => {
     if (!data || !saved) return [];
@@ -589,34 +600,36 @@ export default function Admin() {
     return () => window.removeEventListener('beforeunload', h);
   }, [dirtyKeys]);
 
-  if (!isSupabaseConfigured) {
-    return (
-      <div className="min-h-screen bg-[#0d0d0d] text-gray-300 flex items-center justify-center p-6 text-center">
-        ადმინ პანელი ჯერ არ არის დაკავშირებული Supabase-თან.
-      </div>
-    );
-  }
   if (!ready) return <div className="min-h-screen bg-[#0d0d0d]" />;
-  if (!session) return <Login />;
-
-  const email = (session.user?.email || '').toLowerCase();
-  const allowed = ADMIN_EMAILS.map((e) => e.toLowerCase()).includes(email);
+  if (!loggedIn) return <Login onLogin={loadContent} />;
 
   const setSection = (key, value) => setData((d) => ({ ...d, [key]: value }));
+
+  const logout = () => {
+    if (dirtyKeys.length && !window.confirm('შეუნახავი ცვლილებები დაიკარგება. გავიდე?')) return;
+    setPw('');
+    setLoggedIn(false);
+    setData(null);
+    setSaved(null);
+  };
 
   const save = async () => {
     setSaving(true);
     setStatus('');
-    const payload = dirtyKeys.map((k) => ({ key: k, data: normalize(k, data[k]), updated_at: new Date().toISOString() }));
-    const { error } = await supabase.from('site_content').upsert(payload);
-    if (error) {
-      setStatus('შენახვა ვერ მოხერხდა: ' + error.message);
-    } else {
-      const next = { ...data };
-      payload.forEach((p) => { next[p.key] = p.data; });
+    const sections = {};
+    dirtyKeys.forEach((k) => { sections[k] = normalize(k, data[k]); });
+    try {
+      await api('/api/admin/save', { body: { sections } });
+      const next = { ...data, ...sections };
       setData(next);
       setSaved(clone(next));
-      setStatus('შენახულია ✓ საიტზე ცვლილება უკვე ჩანს.');
+      setStatus('შენახულია ✓ საიტზე ცვლილება დაახლოებით 1 წუთში გამოჩნდება.');
+    } catch (ex) {
+      if (ex.status === 401) {
+        setStatus('სესია ამოიწურა ან პაროლი შეიცვალა — გადი და თავიდან შედი (ცვლილებები არ შეინახა).');
+      } else {
+        setStatus('შენახვა ვერ მოხერხდა: ' + ex.message);
+      }
     }
     setSaving(false);
   };
@@ -635,10 +648,10 @@ export default function Admin() {
           </div>
           <a href="/" target="_blank" rel="noopener noreferrer" className="text-xs text-gray-400 hover:text-white">საიტის ნახვა ↗</a>
           {dirtyKeys.length > 0 && <Btn onClick={discard}>გაუქმება</Btn>}
-          <Btn kind="primary" onClick={save} disabled={!allowed || saving || !dirtyKeys.length}>
+          <Btn kind="primary" onClick={save} disabled={saving || !dirtyKeys.length}>
             {saving ? 'ინახება…' : dirtyKeys.length ? `შენახვა (${dirtyKeys.length})` : 'შენახულია'}
           </Btn>
-          <button type="button" className="text-xs text-gray-500 hover:text-white" onClick={() => supabase.auth.signOut()}>გასვლა</button>
+          <button type="button" className="text-xs text-gray-500 hover:text-white" onClick={logout}>გასვლა</button>
         </div>
         <nav className="max-w-6xl mx-auto px-4 flex gap-1 overflow-x-auto">
           {TABS.map((t) => (
@@ -656,11 +669,6 @@ export default function Admin() {
       </header>
 
       <main className="max-w-6xl mx-auto px-4 py-6 space-y-4">
-        {!allowed && (
-          <p className="rounded-lg border border-amber-500/30 bg-amber-500/10 text-amber-300 text-sm p-3">
-            ამ ანგარიშს ({email}) შენახვის უფლება არ აქვს.
-          </p>
-        )}
         {status && (
           <p className={`rounded-lg text-sm p-3 border ${status.startsWith('შენახულია') ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-300' : 'border-red-500/30 bg-red-500/10 text-red-300'}`}>
             {status}

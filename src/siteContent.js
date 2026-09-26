@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
-import { SUPABASE_URL, SUPABASE_ANON_KEY, isSupabaseConfigured } from './supabaseConfig';
 
-const CACHE_KEY = 'eshelon-site-content-v1';
+const CACHE_KEY = 'eshelon-site-content-v2';
 
 function readCache() {
   try {
@@ -21,24 +20,16 @@ function writeCache(content) {
 }
 
 export async function fetchSiteContent() {
-  if (!isSupabaseConfigured) return {};
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/site_content?select=key,data`, {
-    headers: {
-      apikey: SUPABASE_ANON_KEY,
-      Authorization: `Bearer ${SUPABASE_ANON_KEY}`
-    }
-  });
-  if (!res.ok) throw new Error(`content ${res.status}`);
-  const rows = await res.json();
-  const content = {};
-  rows.forEach((row) => {
-    if (row && row.key && row.data != null) content[row.key] = row.data;
-  });
-  return content;
+  const res = await fetch('/api/content', { headers: { Accept: 'application/json' } });
+  const type = res.headers.get('Content-Type') || '';
+  if (!res.ok || !type.includes('application/json')) throw new Error(`content ${res.status}`);
+  const data = await res.json();
+  return data && typeof data === 'object' ? data : {};
 }
 
-// Returns content saved from the admin panel. Missing keys fall back to the
-// defaults written in App.js, so the site always renders even if Supabase is down.
+// Returns content saved from the admin panel (stored in Cloudflare KV).
+// Missing sections fall back to the defaults written in App.js, so the site
+// always renders even if the content API is unavailable.
 export function useSiteContent() {
   const [content, setContent] = useState(() => (typeof window === 'undefined' ? {} : readCache()));
 

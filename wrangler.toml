@@ -1,0 +1,7 @@
+name = "eshelon4"
+pages_build_output_dir = "build"
+compatibility_date = "2026-09-01"
+
+[[kv_namespaces]]
+binding = "SITE_KV"
+id = "73841f7d4ddc478bad86d4060287c9a2"
