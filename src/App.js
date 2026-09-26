@@ -60,6 +60,7 @@ import {
   Lock
 
 } from 'lucide-react';
+import { useSiteContent, pickList } from './siteContent';
 
 
 
@@ -415,7 +416,7 @@ const workTypeByProjectId = {
 };
 
 function getWorkTypeLabel(project) {
-  return workTypeByProjectId[project.id] || 'სოც. მედია';
+  return project.workType || workTypeByProjectId[project.id] || 'სოც. მედია';
 }
 
 function ModalGalleryImage({ project, imageSrc, imageIdx }) {
@@ -1095,7 +1096,7 @@ function AboutSection() {
   );
 }
 
-function FacebookNewsSection() {
+function FacebookNewsSection({ posts = facebookNewsPosts }) {
   return (
     <section id="facebook-news" data-reveal className="reveal-section py-14 sm:py-16 bg-[#0c0c0f] border-y border-[#1e1e24]">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -1118,7 +1119,7 @@ function FacebookNewsSection() {
         </div>
 
         <div className="reveal-stagger grid grid-cols-2 lg:grid-cols-2 gap-3 sm:gap-4">
-          {facebookNewsPosts.map((post) => (
+          {posts.map((post) => (
             <a
               key={post.id}
               href={post.url}
@@ -1219,7 +1220,7 @@ const folioPosterImages = [
   '/optimized/posters/showcase/post-34-square.jpg'
 ];
 
-function CollaborationPage() {
+function CollaborationPage({ offers = collaborationOffers, terms = collaborationTerms }) {
   return (
     <div className="min-h-screen bg-[#0d0d0d] text-[#f2f2f2] font-sans antialiased selection:bg-[#E50914] selection:text-white">
       <nav className="nav-glass sticky top-0 z-40 border-b border-[#262626]/80">
@@ -1268,7 +1269,7 @@ function CollaborationPage() {
         <section className="py-14 sm:py-16 border-b border-[#1e1e1e]">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
             <div className="grid grid-cols-1 xl:grid-cols-3 gap-5">
-              {collaborationOffers.map((offer) => (
+              {offers.map((offer) => (
                 <div key={offer.id} className="surface-card relative overflow-hidden bg-[#121212] border border-white/10 rounded-2xl p-5 sm:p-6">
                   <div className={`pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b ${offer.accent}`} />
                   <div className="relative space-y-4">
@@ -1312,7 +1313,7 @@ function CollaborationPage() {
                 <p className="text-sm font-bold text-white">თანამშრომლობის ძირითადი პირობები</p>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
-                {collaborationTerms.map((term, index) => (
+                {terms.map((term, index) => (
                   <div key={term} className="rounded-xl border border-white/10 bg-white/[0.02] px-3.5 py-3 flex items-start gap-2.5">
                     <span className="mt-0.5 text-xs font-bold text-[#E50914]">{String(index + 1).padStart(2, '0')}</span>
                     <p className="text-sm text-gray-300 leading-relaxed">{term}</p>
@@ -1338,8 +1339,14 @@ function CollaborationPage() {
 
 function App() {
 
-  const SMM_POST_UNIT_PRICE = 220;
-  const SMM_STORY_UNIT_PRICE = 40;
+  const siteContent = useSiteContent();
+  const calc = { logo: 500, guidelines: 3000, post: 220, story: 40, advertising: 400, shadowTesting: 250, ...(siteContent.calculator || {}) };
+  const SMM_POST_UNIT_PRICE = Number(calc.post) || 0;
+  const SMM_STORY_UNIT_PRICE = Number(calc.story) || 0;
+  const brandingList = pickList(siteContent.branding, brandingPackages);
+  const smmList = pickList(siteContent.smm, smmPackages);
+  const newsList = pickList(siteContent.news, facebookNewsPosts);
+  const collaborationContent = siteContent.collaboration || {};
   const ORDER_RECIPIENTS = [
     "tazo.gochelashvili.3@gmail.com",
     "kalmakhelidzelazare@gmail.com"
@@ -1353,7 +1360,7 @@ function App() {
 
   const [selectedProject, setSelectedProject] = useState(null);
   const [visiblePortfolioCount, setVisiblePortfolioCount] = useState(6);
-  const allPortfolioProjects = [...portfolioData, ...extraPortfolioData];
+  const allPortfolioProjects = pickList(siteContent.portfolio, [...portfolioData, ...extraPortfolioData]);
   const visiblePortfolioProjects = allPortfolioProjects.slice(0, visiblePortfolioCount);
   const hasMorePortfolioProjects = visiblePortfolioCount < allPortfolioProjects.length;
 
@@ -1529,17 +1536,17 @@ function App() {
 
     let base = 0;
 
-    if (customServices.logo) base += 500;
+    if (customServices.logo) base += Number(calc.logo) || 0;
 
-    if (customServices.guidelines) base += 3000;
+    if (customServices.guidelines) base += Number(calc.guidelines) || 0;
 
     base += customServices.posts * SMM_POST_UNIT_PRICE;
 
     base += customServices.stories * SMM_STORY_UNIT_PRICE;
 
-    if (customServices.advertising) base += 400;
+    if (customServices.advertising) base += Number(calc.advertising) || 0;
 
-    if (customServices.shadowTesting) base += 250;
+    if (customServices.shadowTesting) base += Number(calc.shadowTesting) || 0;
 
     return base;
 
@@ -1779,7 +1786,7 @@ Keep the style bold, youthful, and highly confident (as a top-tier digital agenc
 
 
   if (isCollaborationPage) {
-    return <CollaborationPage />;
+    return <CollaborationPage offers={pickList(collaborationContent.offers, collaborationOffers)} terms={pickList(collaborationContent.terms, collaborationTerms)} />;
   }
 
   return (
@@ -2662,7 +2669,7 @@ Keep the style bold, youthful, and highly confident (as a top-tier digital agenc
 
             {activeTab === 'branding' ? (
 
-              brandingPackages.map((pkg, idx) => (
+              brandingList.map((pkg, idx) => (
 
                 <div
 
@@ -2791,7 +2798,7 @@ Keep the style bold, youthful, and highly confident (as a top-tier digital agenc
 
             ) : (
 
-              smmPackages.map((pkg, idx) => (
+              smmList.map((pkg, idx) => (
 
                 <div
 
@@ -2942,7 +2949,7 @@ Keep the style bold, youthful, and highly confident (as a top-tier digital agenc
 
                 <div className="flex items-center justify-between">
 
-                  <label className="text-xs font-bold text-gray-300 uppercase">ლოგოს დიზაინი (+500 ₾)</label>
+                  <label className="text-xs font-bold text-gray-300 uppercase">ლოგოს დიზაინი (+{calc.logo} ₾)</label>
 
                   <input
 
@@ -2962,7 +2969,7 @@ Keep the style bold, youthful, and highly confident (as a top-tier digital agenc
 
                 <div className="flex items-center justify-between">
 
-                  <label className="text-xs font-bold text-gray-300 uppercase">ბრენდბუქი & გრიდები (+3000 ₾)</label>
+                  <label className="text-xs font-bold text-gray-300 uppercase">ბრენდბუქი & გრიდები (+{calc.guidelines} ₾)</label>
 
                   <input
 
@@ -3042,7 +3049,7 @@ Keep the style bold, youthful, and highly confident (as a top-tier digital agenc
 
                 <div className="flex items-center justify-between">
 
-                  <label className="text-xs font-bold text-gray-300 uppercase">რეკლამის მართვა (Ad set) (+400 ₾)</label>
+                  <label className="text-xs font-bold text-gray-300 uppercase">რეკლამის მართვა (Ad set) (+{calc.advertising} ₾)</label>
 
                   <input
 
@@ -3062,7 +3069,7 @@ Keep the style bold, youthful, and highly confident (as a top-tier digital agenc
 
                 <div className="flex items-center justify-between">
 
-                  <label className="text-xs font-bold text-gray-300 uppercase">შადოუ რეკლამების ტესტირება (+250 ₾)</label>
+                  <label className="text-xs font-bold text-gray-300 uppercase">შადოუ რეკლამების ტესტირება (+{calc.shadowTesting} ₾)</label>
 
                   <input
 
@@ -3134,7 +3141,7 @@ Keep the style bold, youthful, and highly confident (as a top-tier digital agenc
 
       {/* FACEBOOK NEWS */}
 
-      <FacebookNewsSection />
+      <FacebookNewsSection posts={newsList} />
 
 
 
@@ -3586,5 +3593,16 @@ Keep the style bold, youthful, and highly confident (as a top-tier digital agenc
   );
 
 }
+
+export {
+  portfolioData,
+  extraPortfolioData,
+  workTypeByProjectId,
+  brandingPackages,
+  smmPackages,
+  facebookNewsPosts,
+  collaborationOffers,
+  collaborationTerms
+};
 
 export default App;
