@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { X, ChevronLeft, ChevronRight, ArrowRight, Check, Link2, Maximize2 } from 'lucide-react';
 import { useLang } from '../i18n';
+import Img from '../Img';
 
 export function projectImages(project) {
   if (!project) return [];
@@ -9,7 +10,7 @@ export function projectImages(project) {
   return single ? [single] : [];
 }
 
-function FadeImage({ src, alt, className = '', eager, onClick }) {
+function FadeImage({ src, alt, className = '', eager, onClick, sizes = '100vw' }) {
   const { t } = useLang();
   const [loaded, setLoaded] = useState(false);
   return (
@@ -19,8 +20,9 @@ function FadeImage({ src, alt, className = '', eager, onClick }) {
       className={`pv-img group relative block w-full overflow-hidden rounded-xl bg-white/[0.03] border border-white/[0.06] cursor-zoom-in ${className}`}
       aria-label={`${alt} — ${t('გადიდება', 'enlarge')}`}
     >
-      <img
+      <Img
         src={src}
+        sizes={sizes}
         alt={alt}
         loading={eager ? 'eager' : 'lazy'}
         decoding="async"
@@ -87,9 +89,10 @@ function Lightbox({ images, index, title, onClose, onIndex }) {
         </div>
       </div>
       <div className="relative flex-1 min-h-0 overflow-auto flex items-center justify-center" style={{ touchAction: 'pinch-zoom pan-x pan-y' }}>
-        <img
+        <Img
           key={images[index]}
           src={images[index]}
+          sizes="100vw"
           alt={`${title} ${index + 1}`}
           onClick={toggleZoom}
           className={`pv-zoom-in max-w-full max-h-full object-contain select-none transition-transform duration-300 ${zoom ? 'cursor-zoom-out' : 'cursor-zoom-in'}`}
@@ -257,12 +260,12 @@ export default function ProjectViewer({ projects, index, onClose, onNavigate, on
             {/* images */}
             <div className="lg:col-span-8 order-2">
               {isLong || images.length === 1 ? (
-                <FadeImage src={images[0]} alt={project.title} eager onClick={() => setLightbox(0)} />
+                <FadeImage src={images[0]} sizes="(min-width: 1024px) 860px, 100vw" alt={project.title} eager onClick={() => setLightbox(0)} />
               ) : (
                 <div className="columns-1 sm:columns-2 gap-3 sm:gap-4 [&>*]:mb-3 sm:[&>*]:mb-4">
                   {images.map((src, i) => (
                     <div key={`${src}-${i}`} className="break-inside-avoid">
-                      <FadeImage src={src} alt={`${project.title} ${i + 1}`} eager={i < 4} onClick={() => setLightbox(i)} />
+                      <FadeImage src={src} sizes="(min-width: 1024px) 420px, (min-width: 640px) 50vw, 100vw" alt={`${project.title} ${i + 1}`} eager={i < 4} onClick={() => setLightbox(i)} />
                     </div>
                   ))}
                 </div>
@@ -304,7 +307,7 @@ export default function ProjectViewer({ projects, index, onClose, onNavigate, on
               className="group mt-14 sm:mt-20 w-full text-left relative overflow-hidden rounded-2xl border border-white/10 bg-[#111]"
             >
               {next.coverImage && (
-                <img src={next.coverImage} alt="" loading="lazy" className="absolute inset-0 w-full h-full object-cover opacity-35 group-hover:opacity-50 group-hover:scale-105 transition duration-700" />
+                <Img src={next.coverImage} sizes="100vw" alt="" loading="lazy" className="absolute inset-0 w-full h-full object-cover opacity-35 group-hover:opacity-50 group-hover:scale-105 transition duration-700" />
               )}
               <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/50 to-black/10" />
               <div className="relative flex items-center justify-between gap-4 p-6 sm:p-10 min-h-[140px] sm:min-h-[200px]">

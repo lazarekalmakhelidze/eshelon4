@@ -1,7 +1,8 @@
 import React, { useMemo } from 'react';
 import styles from './PosterFolio.module.css';
+import Img from '../Img';
 
-const defaultPosters = [
+export const defaultPosters = [
   '/optimized/posters/harmonica-main-01.jpg',
   '/optimized/posters/showcase/post-28-square.jpg',
   '/optimized/posters/showcase/post-23.jpg',
@@ -31,7 +32,7 @@ export default function PosterFolio({
   }, [safePosters]);
 
   return (
-    <section className={styles.section} aria-label="Poster folio gallery">
+    <section className={styles.section} aria-label="Poster folio gallery" data-pause-offscreen>
       <div className={styles.viewport}>
         <div className={styles.rail}>
           <div
@@ -46,8 +47,9 @@ export default function PosterFolio({
                   className={styles.card}
                   key={`${src}-${index}`}
                 >
-                  <img
+                  <Img
                     src={src}
+                    sizes="(max-width: 920px) 190px, 286px"
                     alt={`Poster ${originalIndex + 1}`}
                     className={styles.poster}
                     loading="lazy"

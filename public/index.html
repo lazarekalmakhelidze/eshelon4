@@ -18,10 +18,81 @@
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta name="twitter:card" content="summary_large_image" />
-    <link rel="preload" as="image" href="/hero-headline.png" />
+
+    <link rel="preload" as="image" type="image/webp" media="(max-width: 1023px)" imagesrcset="/v/cover-portrait-480.webp 480w, /v/cover-portrait-960.webp 960w, /v/cover-portrait-1166.webp 1166w" imagesizes="100vw" />
+    <link rel="preload" as="image" type="image/webp" media="(min-width: 1024px)" imagesrcset="/v/cover-landscape-480.webp 480w, /v/cover-landscape-960.webp 960w, /v/cover-landscape-1600.webp 1600w" imagesizes="100vw" />
+    <link rel="preload" as="image" type="image/webp" imagesrcset="/v/hero-headline-480.webp 480w, /v/hero-headline-960.webp 960w, /v/hero-headline-1600.webp 1600w" imagesizes="(min-width: 640px) 512px, 60vw" />
+
+    <style>
+      html.is-booting { overflow: hidden; }
+      html.is-booting #hero * { animation-play-state: paused !important; }
+      #boot { position: fixed; inset: 0; z-index: 9999; background: #0b0b0b; color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px; font-family: "Helvetica Neue", Arial, sans-serif; transition: transform .9s cubic-bezier(.76,0,.24,1), opacity .5s ease .45s; will-change: transform; }
+      #boot::before { content: ""; position: absolute; inset: 0; background: radial-gradient(60% 45% at 50% 42%, rgba(229,9,20,.16), transparent 70%); animation: bGlow 2.6s ease-in-out infinite alternate; }
+      #boot::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: #E50914; transform-origin: left; transform: scaleX(var(--p, 0)); transition: transform .35s ease; box-shadow: 0 0 18px rgba(229,9,20,.8); }
+      #boot.b-out { transform: translateY(-100%); }
+      #boot .b-mark { position: relative; width: 76px; height: 76px; border-radius: 18px; overflow: hidden; border: 1px solid rgba(229,9,20,.55); box-shadow: 0 0 0 6px rgba(229,9,20,.08), 0 18px 50px -12px rgba(229,9,20,.55); animation: bFloat 2.4s ease-in-out infinite; }
+      #boot .b-mark img { width: 100%; height: 100%; display: block; object-fit: cover; }
+      #boot .b-word { position: relative; display: flex; gap: .42em; font-weight: 900; font-size: 22px; letter-spacing: .02em; }
+      #boot .b-word span { opacity: 0; transform: translateY(10px); animation: bIn .6s cubic-bezier(.22,1,.36,1) forwards; }
+      #boot .b-sub { position: relative; margin-top: -14px; font-size: 10px; font-weight: 800; letter-spacing: .5em; color: #E50914; opacity: 0; animation: bIn .6s .55s forwards; }
+      #boot .b-pct { position: relative; font-size: 12px; font-weight: 700; color: rgba(255,255,255,.45); font-variant-numeric: tabular-nums; letter-spacing: .08em; min-width: 4ch; text-align: center; }
+      @keyframes bIn { to { opacity: 1; transform: none; } }
+      @keyframes bFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+      @keyframes bGlow { from { opacity: .55; } to { opacity: 1; } }
+      @media (prefers-reduced-motion: reduce) { #boot, #boot * , #boot::before { animation: none !important; } #boot .b-word span, #boot .b-sub { opacity: 1; transform: none; } #boot.b-out { transform: none; opacity: 0; } }
+    </style>
+    <noscript><style>#boot { display: none; } html.is-booting { overflow: auto; }</style></noscript>
   </head>
   <body class="bg-[#0d0d0d]">
     <noscript>ESHELON — ბრენდინგისა და სოციალური მედიის სააგენტო. გთხოვთ, ჩართოთ JavaScript.</noscript>
+    <div id="boot" aria-hidden="true">
+      <div class="b-mark"><img src="data:image/webp;base64,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" alt="" /></div>
+      <div class="b-word"><span style="animation-delay:0.08s">E</span><span style="animation-delay:0.14s">S</span><span style="animation-delay:0.20s">H</span><span style="animation-delay:0.26s">E</span><span style="animation-delay:0.32s">L</span><span style="animation-delay:0.38s">O</span><span style="animation-delay:0.44s">N</span></div>
+      <div class="b-sub">HIGHEST</div>
+      <div class="b-pct">0%</div>
+    </div>
+    <script>
+      (function () {
+        var el = document.getElementById('boot');
+        var html = document.documentElement;
+        if (!el) return;
+        if (/^\/admin\/?$/.test(location.pathname)) { el.parentNode.removeChild(el); return; }
+        html.classList.add('is-booting');
+        var seen = false;
+        try { seen = sessionStorage.getItem('esh-boot') === '1'; } catch (e) {}
+        var MIN = seen ? 0 : 1100, MAX = 9000, t0 = Date.now();
+        var weights = { app: 40, fonts: 15, cover: 30, headline: 15 }, got = {}, shown = 0, finished = false;
+        var pct = el.querySelector('.b-pct');
+        function real() { var p = 0; for (var k in got) p += weights[k] || 0; return p; }
+        function frame() {
+          if (finished) return;
+          var elapsed = Date.now() - t0;
+          // keeps moving smoothly towards 95% while real parts arrive, so it never looks frozen
+          var r = real();
+          var want = Math.min(99, r + (95 - r) * (1 - Math.exp(-elapsed / 3500)));
+          shown += (want - shown) * 0.1;
+          paint(shown);
+          if (real() >= 100 && elapsed >= MIN) return finish();
+          requestAnimationFrame(frame);
+        }
+        function paint(v) { el.style.setProperty('--p', (v / 100).toFixed(3)); pct.textContent = Math.round(v) + '%'; }
+        function finish() {
+          if (finished) return;
+          finished = true;
+          paint(100);
+          setTimeout(function () {
+            el.classList.add('b-out');
+            html.classList.remove('is-booting');
+            try { sessionStorage.setItem('esh-boot', '1'); } catch (e) {}
+            try { window.dispatchEvent(new Event('eshelon:ready')); } catch (e) {}
+            setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); }, 1000);
+          }, 220);
+        }
+        window.__boot = { mark: function (k) { if (!got[k]) got[k] = Date.now() - t0; }, got: got, done: finish, get ready() { return finished; } };
+        setTimeout(finish, MAX);
+        requestAnimationFrame(frame);
+      })();
+    </script>
     <div id="root"></div>
   </body>
 </html>

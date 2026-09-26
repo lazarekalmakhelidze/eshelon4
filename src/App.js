@@ -2,6 +2,7 @@ import './style.css';
 
 import React, { useEffect, useRef, useState } from 'react';
 import PosterFolio from './components/PosterFolio';
+import Img, { webpSrcSet, webpUrl } from './Img';
 
 import {
   Compass,
@@ -228,54 +229,8 @@ function getWorkTypeLabel(project) {
   return project.workType || workTypeByProjectId[project.id] || 'სოც. მედია';
 }
 
-function ModalGalleryImage({ project, imageSrc, imageIdx }) {
-  return (
-    <div className="rounded-xl overflow-hidden border border-white/10 bg-black/30 shadow-[0_10px_28px_-20px_rgba(0,0,0,0.9)]">
-      <img
-        src={imageSrc}
-        alt={`${project.title} ${imageIdx + 1}`}
-        className="block w-full h-auto object-cover"
-        loading={imageIdx < 6 ? 'eager' : 'lazy'}
-        decoding="async"
-      />
-    </div>
-  );
-}
-
-function PortfolioModalGallery({ project }) {
-  const renderColumns = (columnCount) => (
-    Array.from({ length: columnCount }, (_, columnIndex) => (
-      <div key={columnIndex} className="flex min-w-0 flex-col gap-3 sm:gap-4">
-        {project.modalImages
-          .map((imageSrc, imageIdx) => ({ imageSrc, imageIdx }))
-          .filter((_, imageIdx) => imageIdx % columnCount === columnIndex)
-          .map(({ imageSrc, imageIdx }) => (
-            <ModalGalleryImage
-              key={`${imageSrc}-${imageIdx}`}
-              project={project}
-              imageSrc={imageSrc}
-              imageIdx={imageIdx}
-            />
-          ))}
-      </div>
-    ))
-  );
-  return (
-    <>
-      <div className="grid grid-cols-1 gap-3 sm:hidden">
-        {renderColumns(1)}
-      </div>
-      <div className="hidden sm:grid sm:grid-cols-2 gap-4 xl:hidden">
-        {renderColumns(2)}
-      </div>
-      <div className="hidden xl:grid xl:grid-cols-3 gap-4">
-        {renderColumns(3)}
-      </div>
-    </>
-  );
-}
-
 function PortfolioCard({ project, onSelect }) {
+  const { t } = useLang();
   return (
     <div
       onClick={() => onSelect(project)}
@@ -286,8 +241,9 @@ function PortfolioCard({ project, onSelect }) {
       <div className="aspect-video relative border-b border-white/5 overflow-hidden">
         {project.coverImage ? (
           <>
-            <img
+            <Img
               src={project.coverImage}
+              sizes="(min-width: 1024px) 400px, (min-width: 768px) 50vw, 100vw"
               alt={`${project.title} cover`}
               className="w-full h-full object-cover transition duration-700 group-hover:scale-110"
               loading="lazy"
@@ -321,7 +277,7 @@ function PortfolioCard({ project, onSelect }) {
         </div>
         <p className="text-sm text-gray-400 line-clamp-3">{project.description}</p>
         <div className="pt-4 border-t border-white/5 flex items-center justify-between">
-          <span className="text-xs font-bold text-white group-hover:text-[#E50914] transition duration-200">ქეისის დეტალები</span>
+          <span className="text-xs font-bold text-white group-hover:text-[#E50914] transition duration-200">{t('ქეისის დეტალები', 'View case')}</span>
           <ChevronRight className="w-4 h-4 text-gray-500 group-hover:translate-x-1 group-hover:text-[#E50914] transition duration-200" />
         </div>
       </div>
@@ -554,10 +510,15 @@ function HeroSection({ settings }) {
         className="absolute inset-0 scale-[1.02] lg:scale-[1.04]"
       >
         <picture className="block w-full h-full">
+          <source media="(min-width: 1024px)" type="image/webp" srcSet={webpSrcSet('/cover-landscape.jpg')} sizes="100vw" />
           <source media="(min-width: 1024px)" srcSet="/cover-landscape.jpg" />
+          <source type="image/webp" srcSet={webpSrcSet('/cover-portrait.jpg')} sizes="100vw" />
           <img
             src="/cover-portrait.jpg"
-            alt="Eshelon Cover"
+            alt=""
+            data-boot="cover"
+            onLoad={() => window.__boot && window.__boot.mark('cover')}
+            onError={() => window.__boot && window.__boot.mark('cover')}
             className="w-full h-full object-cover object-[62%_20%] lg:object-right"
             style={{ animation: 'coverReveal 2.4s cubic-bezier(0.22,1,0.36,1) both' }}
             fetchPriority="high"
@@ -587,9 +548,13 @@ function HeroSection({ settings }) {
           ) : (
             <div className="inline-block">
               <h1 className="sr-only">ზრდა ერთეულების არჩევანია</h1>
-              <img
+              <Img
                 src="/hero-headline.png"
+                sizes="(min-width: 640px) 512px, 60vw"
                 alt=""
+                data-boot="headline"
+                onLoad={() => window.__boot && window.__boot.mark('headline')}
+                onError={() => window.__boot && window.__boot.mark('headline')}
                 className="w-full max-w-[90vw] sm:max-w-lg mt-1 sm:-mt-4 lg:-mt-12 drop-shadow-[0_10px_30px_rgba(0,0,0,0.75)]"
                 fetchPriority="high"
                 decoding="async"
@@ -601,7 +566,7 @@ function HeroSection({ settings }) {
             </div>
           )}
           {settings.tagline && (
-            <p className="text-[15px] sm:text-lg text-gray-100 font-medium max-w-md leading-snug" style={{ animation: 'headlineIn 1s 0.7s cubic-bezier(0.22,1,0.36,1) both' }}>
+            <p className="text-[15px] sm:text-lg text-gray-100 font-medium max-w-md leading-snug text-balance" style={{ animation: 'headlineIn 1s 0.7s cubic-bezier(0.22,1,0.36,1) both' }}>
               {settings.tagline}
             </p>
           )}
@@ -639,7 +604,7 @@ function PartnersStrip() {
     return (
       <div className={`py-6 ${rowClass}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-4">
-          <p className={`text-center text-xs uppercase tracking-[0.28em] ${titleClass || 'text-gray-500'}`}>{title}</p>
+          <p className={`text-center text-[11px] sm:text-xs uppercase tracking-[0.12em] sm:tracking-[0.28em] ${titleClass || 'text-gray-500'}`}>{title}</p>
         </div>
         <div className="relative">
           <div className="pointer-events-none absolute inset-y-0 left-0 w-28 bg-gradient-to-r from-[#0b0b0b] to-transparent z-10" />
@@ -648,8 +613,9 @@ function PartnersStrip() {
             <div className="logo-group">
               {loopLogos.map((logo, idx) => (
                 <div key={`${logo.name}-${idx}`} className="logo-tile">
-                  <img
+                  <Img
                     src={logo.src}
+                    sizes="120px"
                     alt={`${logo.name} logo`}
                     className="logo-mark"
                     style={logo.scale ? { '--logo-scale': logo.scale } : undefined}
@@ -662,8 +628,9 @@ function PartnersStrip() {
             <div className="logo-group" aria-hidden="true">
               {loopLogos.map((logo, idx) => (
                 <div key={`${logo.name}-clone-${idx}`} className="logo-tile">
-                  <img
+                  <Img
                     src={logo.src}
+                    sizes="120px"
                     alt=""
                     className="logo-mark"
                     style={logo.scale ? { '--logo-scale': logo.scale } : undefined}
@@ -679,7 +646,7 @@ function PartnersStrip() {
     );
   };
   return (
-    <section data-reveal className="reveal-section relative overflow-hidden bg-[#0b0b0b] border-y border-[#1a1a1a]">
+    <section data-reveal data-pause-offscreen className="reveal-section relative overflow-hidden bg-[#0b0b0b] border-y border-[#1a1a1a]">
       <LogoMarqueeRow title={t('ბრენდები, რომლებთანაც გუნდს უმუშავია', 'Brands our team has worked with')} logos={partnerLogos} speed={partnerMarqueeSpeed} />
       <div className="border-t border-white/5" />
       <LogoMarqueeRow
@@ -739,8 +706,9 @@ function AboutSection() {
           <div className="lg:col-span-6">
             <div className="surface-card h-full bg-[#121212] border border-white/10 rounded-2xl p-3 sm:p-4">
               <div className="relative rounded-xl overflow-hidden border border-white/10">
-                <img
+                <Img
                   src="/optimized/about/team-story.jpg"
+                  sizes="(min-width: 1024px) 600px, 100vw"
                   onError={(e) => { e.currentTarget.src = '/optimized/facebook/p3.jpg'; }}
                   alt="ESHELON founders and team story visual"
                   className="w-full h-[420px] sm:h-[500px] object-cover"
@@ -764,9 +732,9 @@ function FacebookNewsSection({ posts = facebookNewsPosts, facebookUrl = '' }) {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-3 mb-8 sm:mb-10">
           <div className="space-y-3 max-w-2xl">
-            <h2 className="section-eyebrow text-xs font-bold text-[#E50914] tracking-widest uppercase">{t('ᲤᲔᲘᲡᲑᲣᲥ ᲜᲘᲣᲡᲔᲑᲘ', 'FROM OUR FACEBOOK')}</h2>
-            <p className="mersad-heading text-2xl sm:text-3xl tracking-tight text-white">{t('ᲒᲐᲛᲝᲒᲕᲧᲔᲕᲘ FACEBOOK-ᲖᲔ', 'FOLLOW US ON FACEBOOK')}</p>
-            <p className="text-xs sm:text-sm text-gray-400">{t('ბლოგის სტილში თავმოყრილი უახლესი პოსტები, ქეისები და კამპანიების მოკლე მიმოხილვა.', 'Our latest posts, cases and short campaign breakdowns.')}</p>
+            <h2 className="section-eyebrow text-xs font-bold text-[#E50914] tracking-widest uppercase">{t('სიახლეები', 'News')}</h2>
+            <p className="mersad-heading text-2xl sm:text-3xl tracking-tight text-white">{t('ᲑᲝᲚᲝ ᲞᲝᲡᲢᲔᲑᲘ', 'LATEST POSTS')}</p>
+            <p className="text-xs sm:text-sm text-gray-400">{t('უახლესი პოსტები, ქეისები და კამპანიების მოკლე მიმოხილვა.', 'Our latest posts, cases and short campaign breakdowns.')}</p>
           </div>
           {facebookUrl && (
           <a
@@ -780,18 +748,19 @@ function FacebookNewsSection({ posts = facebookNewsPosts, facebookUrl = '' }) {
           </a>
           )}
         </div>
-        <div className="reveal-stagger grid grid-cols-2 lg:grid-cols-2 gap-3 sm:gap-4">
+        <div className="reveal-stagger grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
           {posts.map((post) => (
             <a
               key={post.id}
               href={post.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="surface-card group bg-[#121217] border border-white/10 rounded-xl overflow-hidden hover:border-[#E50914]/45 transition duration-300 lg:flex lg:items-stretch"
+              className="surface-card group bg-[#121217] border border-white/10 rounded-xl overflow-hidden hover:border-[#E50914]/45 transition duration-300 flex items-stretch sm:block lg:flex"
             >
-              <div className="aspect-[4/5] overflow-hidden relative lg:w-36 lg:min-w-[9rem] lg:aspect-[4/5]">
-                <img
+              <div className="w-28 min-w-[7rem] sm:w-auto sm:min-w-0 aspect-[4/5] overflow-hidden relative lg:w-36 lg:min-w-[9rem]">
+                <Img
                   src={post.image}
+                  sizes="(min-width: 1024px) 144px, (min-width: 640px) 50vw, 112px"
                   alt={post.title}
                   className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
                   loading="lazy"
@@ -799,8 +768,8 @@ function FacebookNewsSection({ posts = facebookNewsPosts, facebookUrl = '' }) {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
               </div>
-              <div className="p-3.5 sm:p-4 space-y-2.5 lg:flex-1 lg:flex lg:flex-col lg:justify-center">
-                <div className="flex items-center gap-2 text-xs uppercase tracking-widest text-gray-400">
+              <div className="flex-1 min-w-0 p-3.5 sm:p-4 space-y-2 flex flex-col justify-center sm:block lg:flex">
+                <div className="flex items-center gap-3 text-[11px] tracking-wide text-gray-400 whitespace-nowrap">
                   <span className="inline-flex items-center gap-1.5">
                     <CalendarDays className="w-3 h-3" />
                     {post.date}
@@ -891,7 +860,7 @@ function CollaborationPage({ offers = collaborationOffers, terms = collaboration
             <div className="relative">
               <div className="absolute -inset-1 bg-gradient-to-r from-[#E50914] to-orange-600 rounded-lg blur opacity-60 group-hover:opacity-100 transition duration-300" />
               <div className="relative w-12 h-12 rounded-lg overflow-hidden border border-[#E50914]/50">
-                <img src="/logod.jpg" alt="Eshelon Logo" className="w-full h-full object-cover" />
+                <Img src="/logod.jpg" sizes="48px" alt="ESHELON" className="w-full h-full object-cover" />
               </div>
             </div>
             <div>
@@ -1030,9 +999,25 @@ function App() {
   const [selectedIndex, setSelectedIndex] = useState(null);
   const [visiblePortfolioCount, setVisiblePortfolioCount] = useState(6);
   const allPortfolioProjects = pickList(siteContent.portfolio, [...portfolioData, ...extraPortfolioData]).map((pr) => localizeProject(pr, lang));
-  const visiblePortfolioProjects = allPortfolioProjects.slice(0, visiblePortfolioCount);
-  const hasMorePortfolioProjects = visiblePortfolioCount < allPortfolioProjects.length;
+  const [portfolioFilter, setPortfolioFilter] = useState('all');
+  const portfolioFilters = (() => {
+    const counts = new Map();
+    allPortfolioProjects.forEach((pr) => {
+      const label = getWorkTypeLabel(pr);
+      counts.set(label, (counts.get(label) || 0) + 1);
+    });
+    return [
+      { key: 'all', label: t('ყველა', 'All'), count: allPortfolioProjects.length },
+      ...Array.from(counts, ([label, count]) => ({ key: label, label, count }))
+    ];
+  })();
+  const activeFilter = portfolioFilters.some((f) => f.key === portfolioFilter) ? portfolioFilter : 'all';
+  const filteredProjects = activeFilter === 'all' ? allPortfolioProjects : allPortfolioProjects.filter((pr) => getWorkTypeLabel(pr) === activeFilter);
+  const visiblePortfolioProjects = filteredProjects.slice(0, visiblePortfolioCount);
+  const hasMorePortfolioProjects = visiblePortfolioCount < filteredProjects.length;
   const selectedProject = selectedIndex !== null ? allPortfolioProjects[selectedIndex] : null;
+  // the project viewer steps through the filtered list the visitor is looking at
+  const viewerList = selectedProject && filteredProjects.some((pr) => pr.id === selectedProject.id) ? filteredProjects : allPortfolioProjects;
   const [menuOpen, setMenuOpen] = useState(false);
   const [showFloat, setShowFloat] = useState(false);
   const [contactState, setContactState] = useState('idle'); // idle | sending | sent | error
@@ -1104,9 +1089,9 @@ function App() {
     window.history.pushState({ project: project.id }, '', `#project-${project.id}`);
     setSelectedIndex(idx);
   };
-  const navigateProject = (idx) => {
-    const pr = allPortfolioProjects[idx];
-    if (!pr) return;
+  const navigateProject = (pr) => {
+    const idx = allPortfolioProjects.findIndex((x) => x.id === (pr && pr.id));
+    if (idx < 0) return;
     window.history.replaceState({ project: pr.id }, '', `#project-${pr.id}`);
     setSelectedIndex(idx);
   };
@@ -1117,6 +1102,18 @@ function App() {
       setSelectedIndex(null);
     }
   };
+  const [nearContact, setNearContact] = useState(false);
+  useEffect(() => {
+    const targets = ['contact', 'site-footer'].map((id) => document.getElementById(id)).filter(Boolean);
+    if (!targets.length || !('IntersectionObserver' in window)) return undefined;
+    const visible = new Set();
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => (e.isIntersecting ? visible.add(e.target.id) : visible.delete(e.target.id)));
+      setNearContact(visible.size > 0);
+    }, { threshold: 0.05 });
+    targets.forEach((el) => io.observe(el));
+    return () => io.disconnect();
+  }, [isCollaborationPage]);
   useEffect(() => {
     const onScroll = () => setShowFloat(window.scrollY > window.innerHeight * 0.9);
     onScroll();
@@ -1124,6 +1121,58 @@ function App() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
   const progressRef = useRef(null);
+  // endless strips (logos, posters) stop animating while off-screen — saves battery and keeps scrolling smooth
+  useEffect(() => {
+    const els = document.querySelectorAll('[data-pause-offscreen]');
+    if (!els.length || !('IntersectionObserver' in window)) return undefined;
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => e.target.classList.toggle('anim-paused', !e.isIntersecting));
+    }, { rootMargin: '120px 0px' });
+    els.forEach((el) => io.observe(el));
+    return () => io.disconnect();
+  }, [isCollaborationPage]);
+  // loading screen: tell it what is ready (see public/index.html)
+  useEffect(() => {
+    const boot = window.__boot;
+    if (!boot) return undefined;
+    boot.mark('app');
+    if (lang === 'en' || isCollaborationPage) boot.mark('headline');
+    if (isCollaborationPage) boot.mark('cover');
+    // wait for the brand fonts, but never more than 2.5 s after the page itself is ready
+    const fontCap = setTimeout(() => boot.mark('fonts'), 2500);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => boot.mark('fonts'));
+    else boot.mark('fonts');
+    const check = () => document.querySelectorAll('img[data-boot]').forEach((img) => {
+      if (img.complete) boot.mark(img.getAttribute('data-boot'));
+    });
+    check();
+    const id = setInterval(check, 300);
+    const stop = setTimeout(() => clearInterval(id), 10000);
+    return () => { clearInterval(id); clearTimeout(stop); clearTimeout(fontCap); };
+    // run once on first render
+  }, []); // eslint-disable-line
+  // after the loading screen: quietly fetch the next images people will scroll to
+  useEffect(() => {
+    const run = () => {
+      const urls = [
+        ...allPortfolioProjects.slice(0, 6).map((pr) => webpUrl(pr.coverImage, 480)),
+        ...folioPosterImages.map((src) => webpUrl(src, 480))
+      ].filter(Boolean);
+      let i = 0;
+      const next = () => {
+        if (i >= urls.length) return;
+        const img = new Image();
+        img.decoding = 'async';
+        img.onload = img.onerror = () => { i += 1; setTimeout(next, 60); };
+        img.src = urls[i];
+      };
+      next();
+    };
+    const start = () => ('requestIdleCallback' in window ? window.requestIdleCallback(run, { timeout: 2500 }) : setTimeout(run, 1200));
+    if (!window.__boot || window.__boot.ready) { start(); return undefined; }
+    window.addEventListener('eshelon:ready', start, { once: true });
+    return () => window.removeEventListener('eshelon:ready', start);
+  }, []); // eslint-disable-line
   useEffect(() => {
     let rafId = null;
     const updateScrollProgress = () => {
@@ -1219,7 +1268,7 @@ function App() {
                 <div className="relative cursor-pointer">
                   <div className="absolute -inset-1 bg-gradient-to-r from-[#E50914] to-orange-600 rounded-lg blur opacity-60 group-hover:opacity-100 transition duration-300" />
                   <div className="relative w-12 h-12 rounded-lg overflow-hidden border border-[#E50914]/50">
-                    <img src="/logod.jpg" alt="Eshelon Logo" className="w-full h-full object-cover" />
+                    <Img src="/logod.jpg" sizes="48px" alt="ESHELON" className="w-full h-full object-cover" />
                   </div>
                 </div>
                 <div>
@@ -1292,11 +1341,8 @@ function App() {
                 {t('ᲞᲝᲠᲢᲤᲝᲚᲘᲝ,', 'A PORTFOLIO')} <br className="hidden sm:block" />
                 {t('ᲠᲝᲛᲔᲚᲘᲪ ᲗᲐᲕᲐᲓ ᲡᲐᲣᲑᲠᲝᲑᲡ ᲡᲐᲙᲣᲗᲐᲠ ᲗᲐᲕᲖᲔ', 'THAT SPEAKS FOR ITSELF')}
               </p>
-              <p className="text-gray-300">{t('გადახედეთ ჩვენს მიერ განხორციელებულ ბრენდინგისა და მარკეტინგის ქეისებს.', 'Explore our branding and marketing case studies.')}</p>
+              <p className="text-balance text-gray-300">{t('გადახედეთ ჩვენს მიერ განხორციელებულ ბრენდინგისა და მარკეტინგის ქეისებს.', 'Explore our branding and marketing case studies.')}</p>
             </div>
-            <p className="text-sm text-gray-400 md:text-right self-start md:self-auto">
-              <span className="text-white font-bold tabular-nums">{allPortfolioProjects.length}</span> {t('ქეისი · დააჭირეთ დეტალებისთვის', 'cases · tap to open')}
-            </p>
           </div>
           <div className="mb-14">
             <PosterFolio
@@ -1304,8 +1350,27 @@ function App() {
               speedSeconds={62}
             />
           </div>
+          {/* FILTERS */}
+          {portfolioFilters.length > 2 && (
+            <div className="-mx-4 px-4 sm:mx-0 sm:px-0 mb-6 sm:mb-8 overflow-x-auto no-scrollbar">
+              <div className="flex items-center gap-2 w-max">
+                {portfolioFilters.map((f) => (
+                  <button
+                    key={f.key}
+                    type="button"
+                    onClick={() => { setPortfolioFilter(f.key); setVisiblePortfolioCount(6); }}
+                    aria-pressed={portfolioFilter === f.key}
+                    className={`whitespace-nowrap px-4 py-2 rounded-full text-sm font-semibold border transition ${portfolioFilter === f.key ? 'bg-white text-black border-white' : 'border-white/15 text-gray-300 hover:border-white/40 hover:text-white'}`}
+                  >
+                    {f.label}
+                    <span className={`ml-1.5 text-xs tabular-nums ${portfolioFilter === f.key ? 'text-black/50' : 'text-gray-500'}`}>{f.count}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
           {/* GRID OF CASE STUDIES */}
-          <div className="reveal-stagger grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-8">
+          <div key={portfolioFilter} className="reveal-stagger grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-8">
             {visiblePortfolioProjects.map((project, idx) => (
               <div
                 key={project.id}
@@ -1324,7 +1389,7 @@ function App() {
               <button
                 type="button"
                 data-testid="portfolio-show-more"
-                onClick={() => setVisiblePortfolioCount((count) => Math.min(count + 3, allPortfolioProjects.length))}
+                onClick={() => setVisiblePortfolioCount((count) => Math.min(count + 3, filteredProjects.length))}
                 className="group relative inline-flex items-center gap-2 px-6 py-3.5 rounded-xl border border-red-300/20 bg-gradient-to-r from-[#E50914] via-red-600 to-[#E50914] text-white text-xs font-black tracking-wider shadow-[0_18px_38px_-20px_rgba(229,9,20,0.95)] hover:scale-[1.02] active:scale-[0.985] transition"
               >
                 <span className="absolute inset-0 rounded-xl bg-white/0 group-hover:bg-white/10 transition" />
@@ -1338,10 +1403,10 @@ function App() {
       {/* PROJECT VIEWER */}
       {selectedProject && (
         <ProjectViewer
-          projects={allPortfolioProjects}
-          index={selectedIndex}
+          projects={viewerList}
+          index={Math.max(0, viewerList.findIndex((pr) => pr.id === selectedProject.id))}
           onClose={closeProject}
-          onNavigate={navigateProject}
+          onNavigate={(i) => navigateProject(viewerList[i])}
           onOrder={(pr) => { closeProject(); setTimeout(() => openOrder({ title: `${t('მსგავსი პროექტი', 'A project like')}: ${pr.title}`, price: t('ფასი შეთანხმებით', 'Price on request'), desc: pr.category, details: `${t('პროექტი', 'Project')}: ${pr.title}` }), 60); }}
           workTypeLabel={getWorkTypeLabel(selectedProject)}
         />
@@ -1352,7 +1417,7 @@ function App() {
           <div className="text-center max-w-3xl mx-auto space-y-4 mb-16">
             <h2 className="section-eyebrow text-xs font-bold text-[#E50914] tracking-widest uppercase">{t('ᲠᲐᲡ ᲕᲐᲙᲔᲗᲔᲑᲗ', 'WHAT WE DO')}</h2>
             <p className="mersad-heading text-3xl sm:text-4xl tracking-tight text-white">{t('ᲡᲠᲣᲚᲘ ᲪᲘᲤᲠᲣᲚᲘ ᲐᲠᲡᲔᲜᲐᲚᲘ ᲗᲥᲕᲔᲜᲘ ᲑᲘᲖᲜᲔᲡᲘᲡ ᲬᲐᲠᲛᲐᲢᲔᲑᲘᲡᲗᲕᲘᲡ', 'A FULL DIGITAL ARSENAL FOR YOUR BUSINESS')}</p>
-            <p className="text-gray-300">{t('ჩვენი მომსახურებები მოიცავს ყველაფერს, რაც გჭირდებათ იდეიდან – მილიონიან ბრენდამდე მისასვლელად.', 'Everything you need to go from an idea to a brand people remember.')}</p>
+            <p className="text-balance text-gray-300">{t('ჩვენი მომსახურებები მოიცავს ყველაფერს, რაც გჭირდებათ იდეიდან – მილიონიან ბრენდამდე მისასვლელად.', 'Everything you need to go from an idea to a brand people remember.')}</p>
           </div>
           <div className="reveal-stagger grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-8">
             {/* Service 1 */}
@@ -1424,7 +1489,7 @@ function App() {
           <div className="text-center max-w-3xl mx-auto space-y-4 mb-10 sm:mb-14">
             <h2 className="section-eyebrow text-xs font-bold text-[#E50914] tracking-widest uppercase">{t('ფასები და პაკეტები', 'Pricing')}</h2>
             <p className="mersad-heading text-[26px] leading-[1.15] sm:text-4xl text-white">{t('ᲐᲘᲠᲩᲘᲔᲗ ᲗᲥᲕᲔᲜᲘ ᲞᲐᲙᲔᲢᲘ', 'CHOOSE YOUR PACKAGE')}</p>
-            <p className="text-gray-300 text-[15px] sm:text-base">
+            <p className="text-balance text-gray-300 text-[15px] sm:text-base">
               {t('გამჭვირვალე ფასები — ერთჯერადი ბრენდინგი ან ყოველთვიური სოციალური მედია.', 'Transparent prices — one-time branding or monthly social media.')}
             </p>
             <div className="flex justify-center pt-3">
@@ -1442,6 +1507,18 @@ function App() {
               </div>
             </div>
           </div>
+          {/* PRICING NOTE */}
+          {settings.pricingNote && (() => {
+            const m = settings.pricingNote.match(/^(.+?[.!?])\s+(.*)$/s);
+            return (
+              <div className="max-w-3xl mx-auto -mt-2 mb-8 sm:mb-10 flex items-start gap-3 rounded-xl border border-white/[0.08] bg-white/[0.03] px-4 py-3.5 text-left">
+                <Info className="w-5 h-5 text-[#ff4d55] shrink-0 mt-0.5" />
+                <p className="text-sm text-gray-300 leading-relaxed">
+                  {m ? <><span className="font-bold text-white">{m[1]}</span> {m[2]}</> : settings.pricingNote}
+                </p>
+              </div>
+            );
+          })()}
           {/* PRICING CARDS */}
           <div key={activeTab} className="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-6 items-stretch pf-step">
             {(activeTab === 'branding' ? brandingList : smmList).map((pkg, idx) => {
@@ -1460,7 +1537,8 @@ function App() {
                     <h4 className="text-lg font-bold text-white">{pkg.title}</h4>
                     {pkg.badge && !pkg.featured && <span className="text-[11px] text-gray-400 px-2 py-0.5 rounded-md border border-white/10">{pkg.badge}</span>}
                   </div>
-                  <div className="mt-4 text-[34px] leading-none font-black text-white tracking-tight">{pkg.price}</div>
+                  <p className="mt-4 text-[11px] font-semibold tracking-wide text-gray-500">{t('საორიენტაციო ფასი', 'Indicative price')}</p>
+                  <div className="mt-1 text-[34px] leading-none font-black text-white tracking-tight">{pkg.price}</div>
                   {pkg.desc && <p className="mt-3 text-sm text-gray-400 leading-relaxed">{pkg.desc}</p>}
                   <ul className="mt-6 pt-5 border-t border-white/[0.08] space-y-3 flex-1">
                     {included.map((feat, fIdx) => (
@@ -1490,13 +1568,13 @@ function App() {
                 <p className="text-xl sm:text-2xl font-black text-white">{t('ვერ გადაწყვიტეთ?', 'Not sure yet?')}</p>
                 <p className="text-sm text-gray-400 mt-1">{t('უპასუხეთ 3 კითხვას ან ააწყვეთ პაკეტი თავად.', 'Answer 3 quick questions or build your own package.')}</p>
               </div>
-              <div className="inline-flex self-start sm:self-auto bg-[#121212] p-1 rounded-xl border border-white/[0.08]">
-                {[['finder', t('დამეხმარეთ არჩევაში', 'Help me choose')], ['calc', t('ავაწყობ თავად', 'Build my own')]].map(([key, label]) => (
+              <div className="grid grid-cols-2 sm:inline-grid self-stretch sm:self-auto bg-[#121212] p-1 rounded-xl border border-white/[0.08]">
+                {[['finder', t('კითხვარი', 'Quick quiz')], ['calc', t('კალკულატორი', 'Calculator')]].map(([key, label]) => (
                   <button
                     key={key}
                     type="button"
                     onClick={() => setHelperTab(key)}
-                    className={`px-4 py-2 rounded-lg text-sm font-semibold transition ${helperTab === key ? 'bg-white text-black' : 'text-gray-400 hover:text-white'}`}
+                    className={`px-4 py-2.5 rounded-lg text-sm font-semibold whitespace-nowrap transition ${helperTab === key ? 'bg-white text-black' : 'text-gray-400 hover:text-white'}`}
                   >
                     {label}
                   </button>
@@ -1534,12 +1612,12 @@ function App() {
               <div className="space-y-4">
                 <h2 className="section-eyebrow text-xs font-bold text-[#E50914] tracking-widest uppercase">{t('კონტაქტი', 'Contact')}</h2>
                 <p className="mersad-heading text-[26px] leading-[1.15] sm:text-4xl text-white">{t('ᲓᲐᲕᲘᲬᲧᲝᲗ ᲗᲥᲕᲔᲜᲘ ᲑᲠᲔᲜᲓᲘᲡ ᲐᲦᲛᲐᲕᲚᲝᲑᲐ', 'LET’S GROW YOUR BRAND')}</p>
-                <p className="text-gray-300 text-[15px] leading-relaxed">
+                <p className="text-balance text-gray-300 text-[15px] leading-relaxed">
                   {t('პირველი კონსულტაცია უფასოა. მოგვწერეთ ან დაგვირეკეთ — ერთად განვსაზღვრავთ, რა სჭირდება თქვენს ბრენდს.', 'The first consultation is free. Message or call us — together we’ll figure out what your brand needs.')}
                 </p>
               </div>
               {/* quick actions */}
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 min-[400px]:grid-cols-2 gap-3">
                 {phoneHref && (
                   <a href={phoneHref} className="contact-action group">
                     <Phone className="w-5 h-5 text-[#ff4d55]" />
@@ -1568,7 +1646,7 @@ function App() {
                   </a>
                 )}
                 {settings.email && (
-                  <a href={`mailto:${settings.email}`} className="contact-action group col-span-2">
+                  <a href={`mailto:${settings.email}`} className="contact-action group min-[400px]:col-span-2">
                     <Mail className="w-5 h-5 text-[#ff4d55]" />
                     <span className="min-w-0">
                       <span className="block text-[12px] text-gray-400">{t('ელფოსტა', 'Email')}</span>
@@ -1660,20 +1738,20 @@ function App() {
         </div>
       </section>
       {/* FOOTER */}
-      <footer className="bg-black border-t border-[#1a1a1a] pt-14 pb-24 lg:pb-10">
+      <footer id="site-footer" className="bg-black border-t border-[#1a1a1a] pt-12 sm:pt-14 pb-8 sm:pb-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
-            <div className="space-y-4 lg:col-span-2">
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-9 lg:gap-10 text-center lg:text-left">
+            <div className="space-y-4 lg:col-span-2 flex flex-col items-center lg:items-start">
               <a href="#hero" onClick={scrollToTopSmooth} className="inline-flex items-center space-x-3 group">
                 <div className="w-11 h-11 rounded-lg overflow-hidden border border-[#E50914]/30 group-hover:border-[#E50914]/60 transition-colors">
-                  <img src="/logod.jpg" alt="ESHELON" className="w-full h-full object-cover" />
+                  <Img src="/logod.jpg" sizes="48px" alt="ESHELON" className="w-full h-full object-cover" />
                 </div>
-                <div>
+                <div className="text-left">
                   <span className="text-lg font-black tracking-widest text-white block">ESHELON</span>
                   <span className="text-xs tracking-widest text-[#E50914] font-bold block uppercase -mt-1">Highest</span>
                 </div>
               </a>
-              <p className="text-sm text-gray-400 max-w-sm leading-relaxed">{settings.tagline}</p>
+              <p className="text-sm text-gray-400 max-w-xs lg:max-w-sm leading-relaxed text-balance">{settings.tagline}</p>
               {(settings.facebook || settings.instagram || waHref) && (
                 <div className="flex items-center gap-2">
                   {settings.facebook && <a href={settings.facebook} target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="social-btn"><FacebookIcon /></a>}
@@ -1682,32 +1760,32 @@ function App() {
                 </div>
               )}
             </div>
-            <div className="space-y-3">
+            <div className="space-y-3 border-t border-white/[0.06] pt-8 lg:border-0 lg:pt-0">
               <p className="text-xs font-bold tracking-widest text-gray-500 uppercase">{t('ნავიგაცია', 'Menu')}</p>
-              <nav className="flex flex-col gap-2 text-sm">
+              <nav className="flex flex-wrap justify-center lg:flex-col lg:items-start gap-x-5 gap-y-2 text-sm">
                 <a href="#portfolio" className="text-gray-300 hover:text-white">{t('პორტფოლიო', 'Portfolio')}</a>
                 <a href="#services" className="text-gray-300 hover:text-white">{t('სერვისები', 'Services')}</a>
                 <a href="#pricing" className="text-gray-300 hover:text-white">{t('ფასები', 'Pricing')}</a>
                 <a href="#about" className="text-gray-300 hover:text-white">{t('ჩვენ შესახებ', 'About')}</a>
               </nav>
             </div>
-            <div className="space-y-3">
+            <div className="space-y-3 border-t border-white/[0.06] pt-8 lg:border-0 lg:pt-0">
               <p className="text-xs font-bold tracking-widest text-gray-500 uppercase">{t('კონტაქტი', 'Contact')}</p>
-              <div className="flex flex-col gap-2 text-sm">
-                {phoneHref && <a href={phoneHref} className="text-gray-300 hover:text-white">{settings.phone}</a>}
+              <div className="flex flex-col items-center lg:items-start gap-2 text-sm">
+                {phoneHref && <a href={phoneHref} className="text-gray-200 hover:text-white font-semibold">{settings.phone}</a>}
                 {settings.email && <a href={`mailto:${settings.email}`} className="text-gray-300 hover:text-white break-all">{settings.email}</a>}
                 {settings.address && <span className="text-gray-400">{settings.address}</span>}
               </div>
             </div>
           </div>
-          <div className="mt-12 pt-6 border-t border-white/[0.06] flex flex-col sm:flex-row justify-between gap-3 text-xs text-gray-500">
+          <div className="mt-10 sm:mt-12 pt-6 border-t border-white/[0.06] flex flex-col-reverse sm:flex-row items-center justify-between gap-3 text-xs text-gray-500">
             <p>© {new Date().getFullYear()} ESHELON. {t('ყველა უფლება დაცულია.', 'All rights reserved.')}</p>
             <a href="#hero" onClick={scrollToTopSmooth} className="hover:text-white">↑ {t('დასაწყისში დაბრუნება', 'Back to top')}</a>
           </div>
         </div>
       </footer>
       {/* FLOATING CONTACT (mobile) */}
-      <div className={`lg:hidden fixed bottom-4 inset-x-4 z-40 flex gap-2 transition-all duration-500 ${showFloat && !selectedProject && !orderModal && !menuOpen ? 'translate-y-0 opacity-100' : 'translate-y-24 opacity-0 pointer-events-none'}`}>
+      <div className={`lg:hidden fixed bottom-4 inset-x-4 z-40 flex gap-2 transition-all duration-500 ${showFloat && !nearContact && !selectedProject && !orderModal && !menuOpen ? 'translate-y-0 opacity-100' : 'translate-y-24 opacity-0 pointer-events-none'}`}>
         {waHref && (
           <a href={waHref} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" className="w-14 h-14 shrink-0 rounded-2xl bg-[#1b1b1b]/95 backdrop-blur border border-white/10 flex items-center justify-center text-[#25D366] shadow-xl">
             <WhatsAppIcon className="w-6 h-6" />

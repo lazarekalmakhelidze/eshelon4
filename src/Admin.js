@@ -82,6 +82,7 @@ function withEnglish(key, data) {
       tagline_en: data.tagline_en || SETTINGS_EN.tagline,
       address_en: data.address_en || SETTINGS_EN.address,
       responseTime_en: data.responseTime_en || SETTINGS_EN.responseTime,
+      pricingNote_en: data.pricingNote_en || SETTINGS_EN.pricingNote,
       stats: (data.stats || []).map((st) => ({ ...st, label_en: st.label_en || SETTINGS_EN.statLabels[st.label] || '' }))
     };
   }
@@ -537,11 +538,13 @@ function SettingsEditor({ value, onChange }) {
         </div>
         <Field label="მისამართი" value={v.address} onChange={(x) => set({ address: x })} />
         <Field label="პასუხის დრო (ფორმის თავზე)" value={v.responseTime} onChange={(x) => set({ responseTime: x })} />
+        <Field label="ფასების მინიშნება (ფასების ბლოკის თავზე; პირველი წინადადება მუქად)" textarea value={v.pricingNote} onChange={(x) => set({ pricingNote: x })} />
       </div>
       <EnBox hint="ინგლისური ვერსიისთვის">
         <Field label="Tagline" value={v.tagline_en} onChange={(x) => set({ tagline_en: x })} />
         <Field label="Address" value={v.address_en} onChange={(x) => set({ address_en: x })} />
         <Field label="Response time" value={v.responseTime_en} onChange={(x) => set({ responseTime_en: x })} />
+        <Field label="Pricing note" textarea value={v.pricingNote_en} onChange={(x) => set({ pricingNote_en: x })} />
         <div className="space-y-2">
           <span className="text-xs font-semibold text-gray-400">Stat labels (same order)</span>
           {[0, 1, 2].map((i) => (

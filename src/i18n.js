@@ -1,7 +1,9 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { DEFAULT_SETTINGS } from './siteSettings';
 import { PORTFOLIO_EN, WORK_TYPE_EN, PACKAGE_EN, FEATURE_EN, NEWS_EN, COLLAB_EN, SETTINGS_EN, priceEn } from './contentEn';
 
 const STORE_KEY = 'eshelon-lang';
+const DEFAULT_PRICING_NOTE = DEFAULT_SETTINGS.pricingNote;
 
 function initialLang() {
   try {
@@ -108,6 +110,7 @@ export function localizeSettings(s, lang) {
     tagline: s.tagline_en || SETTINGS_EN.tagline,
     address: s.address_en || SETTINGS_EN.address,
     responseTime: s.responseTime_en || SETTINGS_EN.responseTime,
+    pricingNote: s.pricingNote_en || (s.pricingNote && s.pricingNote !== DEFAULT_PRICING_NOTE ? s.pricingNote : SETTINGS_EN.pricingNote),
     stats: (s.stats || []).map((st) => ({ ...st, label: st.label_en || SETTINGS_EN.statLabels[st.label] || st.label }))
   };
 }

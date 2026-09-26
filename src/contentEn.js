@@ -161,6 +161,7 @@ export const SETTINGS_EN = {
   tagline: 'Branding & social media agency · Tbilisi',
   address: 'Tbilisi & Kutaisi, Georgia',
   responseTime: 'We reply within 24 hours',
+  pricingNote: 'Prices are indicative. Every company gets its own offer — the cost isn’t based only on the number of posts or on results: it covers strategy, design and our team’s full involvement.',
   statLabels: {
     'კმაყოფილი კლიენტი': 'happy clients',
     'შექმნილი იდენტობა': 'identities created',
