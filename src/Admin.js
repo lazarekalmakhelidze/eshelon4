@@ -9,6 +9,7 @@ import {
   collaborationOffers,
   collaborationTerms
 } from './App';
+import { DEFAULT_SETTINGS, telHref, whatsappHref } from './siteSettings';
 
 const PW_KEY = 'eshelon-admin-pw';
 const getPw = () => {
@@ -48,7 +49,8 @@ const DEFAULTS = {
   branding: brandingPackages,
   smm: smmPackages,
   calculator: { logo: 500, guidelines: 3000, post: 220, story: 40, advertising: 400, shadowTesting: 250 },
-  collaboration: { offers: collaborationOffers, terms: collaborationTerms }
+  collaboration: { offers: collaborationOffers, terms: collaborationTerms },
+  settings: DEFAULT_SETTINGS
 };
 
 const TABS = [
@@ -57,8 +59,10 @@ const TABS = [
   { key: 'branding', label: 'ბრენდინგის ფასები' },
   { key: 'smm', label: 'SMM ფასები' },
   { key: 'calculator', label: 'კალკულატორი' },
-  { key: 'collaboration', label: 'თანამშრომლობა' }
+  { key: 'collaboration', label: 'თანამშრომლობა' },
+  { key: 'settings', label: 'კონტაქტები & ციფრები' }
 ];
+const ALL_TABS = [{ key: 'inbox', label: 'მოთხოვნები' }, ...TABS];
 
 const newId = (prefix) => `${prefix}-${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
 
@@ -419,6 +423,112 @@ function PackagesEditor({ value, onChange, smm }) {
   );
 }
 
+function SettingsEditor({ value, onChange }) {
+  const v = { ...DEFAULT_SETTINGS, ...value };
+  const set = (patch) => onChange({ ...v, ...patch });
+  const stats = Array.isArray(v.stats) ? v.stats : [];
+  const setStat = (i, patch) => set({ stats: [0, 1, 2].map((k) => (k === i ? { ...(stats[k] || { value: '', label: '' }), ...patch } : (stats[k] || { value: '', label: '' }))) });
+  return (
+    <div className="space-y-6 max-w-3xl">
+      <div className="rounded-xl border border-white/10 bg-[#141414] p-4 space-y-4">
+        <p className="text-sm font-bold text-white">მთავარი ბლოკი</p>
+        <Field label="მოკლე აღწერა სლოგანის ქვეშ" value={v.tagline} onChange={(x) => set({ tagline: x })} />
+        <div className="space-y-2">
+          <span className="text-xs font-semibold text-gray-400">ციფრები (ცარიელს არ აჩვენებს). მაგ: „40+“ — „შექმნილი ბრენდი“</span>
+          {[0, 1, 2].map((i) => (
+            <div key={i} className="grid grid-cols-[110px_1fr] gap-2">
+              <input className={inputCls} placeholder="40+" value={(stats[i] || {}).value || ''} onChange={(e) => setStat(i, { value: e.target.value })} />
+              <input className={inputCls} placeholder="შექმნილი ბრენდი" value={(stats[i] || {}).label || ''} onChange={(e) => setStat(i, { label: e.target.value })} />
+            </div>
+          ))}
+        </div>
+      </div>
+      <div className="rounded-xl border border-white/10 bg-[#141414] p-4 space-y-4">
+        <p className="text-sm font-bold text-white">კონტაქტები</p>
+        <div className="grid sm:grid-cols-2 gap-4">
+          <Field label="ტელეფონი" value={v.phone} onChange={(x) => set({ phone: x })} placeholder="551 98 15 02" />
+          <Field label="WhatsApp ნომერი" value={v.whatsapp} onChange={(x) => set({ whatsapp: x })} placeholder="551 98 15 02" />
+          <Field label="მთავარი ელფოსტა" value={v.email} onChange={(x) => set({ email: x })} />
+          <Field label="მეორე ელფოსტა" value={v.email2} onChange={(x) => set({ email2: x })} />
+        </div>
+        <Field label="მისამართი" value={v.address} onChange={(x) => set({ address: x })} />
+        <Field label="პასუხის დრო (ფორმის თავზე)" value={v.responseTime} onChange={(x) => set({ responseTime: x })} />
+      </div>
+      <div className="rounded-xl border border-white/10 bg-[#141414] p-4 space-y-4">
+        <p className="text-sm font-bold text-white">სოციალური ქსელები <span className="font-normal text-gray-500">— ცარიელი არ გამოჩნდება</span></p>
+        <Field label="Facebook გვერდის ბმული" value={v.facebook} onChange={(x) => set({ facebook: x })} placeholder="https://www.facebook.com/…" />
+        <Field label="Instagram ბმული" value={v.instagram} onChange={(x) => set({ instagram: x })} placeholder="https://www.instagram.com/…" />
+        <Field label="Messenger ბმული" value={v.messenger} onChange={(x) => set({ messenger: x })} placeholder="https://m.me/…" />
+      </div>
+    </div>
+  );
+}
+
+const LEAD_TYPES = { contact: 'შეტყობინება', order: 'შეკვეთა', finder: 'კითხვარი' };
+
+function LeadsInbox() {
+  const [leads, setLeads] = useState(null);
+  const [err, setErr] = useState('');
+  const [filter, setFilter] = useState('open');
+  const load = async () => {
+    setErr('');
+    try {
+      const res = await api('/api/admin/leads', { body: { action: 'list' } });
+      setLeads(res.leads || []);
+    } catch (e) {
+      setErr('ვერ ჩაიტვირთა: ' + e.message);
+      setLeads([]);
+    }
+  };
+  useEffect(() => { load(); }, []);
+  const update = async (lead, patch) => {
+    setLeads((ls) => ls.map((l) => (l.key === lead.key ? { ...l, ...patch } : l)));
+    try { await api('/api/admin/leads', { body: { action: 'update', key: lead.key, ...patch } }); } catch (e) { setErr('ვერ შეინახა'); }
+  };
+  const remove = async (lead) => {
+    if (!window.confirm(`წავშალო ${lead.name}-ის მოთხოვნა?`)) return;
+    setLeads((ls) => ls.filter((l) => l.key !== lead.key));
+    try { await api('/api/admin/leads', { body: { action: 'delete', key: lead.key } }); } catch (e) { setErr('ვერ წაიშალა'); }
+  };
+  if (!leads) return <p className="text-gray-500 text-sm">იტვირთება…</p>;
+  const shown = leads.filter((l) => (filter === 'open' ? !l.done : filter === 'done' ? l.done : true));
+  const openCount = leads.filter((l) => !l.done).length;
+  return (
+    <div className="space-y-4">
+      <div className="flex flex-wrap items-center gap-2">
+        {[['open', `ახალი (${openCount})`], ['done', 'დამუშავებული'], ['all', `ყველა (${leads.length})`]].map(([k, label]) => (
+          <button key={k} type="button" onClick={() => setFilter(k)} className={`px-3 py-1.5 rounded-lg text-sm font-semibold border ${filter === k ? 'bg-[#E50914] border-[#E50914] text-white' : 'border-white/10 text-gray-300 hover:bg-white/5'}`}>{label}</button>
+        ))}
+        <Btn small onClick={load}>განახლება</Btn>
+      </div>
+      {err && <p className="text-sm text-red-300">{err}</p>}
+      {shown.length === 0 && <p className="text-gray-500 text-sm py-8 text-center">აქ ჯერ არაფერია.</p>}
+      {shown.map((l) => (
+        <div key={l.key} className={`rounded-xl border p-4 space-y-3 ${l.done ? 'border-white/5 bg-[#101010] opacity-70' : 'border-white/10 bg-[#141414]'}`}>
+          <div className="flex flex-wrap items-start justify-between gap-2">
+            <div>
+              <p className="text-base font-bold text-white">{l.name} <span className="ml-2 text-[11px] font-semibold px-2 py-0.5 rounded bg-white/10 text-gray-300">{LEAD_TYPES[l.type] || l.type}</span></p>
+              <p className="text-xs text-gray-500">{new Date(l.createdAt).toLocaleString('ka-GE')}</p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {telHref(l.phone) && <a href={telHref(l.phone)} className="px-3 py-1.5 rounded-lg bg-white/10 text-white text-sm font-semibold hover:bg-white/15">📞 {l.phone}</a>}
+              {whatsappHref(l.phone) && <a href={whatsappHref(l.phone)} target="_blank" rel="noopener noreferrer" className="px-3 py-1.5 rounded-lg bg-[#25D366]/15 text-[#5ee08f] text-sm font-semibold hover:bg-[#25D366]/25">WhatsApp</a>}
+            </div>
+          </div>
+          {(l.package || l.price) && <p className="text-sm text-gray-200">📦 {l.package}{l.price ? ` — ${l.price}` : ''}</p>}
+          {l.details && <p className="text-sm text-gray-400">{l.details}</p>}
+          {l.company && <p className="text-sm text-gray-300">🏢 {l.company}</p>}
+          {l.message && <p className="text-sm text-gray-200 whitespace-pre-wrap">{l.message}</p>}
+          <div className="flex gap-2 pt-1">
+            <Btn small onClick={() => update(l, { done: !l.done })}>{l.done ? 'დაბრუნება ახალში' : '✓ დამუშავებულია'}</Btn>
+            <Btn small kind="danger" onClick={() => remove(l)}>წაშლა</Btn>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function CalculatorEditor({ value, onChange }) {
   const rows = [
     ['logo', 'ლოგოს დიზაინი (₾)'],
@@ -510,6 +620,9 @@ function normalize(key, data) {
     Object.entries(data).forEach(([k, v]) => { out[k] = Number(v) || 0; });
     return out;
   }
+  if (key === 'settings') {
+    return { ...data, stats: (data.stats || []).filter((st) => st && (st.value || '').trim()) };
+  }
   if (key === 'collaboration') {
     return { offers: data.offers || [], terms: cleanLines(data.terms) };
   }
@@ -556,7 +669,7 @@ function Login({ onLogin }) {
 export default function Admin() {
   const [loggedIn, setLoggedIn] = useState(false);
   const [ready, setReady] = useState(false);
-  const [tab, setTab] = useState('portfolio');
+  const [tab, setTab] = useState('inbox');
   const [data, setData] = useState(null);
   const [saved, setSaved] = useState(null);
   const [status, setStatus] = useState('');
@@ -654,7 +767,7 @@ export default function Admin() {
           <button type="button" className="text-xs text-gray-500 hover:text-white" onClick={logout}>გასვლა</button>
         </div>
         <nav className="max-w-6xl mx-auto px-4 flex gap-1 overflow-x-auto">
-          {TABS.map((t) => (
+          {ALL_TABS.map((t) => (
             <button
               key={t.key}
               type="button"
@@ -684,6 +797,8 @@ export default function Admin() {
             {tab === 'smm' && <PackagesEditor smm value={data.smm} onChange={(v) => setSection('smm', v)} />}
             {tab === 'calculator' && <CalculatorEditor value={data.calculator} onChange={(v) => setSection('calculator', v)} />}
             {tab === 'collaboration' && <CollaborationEditor value={data.collaboration} onChange={(v) => setSection('collaboration', v)} />}
+            {tab === 'settings' && <SettingsEditor value={data.settings} onChange={(v) => setSection('settings', v)} />}
+            {tab === 'inbox' && <LeadsInbox />}
           </>
         )}
       </main>

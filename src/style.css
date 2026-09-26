@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 @font-face {
   font-family: "Mersad Black";
   src: url("./fonts/MERSAD-BLACK.TTF") format("truetype");
@@ -409,4 +413,83 @@ body {
   100% {
     transform: translate3d(-50%, 0, 0);
   }
+}
+
+/* ---------- 2026-09 polish: contact, forms, viewer, motion ---------- */
+html { -webkit-tap-highlight-color: transparent; }
+body { background: #0d0d0d; }
+
+.contact-action {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: #121212;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: border-color .25s ease, background .25s ease, transform .25s ease;
+}
+.contact-action:hover { border-color: rgba(229, 9, 20, 0.5); background: #161213; transform: translateY(-2px); }
+.contact-action:active { transform: scale(0.98); }
+
+.social-btn {
+  width: 42px;
+  height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  color: #d4d4d4;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: color .2s ease, border-color .2s ease, background .2s ease;
+}
+.social-btn:hover { color: #fff; border-color: rgba(229, 9, 20, 0.6); background: rgba(229, 9, 20, 0.08); }
+
+.form-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #cfcfcf;
+  margin-bottom: 8px;
+}
+.form-input {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  padding: 14px 16px;
+  color: #fff;
+  font-size: 16px; /* 16px stops iOS from zooming into the field */
+  transition: border-color .2s ease, box-shadow .2s ease;
+}
+.form-input::placeholder { color: #6b6b6b; }
+.form-input:focus { outline: none; border-color: #E50914; box-shadow: 0 0 0 3px rgba(229, 9, 20, 0.18); }
+
+/* project viewer */
+.pv-enter { animation: pvEnter .45s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.pv-content { animation: pvContent .55s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.pv-fade { animation: pvFade .25s ease both; }
+.pv-zoom-in { animation: pvZoomIn .35s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.pf-step { animation: pvContent .45s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.sheet-up { animation: sheetUp .42s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.mobile-menu-in { animation: pvContent .3s cubic-bezier(0.22, 1, 0.36, 1) both; }
+@media (min-width: 640px) { .sheet-up { animation-name: pvContent; } }
+
+@keyframes pvEnter { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: none; } }
+@keyframes pvContent { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+@keyframes pvFade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes pvZoomIn { from { opacity: 0; transform: scale(.96); } to { opacity: 1; transform: none; } }
+@keyframes sheetUp { from { transform: translateY(100%); } to { transform: none; } }
+
+/* images inside cards: slow, cinematic zoom on scroll-in */
+.reveal-section .surface-card img { transition: transform 1.2s cubic-bezier(0.22, 1, 0.36, 1); }
+
+/* headings slide in slightly after their section */
+.reveal-section .mersad-heading { transition: opacity .9s cubic-bezier(0.22, 1, 0.36, 1) .08s, transform .9s cubic-bezier(0.22, 1, 0.36, 1) .08s; }
+.reveal-section:not(.reveal-visible) .mersad-heading { opacity: 0; transform: translateY(18px); }
+
+@media (prefers-reduced-motion: reduce) {
+  .pv-enter, .pv-content, .pv-fade, .pv-zoom-in, .pf-step, .sheet-up, .mobile-menu-in { animation: none !important; }
+  .reveal-section:not(.reveal-visible) .mersad-heading { opacity: 1; transform: none; }
 }

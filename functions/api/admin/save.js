@@ -1,6 +1,6 @@
 import { isAdmin, json, denied } from '../../../lib/admin-auth';
 
-const ALLOWED = ['portfolio', 'news', 'branding', 'smm', 'calculator', 'collaboration'];
+const ALLOWED = ['portfolio', 'news', 'branding', 'smm', 'calculator', 'collaboration', 'settings'];
 
 // Body: { sections: { portfolio: [...], smm: [...] } } — merged into stored content.
 export async function onRequestPost({ request, env }) {
