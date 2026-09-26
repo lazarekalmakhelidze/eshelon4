@@ -6,9 +6,74 @@
   font-display: swap;
 }
 
+@font-face {
+  font-family: "Mersad SemiBold";
+  src: url("./fonts/MERSAD-SEMIBOLD.TTF") format("truetype");
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "SF Georgian";
+  src: url("./fonts/SF-Georgian.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+}
+
 .mersad-heading {
   font-family: "Mersad Black", "Helvetica Neue", Arial, sans-serif;
   font-weight: 900;
+}
+
+.mersad-nav {
+  font-family: "SF Georgian", "Helvetica Neue", Arial, system-ui, sans-serif;
+  font-weight: 600;
+  letter-spacing: 0;
+  line-height: 1.25;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.mersad-nav-link {
+  font-size: 13px;
+}
+
+.mersad-nav-cta {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.mersad-nav-mobile {
+  font-family: "SF Georgian", "Helvetica Neue", Arial, system-ui, sans-serif;
+  font-weight: 600;
+  letter-spacing: 0;
+  line-height: 1.3;
+  font-size: 15px;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.sf-georgian-semibold {
+  font-family: "SF Georgian", "Helvetica Neue", Arial, system-ui, sans-serif;
+  font-weight: 600;
+  letter-spacing: 0;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.service-title {
+  font-size: clamp(17px, 1.35vw, 18px);
+  line-height: 1.18;
+  white-space: nowrap;
+}
+
+@media (max-width: 767px) {
+  .service-title {
+    font-size: 20px;
+    white-space: normal;
+  }
 }
 
 :root {
@@ -82,6 +147,15 @@ body {
 .nav-glass a,
 .nav-glass button {
   text-transform: uppercase;
+}
+
+.nav-glass .mersad-heading {
+  text-transform: none;
+}
+
+.nav-glass .mersad-nav,
+.nav-glass .mersad-nav-mobile {
+  text-transform: none;
 }
 
 .section-eyebrow {

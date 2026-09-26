@@ -1,14 +1,16 @@
 {
   "files": {
-    "main.css": "/static/css/main.be7f2791.css",
-    "main.js": "/static/js/main.9f2b03c1.js",
+    "main.css": "/static/css/main.8d9861ab.css",
+    "main.js": "/static/js/main.db50ce91.js",
+    "static/media/SF-Georgian.ttf": "/static/media/SF-Georgian.f1302ddff45984f008f7.ttf",
+    "static/media/MERSAD-SEMIBOLD.TTF": "/static/media/MERSAD-SEMIBOLD.d4d07365467d1e79be78.TTF",
     "static/media/MERSAD-BLACK.TTF": "/static/media/MERSAD-BLACK.7545996e7c55f785630b.TTF",
     "index.html": "/index.html",
-    "main.be7f2791.css.map": "/static/css/main.be7f2791.css.map",
-    "main.9f2b03c1.js.map": "/static/js/main.9f2b03c1.js.map"
+    "main.8d9861ab.css.map": "/static/css/main.8d9861ab.css.map",
+    "main.db50ce91.js.map": "/static/js/main.db50ce91.js.map"
   },
   "entrypoints": [
-    "static/css/main.be7f2791.css",
-    "static/js/main.9f2b03c1.js"
+    "static/css/main.8d9861ab.css",
+    "static/js/main.db50ce91.js"
   ]
 }

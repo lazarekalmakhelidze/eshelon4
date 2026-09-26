@@ -85,6 +85,10 @@ const portfolioData = [
 
     coverImage: '/optimized/portfolio/lokross-cover.jpg',
 
+    modalImage: '/optimized/portfolio/lokrossfull.jpg',
+
+    modalImageScrollable: true,
+
     tags: ['Brand Guidelines', 'Logo Design', 'Grid System', '3D Drape Concept'],
 
     features: ['ოპტიკურად დაბალანსებული გრიდი', 'მონოგრამის არქიტექტურა', '3D პოსტერების სერია']
@@ -109,6 +113,10 @@ const portfolioData = [
 
     coverImage: '/optimized/portfolio/west.jpg',
 
+    modalImage: '/optimized/portfolio/westfull.jpg',
+
+    modalImageScrollable: true,
+
     tags: ['Industrial Design', 'Bebas Neue', '3D Container Rendering', 'Caution Tape Theme'],
 
     features: ['მკაფიო ტიპოგრაფიული იერარქია', 'გრიდზე დასმული გეომეტრია', 'სოციალური მედიის დინამიური ბანერები']
@@ -132,6 +140,10 @@ const portfolioData = [
     bgClass: 'bg-blue-950/40 border-blue-500/30 text-blue-400',
 
     coverImage: '/optimized/portfolio/foodly.jpg',
+
+    modalImage: '/optimized/portfolio/ფუდლი.jpg',
+
+    modalImageScrollable: true,
 
     tags: ['App UI/UX', 'Mascot Design', 'Vibrant Contrast', 'Brand Mascot'],
 
@@ -1834,23 +1846,21 @@ Keep the style bold, youthful, and highly confident (as a top-tier digital agenc
 
             {/* Desktop Navigation */}
 
-            <div className="hidden md:flex items-center space-x-8">
+            <div className="hidden xl:flex items-center space-x-5">
 
-              <a href="#about" className="text-sm font-medium text-gray-300 hover:text-[#E50914] transition-colors">ᲩᲕᲔᲜᲡ ᲨᲔᲡᲐᲮᲔᲑ</a>
+              <a href="#about" className="mersad-nav mersad-nav-link text-gray-300 hover:text-[#E50914] transition-colors">ᲩᲕᲔᲜᲡ ᲨᲔᲡᲐᲮᲔᲑ</a>
 
-              <a href="#services" className="text-sm font-medium text-gray-300 hover:text-[#E50914] transition-colors">ᲡᲔᲠᲕᲘᲡᲔᲑᲘ</a>
+              <a href="#services" className="mersad-nav mersad-nav-link text-gray-300 hover:text-[#E50914] transition-colors">ᲡᲔᲠᲕᲘᲡᲔᲑᲘ</a>
 
-              <a href="#portfolio" className="text-sm font-medium text-gray-300 hover:text-[#E50914] transition-colors">ᲞᲝᲠᲢᲤᲝᲚᲘᲝ</a>
+              <a href="#portfolio" className="mersad-nav mersad-nav-link text-gray-300 hover:text-[#E50914] transition-colors">ᲞᲝᲠᲢᲤᲝᲚᲘᲝ</a>
 
-              <a href="#pricing" className="text-sm font-medium text-gray-300 hover:text-[#E50914] transition-colors">ᲤᲐᲡᲔᲑᲘ</a>
+              <a href="#pricing" className="mersad-nav mersad-nav-link text-gray-300 hover:text-[#E50914] transition-colors">ᲤᲐᲡᲔᲑᲘ</a>
 
-              <a href="/collaboration" className="text-sm font-medium text-gray-300 hover:text-[#E50914] transition-colors">ᲙᲝᲚᲐᲑᲝᲠᲐᲪᲘᲐ</a>
-
-              <a href="#ai-strategist" className="text-sm font-medium flex items-center space-x-1 text-red-400 hover:text-red-300 transition-colors bg-red-950/40 px-3 py-1 rounded-full border border-red-500/20">
+              <a href="#ai-strategist" className="mersad-nav mersad-nav-link flex items-center space-x-1 text-red-400 hover:text-red-300 transition-colors bg-red-950/40 px-3 py-1.5 rounded-full border border-red-500/20">
 
                 <BrainCircuit className="w-4 h-4" />
 
-                <span>ESHELON AI</span>
+                <span className="whitespace-nowrap">ESHELON AI</span>
 
               </a>
 
@@ -1858,11 +1868,11 @@ Keep the style bold, youthful, and highly confident (as a top-tier digital agenc
 
                 href="#contact"
 
-                className="inline-flex items-center justify-center px-5 py-2.5 rounded-lg text-sm font-bold bg-[#E50914] text-white hover:bg-red-700 active:scale-95 transition"
+                className="mersad-nav mersad-nav-cta inline-flex items-center justify-center px-4 py-2.5 rounded-lg bg-[#E50914] text-white hover:bg-red-700 active:scale-95 transition"
 
               >
 
-                ᲙᲝᲜᲢᲐᲥᲢᲘ
+                ᲓᲐᲒᲕᲘᲙᲐᲕᲨᲘᲠᲓᲘᲗ
 
               </a>
 
@@ -1872,7 +1882,7 @@ Keep the style bold, youthful, and highly confident (as a top-tier digital agenc
 
             {/* Mobile menu button */}
 
-            <div className="md:hidden">
+            <div className="xl:hidden">
 
               <button
 
@@ -1898,27 +1908,25 @@ Keep the style bold, youthful, and highly confident (as a top-tier digital agenc
 
         {menuOpen && (
 
-          <div className="md:hidden bg-[#0d0d0d] border-b border-[#262626] px-4 py-6 space-y-4">
+          <div className="xl:hidden bg-[#0d0d0d] border-b border-[#262626] px-4 py-6 space-y-4">
 
-            <a href="#about" onClick={() => setMenuOpen(false)} className="block text-base font-medium text-gray-300 hover:text-[#E50914]">ᲩᲕᲔᲜᲡ ᲨᲔᲡᲐᲮᲔᲑ</a>
+            <a href="#about" onClick={() => setMenuOpen(false)} className="mersad-nav-mobile block text-gray-300 hover:text-[#E50914]">ᲩᲕᲔᲜᲡ ᲨᲔᲡᲐᲮᲔᲑ</a>
 
-            <a href="#services" onClick={() => setMenuOpen(false)} className="block text-base font-medium text-gray-300 hover:text-[#E50914]">ᲡᲔᲠᲕᲘᲡᲔᲑᲘ</a>
+            <a href="#services" onClick={() => setMenuOpen(false)} className="mersad-nav-mobile block text-gray-300 hover:text-[#E50914]">ᲡᲔᲠᲕᲘᲡᲔᲑᲘ</a>
 
-            <a href="#portfolio" onClick={() => setMenuOpen(false)} className="block text-base font-medium text-gray-300 hover:text-[#E50914]">ᲞᲝᲠᲢᲤᲝᲚᲘᲝ</a>
+            <a href="#portfolio" onClick={() => setMenuOpen(false)} className="mersad-nav-mobile block text-gray-300 hover:text-[#E50914]">ᲞᲝᲠᲢᲤᲝᲚᲘᲝ</a>
 
-            <a href="#pricing" onClick={() => setMenuOpen(false)} className="block text-base font-medium text-gray-300 hover:text-[#E50914]">ᲤᲐᲡᲔᲑᲘ</a>
+            <a href="#pricing" onClick={() => setMenuOpen(false)} className="mersad-nav-mobile block text-gray-300 hover:text-[#E50914]">ᲤᲐᲡᲔᲑᲘ</a>
 
-            <a href="/collaboration" onClick={() => setMenuOpen(false)} className="block text-base font-medium text-gray-300 hover:text-[#E50914]">ᲙᲝᲚᲐᲑᲝᲠᲐᲪᲘᲐ</a>
-
-            <a href="#ai-strategist" onClick={() => setMenuOpen(false)} className="flex items-center space-x-2 text-base font-medium text-red-400">
+            <a href="#ai-strategist" onClick={() => setMenuOpen(false)} className="mersad-nav-mobile flex items-center space-x-2 text-red-400">
 
               <BrainCircuit className="w-5 h-5" />
 
-              <span className="mersad-heading">ESHELON AI ᲑᲠᲔᲜᲓ-ᲡᲢᲠᲐᲢᲔᲒᲘ</span>
+              <span className="mersad-nav-mobile">ESHELON AI</span>
 
             </a>
 
-            <a href="#contact" onClick={() => setMenuOpen(false)} className="block w-full text-center py-3 rounded-lg text-base font-bold bg-[#E50914] text-white">
+            <a href="#contact" onClick={() => setMenuOpen(false)} className="mersad-nav-mobile block w-full text-center py-3 rounded-lg bg-[#E50914] text-white">
 
               ᲓᲐᲒᲕᲘᲙᲐᲕᲨᲘᲠᲓᲘᲗ
 
@@ -1977,7 +1985,7 @@ Keep the style bold, youthful, and highly confident (as a top-tier digital agenc
 
               </div>
 
-              <h3 className="text-xl font-bold text-white mb-3">ვიზუალური იდენტობა</h3>
+              <h3 className="sf-georgian-semibold service-title text-white mb-3">ᲕᲘᲖᲣᲐᲚᲣᲠᲘ ᲘᲓᲔᲜᲢᲝᲑᲐ</h3>
 
               <p className="text-gray-400 text-sm leading-relaxed mb-4">
 
@@ -2019,7 +2027,7 @@ Keep the style bold, youthful, and highly confident (as a top-tier digital agenc
 
               </div>
 
-              <h3 className="text-xl font-bold text-white mb-3">სოციალური მედიის მართვა</h3>
+              <h3 className="sf-georgian-semibold service-title text-white mb-3">ᲡᲝᲪᲘᲐᲚᲣᲠᲘ ᲛᲔᲓᲘᲘᲡ ᲛᲐᲠᲗᲕᲐ</h3>
 
               <p className="text-gray-400 text-sm leading-relaxed mb-4">
 
@@ -2061,7 +2069,7 @@ Keep the style bold, youthful, and highly confident (as a top-tier digital agenc
 
               </div>
 
-              <h3 className="text-xl font-bold text-white mb-3">ედვერთაიზინგი & რეკლამა</h3>
+              <h3 className="sf-georgian-semibold service-title text-white mb-3">ᲔᲓᲕᲔᲠᲗᲐᲘᲖᲘᲜᲒᲘ & ᲠᲔᲙᲚᲐᲛᲐ</h3>
 
               <p className="text-gray-400 text-sm leading-relaxed mb-4">
 
@@ -2378,7 +2386,7 @@ Keep the style bold, youthful, and highly confident (as a top-tier digital agenc
 
               </div>
 
-              <h2 className="mersad-heading text-3xl sm:text-4xl text-white">ESHELON AI ᲑᲠᲔᲜᲓ-ᲡᲢᲠᲐᲢᲔᲒᲘ</h2>
+              <h2 className="mersad-heading text-3xl sm:text-4xl text-white">ESHELON AI</h2>
 
               <p className="text-gray-400 max-w-2xl mx-auto text-sm sm:text-base">
 
