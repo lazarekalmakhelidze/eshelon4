@@ -10,6 +10,8 @@ import {
   collaborationTerms
 } from './App';
 import { DEFAULT_SETTINGS, telHref, whatsappHref } from './siteSettings';
+import { PORTFOLIO_EN, PACKAGE_EN, NEWS_EN, COLLAB_EN, SETTINGS_EN, priceEn } from './contentEn';
+import { featureTextEn } from './i18n';
 
 const PW_KEY = 'eshelon-admin-pw';
 const getPw = () => {
@@ -52,6 +54,51 @@ const DEFAULTS = {
   collaboration: { offers: collaborationOffers, terms: collaborationTerms },
   settings: DEFAULT_SETTINGS
 };
+
+function withEnglish(key, data) {
+  if (!data) return data;
+  const has = (o) => o && Object.values(o).some((v) => (Array.isArray(v) ? v.length : v));
+  if (key === 'portfolio') {
+    return data.map((p) => (has(p.en) ? p : { ...p, en: { title: '', ...(PORTFOLIO_EN[p.id] || {}) } }));
+  }
+  if (key === 'branding' || key === 'smm') {
+    return data.map((p) => {
+      if (has(p.en)) return p;
+      const d = PACKAGE_EN[p.title] || {};
+      return { ...p, en: { title: d.title || '', badge: d.badge || '', desc: d.desc || '', price: priceEn(p.price) === p.price ? '' : priceEn(p.price), features: (p.features || []).map((f) => featureTextEn(f.text)) } };
+    });
+  }
+  if (key === 'news') {
+    return data.map((p) => (has(p.en) ? p : { ...p, en: { ...(NEWS_EN[p.id] || {}) } }));
+  }
+  if (key === 'collaboration') {
+    const offers = (data.offers || []).map((o) => (has(o.en) ? o : { ...o, en: { ...(COLLAB_EN.offers[o.id] || {}) } }));
+    const terms_en = Array.isArray(data.terms_en) && data.terms_en.length ? data.terms_en : (JSON.stringify(data.terms) === JSON.stringify(collaborationTerms) ? COLLAB_EN.terms : []);
+    return { ...data, offers, terms_en };
+  }
+  if (key === 'settings') {
+    return {
+      ...data,
+      tagline_en: data.tagline_en || SETTINGS_EN.tagline,
+      address_en: data.address_en || SETTINGS_EN.address,
+      responseTime_en: data.responseTime_en || SETTINGS_EN.responseTime,
+      stats: (data.stats || []).map((st) => ({ ...st, label_en: st.label_en || SETTINGS_EN.statLabels[st.label] || '' }))
+    };
+  }
+  return data;
+}
+
+function EnBox({ children, hint }) {
+  return (
+    <details className="rounded-xl border border-sky-400/20 bg-sky-400/[0.04] group">
+      <summary className="cursor-pointer select-none px-4 py-2.5 text-sm font-semibold text-sky-200 flex items-center justify-between">
+        <span>🇬🇧 English</span>
+        <span className="text-xs font-normal text-sky-200/60">{hint || 'ცარიელი ველი = ქართული ტექსტი გამოჩნდება'}</span>
+      </summary>
+      <div className="px-4 pb-4 space-y-4">{children}</div>
+    </details>
+  );
+}
 
 const TABS = [
   { key: 'portfolio', label: 'პორტფოლიო' },
@@ -338,6 +385,24 @@ function PortfolioEditor({ value, onChange }) {
             value={p.modalImage}
             onChange={(v) => set({ modalImage: v, modalImageScrollable: !!v })}
           />
+          <EnBox>
+            {(() => {
+              const en = p.en || {};
+              const setEn = (patch) => set({ en: { ...en, ...patch } });
+              return (
+                <>
+                  <div className="grid sm:grid-cols-2 gap-4">
+                    <Field label="Title" value={en.title} onChange={(v) => setEn({ title: v })} placeholder={p.title} />
+                    <Field label="Category" value={en.category} onChange={(v) => setEn({ category: v })} />
+                  </div>
+                  <Field label="Work type (card)" value={en.workType} onChange={(v) => setEn({ workType: v })} placeholder="Visual identity / Social media" />
+                  <Field label="Short description" textarea value={en.description} onChange={(v) => setEn({ description: v })} />
+                  <Field label="Full description" textarea rows={5} value={en.longDescription} onChange={(v) => setEn({ longDescription: v })} />
+                  <LinesField label="Key points (one per line)" value={en.features} onChange={(v) => setEn({ features: v })} />
+                </>
+              );
+            })()}
+          </EnBox>
         </>
       )}
     />
@@ -362,6 +427,11 @@ function NewsEditor({ value, onChange }) {
             <Field label="ბმული (Facebook პოსტი)" value={p.url} onChange={(v) => set({ url: v })} />
           </div>
           <ImageField label="სურათი" folder="news" value={p.image} onChange={(v) => set({ image: v })} />
+          <EnBox>
+            <Field label="Title" value={(p.en || {}).title} onChange={(v) => set({ en: { ...(p.en || {}), title: v } })} />
+            <Field label="Short text" textarea value={(p.en || {}).excerpt} onChange={(v) => set({ en: { ...(p.en || {}), excerpt: v } })} />
+            <Field label="Read time" value={(p.en || {}).readTime} onChange={(v) => set({ en: { ...(p.en || {}), readTime: v } })} placeholder="2 min" />
+          </EnBox>
         </>
       )}
     />
@@ -411,12 +481,26 @@ function PackagesEditor({ value, onChange, smm }) {
             <Field label="პატარა წარწერა (ბეჯი)" value={p.badge} onChange={(v) => set({ badge: v })} />
           </div>
           <Field label="აღწერა" textarea value={p.desc} onChange={(v) => set({ desc: v })} />
-          {smm && <Field label="შედარების მინიშნება (წითლად)" value={p.compareHint} onChange={(v) => set({ compareHint: v })} />}
           <Check label="გამოკვეთილი (წითელი ჩარჩო)" checked={p.featured} onChange={(v) => set({ featured: v })} />
           <FeaturesEditor value={p.features} allowDiscount={!smm} onChange={(v) => set({ features: v })} />
-          {smm && (
-            <LinesField label="რით სჯობს წინა პაკეტს" hint="თითო ცალკე ხაზზე. ცარიელი თუ დატოვე, ბლოკი არ გამოჩნდება." value={p.deltaFromPrev} onChange={(v) => set({ deltaFromPrev: v })} />
-          )}
+          <p className="text-[11px] text-gray-500">საიტზე მხოლოდ მონიშნული („შედის“) პუნქტები ჩანს.</p>
+          <EnBox>
+            {(() => {
+              const en = p.en || {};
+              const setEn = (patch) => set({ en: { ...en, ...patch } });
+              return (
+                <>
+                  <div className="grid sm:grid-cols-3 gap-4">
+                    <Field label="Name" value={en.title} onChange={(v) => setEn({ title: v })} placeholder={p.title} />
+                    <Field label="Price" value={en.price} onChange={(v) => setEn({ price: v })} placeholder={smm ? '3,000 ₾ / month' : '500 ₾'} />
+                    <Field label="Badge" value={en.badge} onChange={(v) => setEn({ badge: v })} />
+                  </div>
+                  <Field label="Description" textarea value={en.desc} onChange={(v) => setEn({ desc: v })} />
+                  <LinesField label="Features — same order as above, one per line" value={en.features} onChange={(v) => setEn({ features: v })} />
+                </>
+              );
+            })()}
+          </EnBox>
         </>
       )}
     />
@@ -454,6 +538,17 @@ function SettingsEditor({ value, onChange }) {
         <Field label="მისამართი" value={v.address} onChange={(x) => set({ address: x })} />
         <Field label="პასუხის დრო (ფორმის თავზე)" value={v.responseTime} onChange={(x) => set({ responseTime: x })} />
       </div>
+      <EnBox hint="ინგლისური ვერსიისთვის">
+        <Field label="Tagline" value={v.tagline_en} onChange={(x) => set({ tagline_en: x })} />
+        <Field label="Address" value={v.address_en} onChange={(x) => set({ address_en: x })} />
+        <Field label="Response time" value={v.responseTime_en} onChange={(x) => set({ responseTime_en: x })} />
+        <div className="space-y-2">
+          <span className="text-xs font-semibold text-gray-400">Stat labels (same order)</span>
+          {[0, 1, 2].map((i) => (
+            <input key={i} className={inputCls} placeholder={(stats[i] || {}).label || ''} value={(stats[i] || {}).label_en || ''} onChange={(e) => setStat(i, { label_en: e.target.value })} />
+          ))}
+        </div>
+      </EnBox>
       <div className="rounded-xl border border-white/10 bg-[#141414] p-4 space-y-4">
         <p className="text-sm font-bold text-white">სოციალური ქსელები <span className="font-normal text-gray-500">— ცარიელი არ გამოჩნდება</span></p>
         <Field label="Facebook გვერდის ბმული" value={v.facebook} onChange={(x) => set({ facebook: x })} placeholder="https://www.facebook.com/…" />
@@ -583,12 +678,23 @@ function CollaborationEditor({ value, onChange }) {
                 ))}
                 <Btn small onClick={() => set({ rows: [...rows, { pack: '', partner: '', public: '', benefit: '' }] })}>+ ხაზი</Btn>
               </div>
+              <EnBox>
+                <div className="grid sm:grid-cols-2 gap-4">
+                  <Field label="Title" value={(o.en || {}).title} onChange={(v) => set({ en: { ...(o.en || {}), title: v } })} />
+                  <Field label="Subtitle" value={(o.en || {}).subtitle} onChange={(v) => set({ en: { ...(o.en || {}), subtitle: v } })} />
+                </div>
+              </EnBox>
             </>
           );
         }}
       />
       <div className="rounded-xl border border-white/10 bg-[#141414] p-4">
         <LinesField label="პირობები" hint="თითო პირობა ცალკე ხაზზე" value={value.terms} onChange={(v) => onChange({ ...value, terms: v })} />
+        <div className="mt-4">
+          <EnBox>
+            <LinesField label="Terms (one per line)" value={value.terms_en} onChange={(v) => onChange({ ...value, terms_en: v })} />
+          </EnBox>
+        </div>
       </div>
     </div>
   );
@@ -600,6 +706,7 @@ function normalize(key, data) {
   if (key === 'portfolio') {
     return data.map((p) => {
       const out = { ...p, features: cleanLines(p.features), modalImages: (p.modalImages || []).filter(Boolean) };
+      if (out.en) out.en = { ...out.en, features: cleanLines(out.en.features) };
       if (!out.modalImages.length) delete out.modalImages;
       if (!out.modalImage) { delete out.modalImage; delete out.modalImageScrollable; }
       return out;
@@ -608,6 +715,7 @@ function normalize(key, data) {
   if (key === 'branding' || key === 'smm') {
     return data.map((p) => {
       const out = { ...p, features: (p.features || []).filter((f) => f.text && f.text.trim()) };
+      if (out.en) out.en = { ...out.en, features: (out.en.features || []).map((x) => String(x || '').trim()) };
       const delta = cleanLines(p.deltaFromPrev);
       if (delta.length) out.deltaFromPrev = delta; else delete out.deltaFromPrev;
       if (!out.compareHint) delete out.compareHint;
@@ -624,7 +732,7 @@ function normalize(key, data) {
     return { ...data, stats: (data.stats || []).filter((st) => st && (st.value || '').trim()) };
   }
   if (key === 'collaboration') {
-    return { offers: data.offers || [], terms: cleanLines(data.terms) };
+    return { offers: data.offers || [], terms: cleanLines(data.terms), terms_en: cleanLines(data.terms_en) };
   }
   return data;
 }
@@ -679,6 +787,7 @@ export default function Admin() {
     const merged = clone(DEFAULTS);
     Object.keys(DEFAULTS).forEach((k) => {
       if (stored && stored[k] != null) merged[k] = stored[k];
+      merged[k] = withEnglish(k, merged[k]);
     });
     setData(merged);
     setSaved(clone(merged));

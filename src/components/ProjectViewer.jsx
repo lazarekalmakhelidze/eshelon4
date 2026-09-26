@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { X, ChevronLeft, ChevronRight, ArrowRight, Check, Link2, Maximize2 } from 'lucide-react';
+import { useLang } from '../i18n';
 
 export function projectImages(project) {
   if (!project) return [];
@@ -9,13 +10,14 @@ export function projectImages(project) {
 }
 
 function FadeImage({ src, alt, className = '', eager, onClick }) {
+  const { t } = useLang();
   const [loaded, setLoaded] = useState(false);
   return (
     <button
       type="button"
       onClick={onClick}
       className={`pv-img group relative block w-full overflow-hidden rounded-xl bg-white/[0.03] border border-white/[0.06] cursor-zoom-in ${className}`}
-      aria-label={`${alt} — გადიდება`}
+      aria-label={`${alt} — ${t('გადიდება', 'enlarge')}`}
     >
       <img
         src={src}
@@ -34,6 +36,7 @@ function FadeImage({ src, alt, className = '', eager, onClick }) {
 }
 
 function Lightbox({ images, index, title, onClose, onIndex }) {
+  const { t } = useLang();
   const [zoom, setZoom] = useState(false);
   const [origin, setOrigin] = useState('50% 50%');
   const touch = useRef(null);
@@ -78,7 +81,7 @@ function Lightbox({ images, index, title, onClose, onIndex }) {
         <span className="font-semibold truncate pr-4">{title}</span>
         <div className="flex items-center gap-3">
           {count > 1 && <span className="tabular-nums text-white/60">{index + 1} / {count}</span>}
-          <button type="button" onClick={onClose} className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center" aria-label="დახურვა">
+          <button type="button" onClick={onClose} className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center" aria-label={t('დახურვა', 'Close')}>
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -95,23 +98,24 @@ function Lightbox({ images, index, title, onClose, onIndex }) {
         />
         {count > 1 && (
           <>
-            <button type="button" onClick={() => go(-1)} className="hidden sm:flex absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 items-center justify-center text-white" aria-label="წინა">
+            <button type="button" onClick={() => go(-1)} className="hidden sm:flex absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 items-center justify-center text-white" aria-label={t('წინა', 'Previous')}>
               <ChevronLeft className="w-6 h-6" />
             </button>
-            <button type="button" onClick={() => go(1)} className="hidden sm:flex absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 items-center justify-center text-white" aria-label="შემდეგი">
+            <button type="button" onClick={() => go(1)} className="hidden sm:flex absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 items-center justify-center text-white" aria-label={t('შემდეგი', 'Next')}>
               <ChevronRight className="w-6 h-6" />
             </button>
           </>
         )}
       </div>
       <p className="sm:hidden text-center text-[12px] text-white/45 py-3 shrink-0">
-        {count > 1 ? 'გადაფურცლეთ გვერდზე · გასადიდებლად გაწელეთ თითებით' : 'გასადიდებლად გაწელეთ თითებით'}
+        {count > 1 ? t('გადაფურცლეთ გვერდზე · გასადიდებლად გაწელეთ თითებით', 'Swipe to browse · pinch to zoom') : t('გასადიდებლად გაწელეთ თითებით', 'Pinch to zoom')}
       </p>
     </div>
   );
 }
 
 export default function ProjectViewer({ projects, index, onClose, onNavigate, onOrder, workTypeLabel }) {
+  const { t } = useLang();
   const project = projects[index];
   const images = useMemo(() => projectImages(project), [project]);
   const isLong = Boolean(project && project.modalImageScrollable && !(project.modalImages && project.modalImages.length));
@@ -195,7 +199,7 @@ export default function ProjectViewer({ projects, index, onClose, onNavigate, on
             onClick={() => onOrder(project)}
             className="w-full inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-[#E50914] text-white font-bold text-sm hover:bg-red-700 active:scale-[0.98] transition"
           >
-            მსგავსი პროექტის შეკვეთა
+            {t('მსგავსი პროექტის შეკვეთა', 'Order a similar project')}
             <ArrowRight className="w-4 h-4" />
           </button>
           <button
@@ -204,7 +208,7 @@ export default function ProjectViewer({ projects, index, onClose, onNavigate, on
             className="w-full inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl border border-white/15 text-gray-200 text-sm font-semibold hover:bg-white/5 transition"
           >
             <Link2 className="w-4 h-4" />
-            {copied ? 'ბმული დაკოპირდა ✓' : 'პროექტის გაზიარება'}
+            {copied ? t('ბმული დაკოპირდა ✓', 'Link copied ✓') : t('პროექტის გაზიარება', 'Share project')}
           </button>
         </div>
       )}
@@ -221,7 +225,7 @@ export default function ProjectViewer({ projects, index, onClose, onNavigate, on
       {/* top bar */}
       <div className="absolute top-[3px] left-0 right-0 z-10 h-16 flex items-center justify-between gap-3 px-3 sm:px-6 bg-[#0a0a0a]/85 backdrop-blur-md border-b border-white/[0.06]">
         <div className="flex items-center gap-2 min-w-0">
-          <button type="button" onClick={onClose} className="w-10 h-10 shrink-0 rounded-full bg-white/[0.06] hover:bg-white/10 flex items-center justify-center text-white" aria-label="დახურვა">
+          <button type="button" onClick={onClose} className="w-10 h-10 shrink-0 rounded-full bg-white/[0.06] hover:bg-white/10 flex items-center justify-center text-white" aria-label={t('დახურვა', 'Close')}>
             <X className="w-5 h-5" />
           </button>
           <span className="text-sm font-bold text-white truncate">{project.title}</span>
@@ -229,10 +233,10 @@ export default function ProjectViewer({ projects, index, onClose, onNavigate, on
         {count > 1 && (
           <div className="flex items-center gap-2 shrink-0">
             <span className="hidden sm:inline text-xs text-gray-500 tabular-nums mr-1">{index + 1} / {count}</span>
-            <button type="button" onClick={() => onNavigate((index - 1 + count) % count)} className="w-10 h-10 rounded-full bg-white/[0.06] hover:bg-white/10 flex items-center justify-center text-white" aria-label={`წინა: ${prev.title}`}>
+            <button type="button" onClick={() => onNavigate((index - 1 + count) % count)} className="w-10 h-10 rounded-full bg-white/[0.06] hover:bg-white/10 flex items-center justify-center text-white" aria-label={`${t('წინა', 'Previous')}: ${prev.title}`}>
               <ChevronLeft className="w-5 h-5" />
             </button>
-            <button type="button" onClick={() => onNavigate((index + 1) % count)} className="w-10 h-10 rounded-full bg-white/[0.06] hover:bg-white/10 flex items-center justify-center text-white" aria-label={`შემდეგი: ${next.title}`}>
+            <button type="button" onClick={() => onNavigate((index + 1) % count)} className="w-10 h-10 rounded-full bg-white/[0.06] hover:bg-white/10 flex items-center justify-center text-white" aria-label={`${t('შემდეგი', 'Next')}: ${next.title}`}>
               <ChevronRight className="w-5 h-5" />
             </button>
           </div>
@@ -281,12 +285,12 @@ export default function ProjectViewer({ projects, index, onClose, onNavigate, on
               )}
               <div className="flex flex-col gap-3">
                 <button type="button" onClick={() => onOrder(project)} className="w-full inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-[#E50914] text-white font-bold text-sm active:scale-[0.98] transition">
-                  მსგავსი პროექტის შეკვეთა
+                  {t('მსგავსი პროექტის შეკვეთა', 'Order a similar project')}
                   <ArrowRight className="w-4 h-4" />
                 </button>
                 <button type="button" onClick={copyLink} className="w-full inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl border border-white/15 text-gray-200 text-sm font-semibold">
                   <Link2 className="w-4 h-4" />
-                  {copied ? 'ბმული დაკოპირდა ✓' : 'პროექტის გაზიარება'}
+                  {copied ? t('ბმული დაკოპირდა ✓', 'Link copied ✓') : t('პროექტის გაზიარება', 'Share project')}
                 </button>
               </div>
             </div>
@@ -305,7 +309,7 @@ export default function ProjectViewer({ projects, index, onClose, onNavigate, on
               <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/50 to-black/10" />
               <div className="relative flex items-center justify-between gap-4 p-6 sm:p-10 min-h-[140px] sm:min-h-[200px]">
                 <div className="min-w-0">
-                  <p className="text-xs font-semibold tracking-wide text-[#ff4d55] mb-2">შემდეგი პროექტი</p>
+                  <p className="text-xs font-semibold tracking-wide text-[#ff4d55] mb-2">{t('შემდეგი პროექტი', 'Next project')}</p>
                   <p className="text-2xl sm:text-4xl font-black text-white truncate">{next.title}</p>
                   <p className="text-sm text-gray-300 mt-1 truncate">{next.category}</p>
                 </div>

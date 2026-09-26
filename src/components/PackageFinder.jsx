@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { ArrowLeft, ArrowRight, RotateCcw, Sparkles } from 'lucide-react';
+import { useLang } from '../i18n';
 
 const pick = (list, i) => (list && list.length ? list[Math.min(i, list.length - 1)] : null);
 
 export default function PackageFinder({ brandingList, smmList, onOrder, onShowPricing }) {
+  const { t } = useLang();
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState({});
 
@@ -11,40 +13,40 @@ export default function PackageFinder({ brandingList, smmList, onOrder, onShowPr
   const questions = [
     {
       key: 'need',
-      title: 'რა გჭირდებათ პირველ რიგში?',
+      title: t('რა გჭირდებათ პირველ რიგში?', 'What do you need first?'),
       options: [
-        { value: 'branding', label: 'ბრენდის შექმნა', hint: 'ლოგო, ფერები, სტილი' },
-        { value: 'smm', label: 'სოციალური მედიის მართვა', hint: 'პოსტები, სთორები, რეკლამა' },
-        { value: 'both', label: 'ორივე ერთად', hint: 'ნულიდან სრულ ბრენდამდე' }
+        { value: 'branding', label: t('ბრენდის შექმნა', 'A new brand'), hint: t('ლოგო, ფერები, სტილი', 'Logo, colours, style') },
+        { value: 'smm', label: t('სოციალური მედიის მართვა', 'Social media management'), hint: t('პოსტები, სთორები, რეკლამა', 'Posts, stories, ads') },
+        { value: 'both', label: t('ორივე ერთად', 'Both'), hint: t('ნულიდან სრულ ბრენდამდე', 'From zero to a complete brand') }
       ]
     },
     need === 'smm'
       ? {
           key: 'level',
-          title: 'რამდენად აქტიური ყოფნა გინდათ სოციალურ ქსელებში?',
+          title: t('რამდენად აქტიური ყოფნა გინდათ სოციალურ ქსელებში?', 'How active do you want to be on social media?'),
           options: [
-            { value: 0, label: 'სტაბილური', hint: 'კვირაში ~2 პოსტი' },
-            { value: 1, label: 'აქტიური', hint: 'კვირაში 2–3 პოსტი + დაგეგმვა' },
-            { value: 2, label: 'მაქსიმალური', hint: 'ყოველდღიური კომუნიკაცია + ანალიტიკა' }
+            { value: 0, label: t('სტაბილური', 'Steady'), hint: t('კვირაში ~2 პოსტი', '~2 posts a week') },
+            { value: 1, label: t('აქტიური', 'Active'), hint: t('კვირაში 2–3 პოსტი + დაგეგმვა', '2–3 posts a week + planning') },
+            { value: 2, label: t('მაქსიმალური', 'Maximum'), hint: t('ყოველდღიური კომუნიკაცია + ანალიტიკა', 'Daily presence + analytics') }
           ]
         }
       : {
           key: 'level',
-          title: 'რა დონის ბრენდინგი გჭირდებათ?',
+          title: t('რა დონის ბრენდინგი გჭირდებათ?', 'What level of branding do you need?'),
           options: [
-            { value: 0, label: 'მხოლოდ ლოგო', hint: 'სწრაფი სტარტისთვის' },
-            { value: 1, label: 'სრული ვიზუალური იდენტობა', hint: 'ლოგო, ტიპოგრაფია, სტილი' },
-            { value: 2, label: 'ბრენდი ნულიდან', hint: 'სახელი, სტრატეგია, ბრენდბუქი' }
+            { value: 0, label: t('მხოლოდ ლოგო', 'Just a logo'), hint: t('სწრაფი სტარტისთვის', 'For a quick start') },
+            { value: 1, label: t('სრული ვიზუალური იდენტობა', 'Full visual identity'), hint: t('ლოგო, ტიპოგრაფია, სტილი', 'Logo, typography, style') },
+            { value: 2, label: t('ბრენდი ნულიდან', 'A brand from scratch'), hint: t('სახელი, სტრატეგია, ბრენდბუქი', 'Name, strategy, brand book') }
           ]
         },
     ...(need === 'both'
       ? [{
           key: 'smmLevel',
-          title: 'და სოციალურ ქსელებში რამდენად აქტიურად?',
+          title: t('და სოციალურ ქსელებში რამდენად აქტიურად?', 'And how active on social media?'),
           options: [
-            { value: 0, label: 'სტაბილური', hint: 'კვირაში ~2 პოსტი' },
-            { value: 1, label: 'აქტიური', hint: 'კვირაში 2–3 პოსტი + დაგეგმვა' },
-            { value: 2, label: 'მაქსიმალური', hint: 'ყოველდღიური კომუნიკაცია' }
+            { value: 0, label: t('სტაბილური', 'Steady'), hint: t('კვირაში ~2 პოსტი', '~2 posts a week') },
+            { value: 1, label: t('აქტიური', 'Active'), hint: t('კვირაში 2–3 პოსტი + დაგეგმვა', '2–3 posts a week + planning') },
+            { value: 2, label: t('მაქსიმალური', 'Maximum'), hint: t('ყოველდღიური კომუნიკაცია', 'Daily presence') }
           ]
         }]
       : [])
@@ -53,9 +55,9 @@ export default function PackageFinder({ brandingList, smmList, onOrder, onShowPr
   const done = step >= questions.length;
   const results = [];
   if (done) {
-    if (need === 'branding' || need === 'both') results.push({ kind: 'ბრენდინგი', pkg: pick(brandingList, answers.level) });
-    if (need === 'smm') results.push({ kind: 'SMM', pkg: pick(smmList, answers.level) });
-    if (need === 'both') results.push({ kind: 'SMM', pkg: pick(smmList, answers.smmLevel) });
+    if (need === 'branding' || need === 'both') results.push({ kind: t('ბრენდინგი', 'Branding'), pkg: pick(brandingList, answers.level) });
+    if (need === 'smm') results.push({ kind: t('SMM', 'Social media'), pkg: pick(smmList, answers.level) });
+    if (need === 'both') results.push({ kind: t('SMM', 'Social media'), pkg: pick(smmList, answers.smmLevel) });
   }
 
   const choose = (key, value) => {
@@ -72,7 +74,7 @@ export default function PackageFinder({ brandingList, smmList, onOrder, onShowPr
         <div className="flex items-center justify-between gap-4 mb-6">
           <div className="inline-flex items-center gap-2 text-[#ff4d55] text-sm font-bold">
             <Sparkles className="w-4 h-4" />
-            არ იცით, რომელი აირჩიოთ?
+            {t('არ იცით, რომელი აირჩიოთ?', 'Not sure which one to pick?')}
           </div>
           {!done && <span className="text-xs text-gray-400 tabular-nums">{step + 1} / {questions.length}</span>}
         </div>
@@ -101,14 +103,14 @@ export default function PackageFinder({ brandingList, smmList, onOrder, onShowPr
             </div>
             {step > 0 && (
               <button type="button" onClick={() => setStep((s) => s - 1)} className="mt-6 inline-flex items-center gap-1.5 text-sm text-gray-400 hover:text-white">
-                <ArrowLeft className="w-4 h-4" /> უკან
+                <ArrowLeft className="w-4 h-4" /> {t('უკან', 'Back')}
               </button>
             )}
           </div>
         ) : (
           <div className="pf-step space-y-5">
             <h3 className="text-xl sm:text-2xl font-black text-white">
-              {results.length > 1 ? 'თქვენთვის ყველაზე შესაფერისი კომბინაცია:' : 'თქვენთვის ყველაზე შესაფერისი პაკეტი:'}
+              {results.length > 1 ? t('თქვენთვის ყველაზე შესაფერისი კომბინაცია:', 'Your best-fit combination:') : t('თქვენთვის ყველაზე შესაფერისი პაკეტი:', 'Your best-fit package:')}
             </h3>
             <div className={`grid gap-3 ${results.length > 1 ? 'sm:grid-cols-2' : ''}`}>
               {results.filter((r) => r.pkg).map((r, i) => (
@@ -121,7 +123,7 @@ export default function PackageFinder({ brandingList, smmList, onOrder, onShowPr
               ))}
             </div>
             {need === 'both' && (
-              <p className="text-sm text-gray-300">სრული ბრენდინგის შემთხვევაში სოციალური მედიის პაკეტზე ფასდაკლება გელით — დეტალებს საუბრისას დავაზუსტებთ.</p>
+              <p className="text-sm text-gray-300">{t('სრული ბრენდინგის შემთხვევაში სოციალური მედიის პაკეტზე ფასდაკლება გელით — დეტალებს საუბრისას დავაზუსტებთ.', 'With full branding you get a discount on the social media package — we’ll confirm the details on a call.')}</p>
             )}
             <div className="flex flex-col sm:flex-row gap-3 pt-1">
               <button
@@ -131,19 +133,19 @@ export default function PackageFinder({ brandingList, smmList, onOrder, onShowPr
                   onOrder({
                     title: valid.map((r) => r.pkg.title).join(' + '),
                     price: valid.map((r) => r.pkg.price).join(' + '),
-                    desc: 'შერჩეულია კითხვარით',
+                    desc: t('შერჩეულია კითხვარით', 'Picked with the quiz'),
                     source: 'finder'
                   });
                 }}
                 className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-[#E50914] text-white font-bold text-sm hover:bg-red-700 active:scale-[0.98] transition"
               >
-                მინდა ეს პაკეტი <ArrowRight className="w-4 h-4" />
+                {t('მინდა ეს პაკეტი', 'I want this')} <ArrowRight className="w-4 h-4" />
               </button>
               <button type="button" onClick={onShowPricing} className="inline-flex items-center justify-center px-6 py-3.5 rounded-xl border border-white/15 text-white text-sm font-semibold hover:bg-white/5 transition">
-                ყველა პაკეტის ნახვა
+                {t('ყველა პაკეტის ნახვა', 'See all packages')}
               </button>
               <button type="button" onClick={reset} className="inline-flex items-center justify-center gap-1.5 px-4 py-3.5 text-sm text-gray-400 hover:text-white">
-                <RotateCcw className="w-4 h-4" /> თავიდან
+                <RotateCcw className="w-4 h-4" /> {t('თავიდან', 'Start over')}
               </button>
             </div>
           </div>

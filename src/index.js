@@ -2,6 +2,7 @@ import React, { StrictMode, Suspense, lazy } from 'react';
 import { createRoot } from 'react-dom/client';
 
 import App from './App';
+import { LangProvider } from './i18n';
 
 const Admin = lazy(() => import('./Admin'));
 
@@ -16,7 +17,9 @@ root.render(
         <Admin />
       </Suspense>
     ) : (
-      <App />
+      <LangProvider>
+        <App />
+      </LangProvider>
     )}
   </StrictMode>
 );

@@ -34,7 +34,9 @@ import {
 import { useSiteContent, pickList } from './siteContent';
 import { mergeSettings, telHref, whatsappHref, sendLead } from './siteSettings';
 import ProjectViewer from './components/ProjectViewer';
+import { useLang, localizeProject, localizePackage, localizeNews, localizeOffer, localizeTerms, localizeSettings } from './i18n';
 import PackageFinder from './components/PackageFinder';
+import PriceCalculator from './components/PriceCalculator';
 import { FacebookIcon, InstagramIcon, WhatsAppIcon, MessengerIcon } from './components/BrandIcons';
 
 // Echelon Branding Assets and Case Studies
@@ -525,27 +527,11 @@ function CountUp({ value }) {
 }
 
 function HeroSection({ settings }) {
-  const sectionRef = useRef(null);
-  useEffect(() => {
-    const el = sectionRef.current;
-    if (!el || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return undefined;
-    let raf = null;
-    const update = () => {
-      raf = null;
-      const y = Math.min(window.scrollY, window.innerHeight);
-      el.style.setProperty('--hero-shift', `${y * 0.22}px`);
-      el.style.setProperty('--hero-fade', String(Math.max(0, 1 - y / (window.innerHeight * 0.85))));
-    };
-    const onScroll = () => { if (raf === null) raf = requestAnimationFrame(update); };
-    update();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => { window.removeEventListener('scroll', onScroll); if (raf) cancelAnimationFrame(raf); };
-  }, []);
+  const { t, en } = useLang();
   const stats = (settings.stats || []).filter((st) => st && st.value);
   return (
     <section
       id="hero"
-      ref={sectionRef}
       className="relative overflow-hidden min-h-[100svh] lg:min-h-[92vh] flex items-center"
     >
       <style>{`
@@ -565,8 +551,7 @@ function HeroSection({ settings }) {
       `}</style>
       {/* Cover image wrapper */}
       <div
-        className="absolute inset-0 scale-[1.06] lg:scale-[1.08] will-change-transform"
-        style={{ transform: 'translate3d(0, var(--hero-shift, 0px), 0)' }}
+        className="absolute inset-0 scale-[1.02] lg:scale-[1.04]"
       >
         <picture className="block w-full h-full">
           <source media="(min-width: 1024px)" srcSet="/cover-landscape.jpg" />
@@ -590,21 +575,31 @@ function HeroSection({ settings }) {
       <div className="absolute inset-0 opacity-8 pointer-events-none [background-image:radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.1)_0,rgba(255,255,255,0)_40%),radial-gradient(circle_at_80%_0,rgba(229,9,20,0.12)_0,rgba(229,9,20,0)_35%)]" />
       {/* Content */}
       <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-14 sm:py-20 lg:py-16">
-        <div className="max-w-[620px] space-y-7 sm:space-y-8" style={{ opacity: 'var(--hero-fade, 1)' }}>
-          {/* Headline PNG — entrance + glow pulse */}
-          <div className="inline-block">
-            <img
-              src="/hero-headline.png"
-              alt="ზრდა ერთეულების არჩევანია"
-              className="w-full max-w-[90vw] sm:max-w-lg mt-1 sm:-mt-4 lg:-mt-12 drop-shadow-[0_10px_30px_rgba(0,0,0,0.75)]"
-              fetchPriority="high"
-              decoding="async"
-              style={{
-                animation: 'headlineIn 1s 0.4s cubic-bezier(0.22,1,0.36,1) both',
-                filter: 'drop-shadow(0 0 14px rgba(229,9,20,0.22))'
-              }}
-            />
-          </div>
+        <div className="max-w-[620px] space-y-7 sm:space-y-8">
+          {/* Headline — Georgian calligraphy PNG, English set in the brand display font */}
+          {en ? (
+            <h1
+              className="mersad-heading text-white uppercase leading-[0.95] text-[44px] sm:text-6xl lg:text-7xl tracking-tight mt-2 sm:-mt-2 lg:-mt-8 drop-shadow-[0_10px_30px_rgba(0,0,0,0.75)]"
+              style={{ animation: 'headlineIn 1s 0.4s cubic-bezier(0.22,1,0.36,1) both' }}
+            >
+              Growth is<br />the choice<br /><span className="text-[#ff4d55]">of the few</span>
+            </h1>
+          ) : (
+            <div className="inline-block">
+              <h1 className="sr-only">ზრდა ერთეულების არჩევანია</h1>
+              <img
+                src="/hero-headline.png"
+                alt=""
+                className="w-full max-w-[90vw] sm:max-w-lg mt-1 sm:-mt-4 lg:-mt-12 drop-shadow-[0_10px_30px_rgba(0,0,0,0.75)]"
+                fetchPriority="high"
+                decoding="async"
+                style={{
+                  animation: 'headlineIn 1s 0.4s cubic-bezier(0.22,1,0.36,1) both',
+                  filter: 'drop-shadow(0 0 14px rgba(229,9,20,0.22))'
+                }}
+              />
+            </div>
+          )}
           {settings.tagline && (
             <p className="text-[15px] sm:text-lg text-gray-100 font-medium max-w-md leading-snug" style={{ animation: 'headlineIn 1s 0.7s cubic-bezier(0.22,1,0.36,1) both' }}>
               {settings.tagline}
@@ -612,11 +607,11 @@ function HeroSection({ settings }) {
           )}
           <div className="flex flex-col sm:flex-row items-stretch sm:items-start gap-3 sm:gap-4" style={{ animation: 'headlineIn 1s 0.85s cubic-bezier(0.22,1,0.36,1) both' }}>
             <a href="#portfolio" className="inline-flex items-center justify-center px-8 py-4 rounded-xl text-base font-bold bg-white text-black hover:bg-gray-100 transition duration-200 shadow-lg active:scale-95">
-              ᲜᲐᲮᲔ ᲞᲝᲠᲢᲤᲝᲚᲘᲝ
+              {t('ᲜᲐᲮᲔ ᲞᲝᲠᲢᲤᲝᲚᲘᲝ', 'VIEW OUR WORK')}
               <ArrowRight className="w-5 h-5 ml-2" />
             </a>
             <a href="#pricing" className="inline-flex items-center justify-center px-8 py-4 rounded-xl text-base font-bold bg-transparent text-white border border-white/30 hover:border-white hover:bg-white/10 transition duration-200 active:scale-95">
-              ᲤᲐᲡᲔᲑᲘᲡ ᲞᲐᲙᲔᲢᲔᲑᲘ
+              {t('ᲤᲐᲡᲔᲑᲘᲡ ᲞᲐᲙᲔᲢᲔᲑᲘ', 'PRICING')}
             </a>
           </div>
           {/* Key metrics */}
@@ -637,6 +632,7 @@ function HeroSection({ settings }) {
 }
 
 function PartnersStrip() {
+  const { t } = useLang();
   const LogoMarqueeRow = ({ title, logos, reverse = false, speed = '34s', rowClass = '', titleClass = '' }) => {
     // Repeat logos inside a single cycle so one loop is always wider than the viewport.
     const loopLogos = [...logos, ...logos, ...logos];
@@ -684,10 +680,10 @@ function PartnersStrip() {
   };
   return (
     <section data-reveal className="reveal-section relative overflow-hidden bg-[#0b0b0b] border-y border-[#1a1a1a]">
-      <LogoMarqueeRow title="ბრენდები, რომლებთანაც გუნდს უმუშავია" logos={partnerLogos} speed={partnerMarqueeSpeed} />
+      <LogoMarqueeRow title={t('ბრენდები, რომლებთანაც გუნდს უმუშავია', 'Brands our team has worked with')} logos={partnerLogos} speed={partnerMarqueeSpeed} />
       <div className="border-t border-white/5" />
       <LogoMarqueeRow
-        title="პარტნიორი კომპანიები"
+        title={t('პარტნიორი კომპანიები', 'Partner companies')}
         logos={collaboratorLogos}
         reverse
         speed={collaboratorMarqueeSpeed}
@@ -699,6 +695,7 @@ function PartnersStrip() {
 }
 
 function AboutSection() {
+  const { t } = useLang();
   return (
     <section id="about" data-reveal className="reveal-section py-24 bg-[#09090a] border-y border-[#1a1a1f] relative overflow-hidden">
       <div className="absolute -top-24 -right-10 w-72 h-72 bg-[#E50914]/12 blur-3xl rounded-full pointer-events-none" />
@@ -706,36 +703,36 @@ function AboutSection() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-stretch">
           <div className="lg:col-span-6 space-y-6">
-            <h2 className="section-eyebrow text-xs font-bold text-[#E50914] tracking-widest uppercase">Ჩვენ და გუნდი</h2>
+            <h2 className="section-eyebrow text-xs font-bold text-[#E50914] tracking-widest uppercase">{t('ჩვენ და გუნდი', 'About us')}</h2>
             <p className="mersad-heading text-3xl sm:text-4xl text-white leading-tight">
-              ᲔᲨᲔᲚᲝᲜᲘᲡ ᲮᲔᲓᲕᲐ ᲓᲐ ᲛᲘᲡᲘᲐ
+              {t('ᲔᲨᲔᲚᲝᲜᲘᲡ ᲮᲔᲓᲕᲐ ᲓᲐ ᲛᲘᲡᲘᲐ', 'ESHELON’S VISION & MISSION')}
             </p>
             <div className="space-y-4 text-gray-300 text-sm sm:text-base leading-relaxed">
               <p>
-                ESHELON-ისთვის ბრენდინგი მხოლოდ ვიზუალი არ არის. ეს არის სტრატეგია, ემოცია და კომუნიკაცია, რომელიც
-                ბიზნესს ბაზარზე გამორჩეულ პოზიციაზე აყენებს.
+                {t('ESHELON-ისთვის ბრენდინგი მხოლოდ ვიზუალი არ არის. ეს არის სტრატეგია, ემოცია და კომუნიკაცია, რომელიც ბიზნესს ბაზარზე გამორჩეულ პოზიციაზე აყენებს.',
+                  'For ESHELON, branding is more than visuals. It is strategy, emotion and communication that put a business in a distinctive position in its market.')}
               </p>
               <p>
-                ჩვენ ვაერთიანებთ კრეატიულ დიზაინს, სიღრმისეულ ანალიზს და პრაქტიკულ მარკეტინგს, რათა თითოეული პროექტი
-                გახდეს არა უბრალოდ ლამაზი, არამედ შედეგზე ორიენტირებული.
+                {t('ჩვენ ვაერთიანებთ კრეატიულ დიზაინს, სიღრმისეულ ანალიზს და პრაქტიკულ მარკეტინგს, რათა თითოეული პროექტი გახდეს არა უბრალოდ ლამაზი, არამედ შედეგზე ორიენტირებული.',
+                  'We combine creative design, in-depth analysis and practical marketing so that every project is not just beautiful, but built for results.')}
               </p>
               <p>
-                დღეს ESHELON მუშაობს გუნდურად, დინამიკურად და პასუხისმგებლობით - პარტნიორებთან ერთად ვქმნით სისტემურ
-                ზრდას და ბრენდებს, რომლებსაც საკუთარი ხასიათი და ძლიერი ხმა აქვთ.
+                {t('დღეს ESHELON მუშაობს გუნდურად, დინამიკურად და პასუხისმგებლობით - პარტნიორებთან ერთად ვქმნით სისტემურ ზრდას და ბრენდებს, რომლებსაც საკუთარი ხასიათი და ძლიერი ხმა აქვთ.',
+                  'Today ESHELON works as a team — fast, responsive and accountable. Together with our partners we build steady growth and brands with their own character and a strong voice.')}
               </p>
             </div>
             <div className="reveal-stagger grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
               <div className="surface-card bg-[#121217] border border-white/10 rounded-xl p-4">
-                <p className="text-xs uppercase tracking-widest text-gray-500">პრიორიტეტი</p>
-                <p className="text-sm font-bold text-white mt-1">ხარისხზე ორიენტაცია</p>
+                <p className="text-xs tracking-wide text-gray-400">{t('პრიორიტეტი', 'Priority')}</p>
+                <p className="text-sm font-bold text-white mt-1">{t('ხარისხზე ორიენტაცია', 'Quality first')}</p>
               </div>
               <div className="surface-card bg-[#121217] border border-white/10 rounded-xl p-4">
-                <p className="text-xs uppercase tracking-widest text-gray-500">განვითარება</p>
-                <p className="text-sm font-bold text-white mt-1">ინოვაციური სიახლეების ძიება</p>
+                <p className="text-xs tracking-wide text-gray-400">{t('განვითარება', 'Growth')}</p>
+                <p className="text-sm font-bold text-white mt-1">{t('ინოვაციური სიახლეების ძიება', 'Always exploring what’s new')}</p>
               </div>
               <div className="surface-card bg-[#121217] border border-white/10 rounded-xl p-4">
-                <p className="text-xs uppercase tracking-widest text-gray-500">დისციპლინა</p>
-                <p className="text-sm font-bold text-white mt-1">დედლაინების ზუსტი დაცვა</p>
+                <p className="text-xs tracking-wide text-gray-400">{t('დისციპლინა', 'Discipline')}</p>
+                <p className="text-sm font-bold text-white mt-1">{t('დედლაინების ზუსტი დაცვა', 'Deadlines we keep')}</p>
               </div>
             </div>
           </div>
@@ -761,14 +758,15 @@ function AboutSection() {
 }
 
 function FacebookNewsSection({ posts = facebookNewsPosts, facebookUrl = '' }) {
+  const { t } = useLang();
   return (
     <section id="facebook-news" data-reveal className="reveal-section py-14 sm:py-16 bg-[#0c0c0f] border-y border-[#1e1e24]">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-3 mb-8 sm:mb-10">
           <div className="space-y-3 max-w-2xl">
-            <h2 className="section-eyebrow text-xs font-bold text-[#E50914] tracking-widest uppercase">ᲤᲔᲘᲡᲑᲣᲥ ᲜᲘᲣᲡᲔᲑᲘ</h2>
-            <p className="mersad-heading text-2xl sm:text-3xl tracking-tight text-white">ᲒᲐᲛᲝᲒᲕᲧᲔᲕᲘ FACEBOOK-ᲖᲔ</p>
-            <p className="text-xs sm:text-sm text-gray-400">ბლოგის სტილში თავმოყრილი უახლესი პოსტები, ქეისები და კამპანიების მოკლე მიმოხილვა.</p>
+            <h2 className="section-eyebrow text-xs font-bold text-[#E50914] tracking-widest uppercase">{t('ᲤᲔᲘᲡᲑᲣᲥ ᲜᲘᲣᲡᲔᲑᲘ', 'FROM OUR FACEBOOK')}</h2>
+            <p className="mersad-heading text-2xl sm:text-3xl tracking-tight text-white">{t('ᲒᲐᲛᲝᲒᲕᲧᲔᲕᲘ FACEBOOK-ᲖᲔ', 'FOLLOW US ON FACEBOOK')}</p>
+            <p className="text-xs sm:text-sm text-gray-400">{t('ბლოგის სტილში თავმოყრილი უახლესი პოსტები, ქეისები და კამპანიების მოკლე მიმოხილვა.', 'Our latest posts, cases and short campaign breakdowns.')}</p>
           </div>
           {facebookUrl && (
           <a
@@ -777,7 +775,7 @@ function FacebookNewsSection({ posts = facebookNewsPosts, facebookUrl = '' }) {
             rel="noopener noreferrer"
             className="inline-flex items-center justify-center px-4 py-2 rounded-lg text-xs font-bold bg-[#E50914] text-white hover:bg-red-700 transition"
           >
-            Facebook-ზე ნახვა
+            {t('Facebook-ზე ნახვა', 'Open Facebook')}
             <ExternalLink className="w-4 h-4 ml-2" />
           </a>
           )}
@@ -884,6 +882,7 @@ const folioPosterImages = [
 ];
 
 function CollaborationPage({ offers = collaborationOffers, terms = collaborationTerms }) {
+  const { t } = useLang();
   return (
     <div className="min-h-screen bg-[#0d0d0d] text-[#f2f2f2] font-sans antialiased selection:bg-[#E50914] selection:text-white">
       <nav className="nav-glass sticky top-0 z-40 border-b border-[#262626]/80">
@@ -901,8 +900,8 @@ function CollaborationPage({ offers = collaborationOffers, terms = collaboration
             </div>
           </a>
           <div className="flex items-center gap-3">
-            <a href="/" className="px-4 py-2 rounded-lg border border-white/15 text-sm text-gray-200 hover:border-white/35 transition">ᲛᲗᲐᲕᲐᲠᲘ</a>
-            <a href="/#contact" className="px-4 py-2 rounded-lg bg-[#E50914] text-sm font-bold text-white hover:bg-red-700 transition">ᲓᲐᲙᲐᲕᲨᲘᲠᲔᲑᲐ</a>
+            <a href="/" className="px-4 py-2 rounded-lg border border-white/15 text-sm text-gray-200 hover:border-white/35 transition">{t('ᲛᲗᲐᲕᲐᲠᲘ', 'HOME')}</a>
+            <a href="/#contact" className="px-4 py-2 rounded-lg bg-[#E50914] text-sm font-bold text-white hover:bg-red-700 transition">{t('ᲓᲐᲙᲐᲕᲨᲘᲠᲔᲑᲐ', 'CONTACT')}</a>
           </div>
         </div>
       </nav>
@@ -911,16 +910,16 @@ function CollaborationPage({ offers = collaborationOffers, terms = collaboration
         <section className="py-16 sm:py-20 border-b border-[#1e1e1e]">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="max-w-3xl space-y-5">
-              <p className="section-eyebrow text-xs font-bold text-[#E50914] tracking-widest uppercase">B2B გვერდი</p>
-              <h1 className="mersad-heading text-4xl sm:text-5xl text-white leading-tight">კოლაბორაცია სააგენტოებისთვის</h1>
+              <p className="section-eyebrow text-xs font-bold text-[#E50914] tracking-widest uppercase">{t('B2B გვერდი', 'For agencies')}</p>
+              <h1 className="mersad-heading text-4xl sm:text-5xl text-white leading-tight">{t('კოლაბორაცია სააგენტოებისთვის', 'Partnering with agencies')}</h1>
               <p className="text-gray-300 text-sm sm:text-base">
-                გამჭვირვალე პირობები, წინასწარ განსაზღვრული ფასები და მარტივი სტრუქტურა. 
-                ეს გვერდი შექმნილია ისე, რომ 1 წუთში ნახოთ რეალური მოდელი და თქვენი სარგებელი.
+                {t('გამჭვირვალე პირობები, წინასწარ განსაზღვრული ფასები და მარტივი სტრუქტურა. ეს გვერდი შექმნილია ისე, რომ 1 წუთში ნახოთ რეალური მოდელი და თქვენი სარგებელი.',
+                  'Transparent terms, fixed prices and a simple structure — see the real model and your margin in one minute.')}
               </p>
               <div className="flex flex-wrap gap-2.5 pt-2">
-                <span className="px-3 py-1 rounded-full text-xs font-semibold bg-green-500/15 text-green-300 border border-green-500/35">-10% პარტნიორული ფასდაკლება</span>
-                <span className="px-3 py-1 rounded-full text-xs font-semibold bg-white/5 text-gray-300 border border-white/15">თეთრი ლეიბლი (White Label)</span>
-                <span className="px-3 py-1 rounded-full text-xs font-semibold bg-white/5 text-gray-300 border border-white/15">ფიქსირებული SLA</span>
+                <span className="px-3 py-1 rounded-full text-xs font-semibold bg-green-500/15 text-green-300 border border-green-500/35">{t('-10% პარტნიორული ფასდაკლება', '-10% partner discount')}</span>
+                <span className="px-3 py-1 rounded-full text-xs font-semibold bg-white/5 text-gray-300 border border-white/15">{t('თეთრი ლეიბლი (White Label)', 'White label')}</span>
+                <span className="px-3 py-1 rounded-full text-xs font-semibold bg-white/5 text-gray-300 border border-white/15">{t('ფიქსირებული SLA', 'Fixed SLA')}</span>
               </div>
             </div>
           </div>
@@ -941,15 +940,15 @@ function CollaborationPage({ offers = collaborationOffers, terms = collaboration
                         <div key={`${offer.id}-${row.pack}`} className={`rounded-xl border p-3 ${row.featured ? 'border-[#E50914]/45 bg-[#E50914]/8' : 'border-white/10 bg-white/[0.02]'}`}>
                           <div className="flex items-center justify-between mb-1.5">
                             <p className="text-sm font-bold text-white">{row.pack}</p>
-                            <span className="text-xs px-2 py-0.5 rounded-full bg-green-500/15 text-green-300 border border-green-500/30">თქვენი სარგებელი {row.benefit}</span>
+                            <span className="text-xs px-2 py-0.5 rounded-full bg-green-500/15 text-green-300 border border-green-500/30">{t('თქვენი სარგებელი', 'Your margin')} {row.benefit}</span>
                           </div>
                           <div className="grid grid-cols-2 gap-2 text-xs">
                             <div className="rounded-lg bg-black/35 border border-white/10 px-2.5 py-2">
-                              <p className="text-xs text-gray-500 uppercase tracking-wide">პარტნიორის ფასი</p>
+                              <p className="text-xs text-gray-500 uppercase tracking-wide">{t('პარტნიორის ფასი', 'Partner price')}</p>
                               <p className="text-sm font-bold text-white mt-0.5">{row.partner}</p>
                             </div>
                             <div className="rounded-lg bg-black/35 border border-white/10 px-2.5 py-2">
-                              <p className="text-xs text-gray-500 uppercase tracking-wide">საჯარო ფასი</p>
+                              <p className="text-xs text-gray-500 uppercase tracking-wide">{t('საჯარო ფასი', 'Public price')}</p>
                               <p className="text-sm font-bold text-white mt-0.5">{row.public}</p>
                             </div>
                           </div>
@@ -967,7 +966,7 @@ function CollaborationPage({ offers = collaborationOffers, terms = collaboration
             <div className="surface-card bg-[#121212] border border-white/10 rounded-2xl p-5 sm:p-6">
               <div className="flex items-center gap-2 mb-4">
                 <Lock className="w-4 h-4 text-[#E50914]" />
-                <p className="text-sm font-bold text-white">თანამშრომლობის ძირითადი პირობები</p>
+                <p className="text-sm font-bold text-white">{t('თანამშრომლობის ძირითადი პირობები', 'Key partnership terms')}</p>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
                 {terms.map((term, index) => (
@@ -985,7 +984,7 @@ function CollaborationPage({ offers = collaborationOffers, terms = collaboration
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row gap-4 sm:items-center sm:justify-between">
           <p className="text-xs text-gray-500">© {new Date().getFullYear()} ESHELON DIGITAL AGENCY</p>
           <a href="/#contact" className="inline-flex items-center justify-center px-5 py-2.5 rounded-lg text-xs font-bold bg-[#E50914] text-white hover:bg-red-700 transition">
-            კოლაბორაციის დაწყება
+            {t('კოლაბორაციის დაწყება', 'Start partnering')}
           </a>
         </div>
       </footer>
@@ -993,18 +992,36 @@ function CollaborationPage({ offers = collaborationOffers, terms = collaboration
   );
 }
 
+function LangSwitch({ className = '' }) {
+  const { lang, setLang } = useLang();
+  return (
+    <div className={`inline-flex items-center rounded-lg border border-white/15 p-0.5 text-[12px] font-bold ${className}`} role="group" aria-label="Language">
+      {[['ka', 'ქარ'], ['en', 'ENG']].map(([code, label]) => (
+        <button
+          key={code}
+          type="button"
+          onClick={() => setLang(code)}
+          aria-pressed={lang === code}
+          className={`px-2.5 py-1.5 rounded-md transition ${lang === code ? 'bg-white text-black' : 'text-gray-400 hover:text-white'}`}
+        >
+          {label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 function App() {
+  const { t, lang } = useLang();
   const siteContent = useSiteContent();
   const calc = { logo: 500, guidelines: 3000, post: 220, story: 40, advertising: 400, shadowTesting: 250, ...(siteContent.calculator || {}) };
-  const SMM_POST_UNIT_PRICE = Number(calc.post) || 0;
-  const SMM_STORY_UNIT_PRICE = Number(calc.story) || 0;
-  const brandingList = pickList(siteContent.branding, brandingPackages);
-  const smmList = pickList(siteContent.smm, smmPackages);
-  const newsList = pickList(siteContent.news, facebookNewsPosts);
+  const brandingList = pickList(siteContent.branding, brandingPackages).map((pk) => localizePackage(pk, lang));
+  const smmList = pickList(siteContent.smm, smmPackages).map((pk) => localizePackage(pk, lang));
+  const newsList = pickList(siteContent.news, facebookNewsPosts).map((n) => localizeNews(n, lang));
   const collaborationContent = siteContent.collaboration || {};
-  const settings = mergeSettings(siteContent.settings);
+  const settings = localizeSettings(mergeSettings(siteContent.settings), lang);
   const phoneHref = telHref(settings.phone);
-  const waHref = whatsappHref(settings.whatsapp, 'გამარჯობა! მაინტერესებს ეშელონის მომსახურება.');
+  const waHref = whatsappHref(settings.whatsapp, t('გამარჯობა! მაინტერესებს ეშელონის მომსახურება.', 'Hi! I’m interested in working with ESHELON.'));
   const normalizedPath = typeof window !== 'undefined'
     ? (window.location.pathname.replace(/\/+$/, '') || '/')
     : '/';
@@ -1012,7 +1029,7 @@ function App() {
   const [activeTab, setActiveTab] = useState('smm'); // branding vs smm
   const [selectedIndex, setSelectedIndex] = useState(null);
   const [visiblePortfolioCount, setVisiblePortfolioCount] = useState(6);
-  const allPortfolioProjects = pickList(siteContent.portfolio, [...portfolioData, ...extraPortfolioData]);
+  const allPortfolioProjects = pickList(siteContent.portfolio, [...portfolioData, ...extraPortfolioData]).map((pr) => localizeProject(pr, lang));
   const visiblePortfolioProjects = allPortfolioProjects.slice(0, visiblePortfolioCount);
   const hasMorePortfolioProjects = visiblePortfolioCount < allPortfolioProjects.length;
   const selectedProject = selectedIndex !== null ? allPortfolioProjects[selectedIndex] : null;
@@ -1020,15 +1037,7 @@ function App() {
   const [showFloat, setShowFloat] = useState(false);
   const [contactState, setContactState] = useState('idle'); // idle | sending | sent | error
   const [orderState, setOrderState] = useState('idle');
-  // Custom calculator state
-  const [customServices, setCustomServices] = useState({
-    logo: false,
-    guidelines: false,
-    posts: 10,
-    stories: 10,
-    advertising: true,
-    shadowTesting: false
-  });
+  const [helperTab, setHelperTab] = useState('finder');
   // Order modal state
   const [orderModal, setOrderModal] = useState(null); // package object or null
   const [orderForm, setOrderForm] = useState({ name: '', phone: '', note: '' });
@@ -1114,13 +1123,13 @@ function App() {
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
+  const progressRef = useRef(null);
   useEffect(() => {
-    const root = document.documentElement;
     let rafId = null;
     const updateScrollProgress = () => {
       const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
       const progress = maxScroll > 0 ? Math.min(1, Math.max(0, window.scrollY / maxScroll)) : 0;
-      root.style.setProperty('--scroll-progress', progress.toString());
+      if (progressRef.current) progressRef.current.style.transform = `scaleX(${progress})`;
       rafId = null;
     };
     const onScroll = () => {
@@ -1136,17 +1145,6 @@ function App() {
       if (rafId !== null) window.cancelAnimationFrame(rafId);
     };
   }, []);
-  // Calculate price dynamically for custom estimator
-  const calculateCustomPrice = () => {
-    let base = 0;
-    if (customServices.logo) base += Number(calc.logo) || 0;
-    if (customServices.guidelines) base += Number(calc.guidelines) || 0;
-    base += customServices.posts * SMM_POST_UNIT_PRICE;
-    base += customServices.stories * SMM_STORY_UNIT_PRICE;
-    if (customServices.advertising) base += Number(calc.advertising) || 0;
-    if (customServices.shadowTesting) base += Number(calc.shadowTesting) || 0;
-    return base;
-  };
   const openOrder = (pkg) => {
     setOrderState('idle');
     setOrderModal(pkg);
@@ -1195,11 +1193,16 @@ function App() {
     }
   };
   if (isCollaborationPage) {
-    return <CollaborationPage offers={pickList(collaborationContent.offers, collaborationOffers)} terms={pickList(collaborationContent.terms, collaborationTerms)} />;
+    return (
+      <CollaborationPage
+        offers={pickList(collaborationContent.offers, collaborationOffers).map((o) => localizeOffer(o, lang))}
+        terms={localizeTerms(pickList(collaborationContent.terms, collaborationTerms), collaborationContent.terms_en, lang, collaborationTerms)}
+      />
+    );
   }
   return (
     <div className="min-h-screen bg-[#0d0d0d] text-[#f2f2f2] font-sans antialiased selection:bg-[#E50914] selection:text-white">
-      <div className="scroll-progress" aria-hidden="true" />
+      <div ref={progressRef} className="scroll-progress" aria-hidden="true" />
       {/* GLOWING HEADER BACKGROUND ACCENT */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[500px] bg-gradient-to-b from-[#E50914]/8 via-transparent to-transparent pointer-events-none -z-10" />
       {/* NAVBAR */}
@@ -1227,23 +1230,25 @@ function App() {
             </div>
             {/* Desktop Navigation */}
             <div className="hidden lg:flex items-center gap-7">
-              <a href="#portfolio" className="mersad-nav mersad-nav-link text-gray-300 hover:text-white transition-colors">ᲞᲝᲠᲢᲤᲝᲚᲘᲝ</a>
-              <a href="#services" className="mersad-nav mersad-nav-link text-gray-300 hover:text-white transition-colors">ᲡᲔᲠᲕᲘᲡᲔᲑᲘ</a>
-              <a href="#pricing" className="mersad-nav mersad-nav-link text-gray-300 hover:text-white transition-colors">ᲤᲐᲡᲔᲑᲘ</a>
-              <a href="#about" className="mersad-nav mersad-nav-link text-gray-300 hover:text-white transition-colors">ᲩᲕᲔᲜᲡ ᲨᲔᲡᲐᲮᲔᲑ</a>
+              <a href="#portfolio" className="mersad-nav mersad-nav-link text-gray-300 hover:text-white transition-colors">{t('ᲞᲝᲠᲢᲤᲝᲚᲘᲝ', 'PORTFOLIO')}</a>
+              <a href="#services" className="mersad-nav mersad-nav-link text-gray-300 hover:text-white transition-colors">{t('ᲡᲔᲠᲕᲘᲡᲔᲑᲘ', 'SERVICES')}</a>
+              <a href="#pricing" className="mersad-nav mersad-nav-link text-gray-300 hover:text-white transition-colors">{t('ᲤᲐᲡᲔᲑᲘ', 'PRICING')}</a>
+              <a href="#about" className="mersad-nav mersad-nav-link text-gray-300 hover:text-white transition-colors">{t('ᲩᲕᲔᲜᲡ ᲨᲔᲡᲐᲮᲔᲑ', 'ABOUT')}</a>
+              <LangSwitch />
               <a
                 href="#contact"
                 className="mersad-nav mersad-nav-cta inline-flex items-center justify-center px-4 py-2.5 rounded-lg bg-[#E50914] text-white hover:bg-red-700 active:scale-95 transition"
               >
-                ᲓᲐᲒᲕᲘᲙᲐᲕᲨᲘᲠᲓᲘᲗ
+                {t('ᲓᲐᲒᲕᲘᲙᲐᲕᲨᲘᲠᲓᲘᲗ', 'CONTACT US')}
               </a>
             </div>
             {/* Mobile menu button */}
-            <div className="lg:hidden">
+            <div className="lg:hidden flex items-center gap-3">
+              <LangSwitch />
               <button
                 onClick={() => setMenuOpen(!menuOpen)}
                 className="w-11 h-11 -mr-2 flex items-center justify-center text-gray-300 hover:text-white focus:outline-none"
-                aria-label={menuOpen ? 'მენიუს დახურვა' : 'მენიუ'}
+                aria-label={menuOpen ? t('მენიუს დახურვა', 'Close menu') : t('მენიუ', 'Menu')}
                 aria-expanded={menuOpen}
               >
                 {menuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -1254,7 +1259,7 @@ function App() {
         {/* Mobile Menu */}
         {menuOpen && (
           <div className="lg:hidden bg-[#0d0d0d]/98 border-b border-[#262626] px-4 pt-4 pb-6 space-y-1 mobile-menu-in">
-            {[['#portfolio', 'ᲞᲝᲠᲢᲤᲝᲚᲘᲝ'], ['#services', 'ᲡᲔᲠᲕᲘᲡᲔᲑᲘ'], ['#pricing', 'ᲤᲐᲡᲔᲑᲘ'], ['#about', 'ᲩᲕᲔᲜᲡ ᲨᲔᲡᲐᲮᲔᲑ']].map(([href, label]) => (
+            {[['#portfolio', t('ᲞᲝᲠᲢᲤᲝᲚᲘᲝ', 'PORTFOLIO')], ['#services', t('ᲡᲔᲠᲕᲘᲡᲔᲑᲘ', 'SERVICES')], ['#pricing', t('ᲤᲐᲡᲔᲑᲘ', 'PRICING')], ['#about', t('ᲩᲕᲔᲜᲡ ᲨᲔᲡᲐᲮᲔᲑ', 'ABOUT')]].map(([href, label]) => (
               <a key={href} href={href} onClick={() => setMenuOpen(false)} className="mersad-nav-mobile flex items-center justify-between py-3.5 border-b border-white/[0.06] text-gray-200 hover:text-white">
                 {label}
                 <ChevronRight className="w-4 h-4 text-gray-600" />
@@ -1263,11 +1268,11 @@ function App() {
             <div className="grid grid-cols-2 gap-3 pt-4">
               {phoneHref && (
                 <a href={phoneHref} className="flex items-center justify-center gap-2 py-3 rounded-lg border border-white/15 text-white text-sm font-semibold">
-                  <Phone className="w-4 h-4" /> დარეკვა
+                  <Phone className="w-4 h-4" /> {t('დარეკვა', 'Call')}
                 </a>
               )}
               <a href="#contact" onClick={() => setMenuOpen(false)} className={`mersad-nav-mobile flex items-center justify-center py-3 rounded-lg bg-[#E50914] text-white ${phoneHref ? '' : 'col-span-2'}`}>
-                ᲓᲐᲒᲕᲘᲙᲐᲕᲨᲘᲠᲓᲘᲗ
+                {t('ᲓᲐᲒᲕᲘᲙᲐᲕᲨᲘᲠᲓᲘᲗ', 'CONTACT US')}
               </a>
             </div>
           </div>
@@ -1282,15 +1287,15 @@ function App() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 sm:mb-16 gap-6">
             <div className="space-y-4 max-w-2xl">
-              <h2 className="section-eyebrow text-xs font-bold text-[#E50914] tracking-widest uppercase">ჩვენი ნამუშევრები</h2>
+              <h2 className="section-eyebrow text-xs font-bold text-[#E50914] tracking-widest uppercase">{t('ჩვენი ნამუშევრები', 'Our work')}</h2>
               <p className="mersad-heading text-[26px] leading-[1.15] sm:text-4xl tracking-tight text-white break-words">
-                ᲞᲝᲠᲢᲤᲝᲚᲘᲝ, <br className="hidden sm:block" />
-                ᲠᲝᲛᲔᲚᲘᲪ ᲗᲐᲕᲐᲓ ᲡᲐᲣᲑᲠᲝᲑᲡ ᲡᲐᲙᲣᲗᲐᲠ ᲗᲐᲕᲖᲔ
+                {t('ᲞᲝᲠᲢᲤᲝᲚᲘᲝ,', 'A PORTFOLIO')} <br className="hidden sm:block" />
+                {t('ᲠᲝᲛᲔᲚᲘᲪ ᲗᲐᲕᲐᲓ ᲡᲐᲣᲑᲠᲝᲑᲡ ᲡᲐᲙᲣᲗᲐᲠ ᲗᲐᲕᲖᲔ', 'THAT SPEAKS FOR ITSELF')}
               </p>
-              <p className="text-gray-300">გადახედეთ ჩვენს მიერ განხორციელებულ ბრენდინგისა და მარკეტინგის ქეისებს.</p>
+              <p className="text-gray-300">{t('გადახედეთ ჩვენს მიერ განხორციელებულ ბრენდინგისა და მარკეტინგის ქეისებს.', 'Explore our branding and marketing case studies.')}</p>
             </div>
             <p className="text-sm text-gray-400 md:text-right self-start md:self-auto">
-              <span className="text-white font-bold tabular-nums">{allPortfolioProjects.length}</span> ქეისი · დააჭირეთ დეტალებისთვის
+              <span className="text-white font-bold tabular-nums">{allPortfolioProjects.length}</span> {t('ქეისი · დააჭირეთ დეტალებისთვის', 'cases · tap to open')}
             </p>
           </div>
           <div className="mb-14">
@@ -1323,7 +1328,7 @@ function App() {
                 className="group relative inline-flex items-center gap-2 px-6 py-3.5 rounded-xl border border-red-300/20 bg-gradient-to-r from-[#E50914] via-red-600 to-[#E50914] text-white text-xs font-black tracking-wider shadow-[0_18px_38px_-20px_rgba(229,9,20,0.95)] hover:scale-[1.02] active:scale-[0.985] transition"
               >
                 <span className="absolute inset-0 rounded-xl bg-white/0 group-hover:bg-white/10 transition" />
-                <span className="relative">მეტის ჩვენება</span>
+                <span className="relative">{t('მეტის ჩვენება', 'Show more')}</span>
                 <ChevronDown className="relative w-4 h-4 transition-transform duration-300" />
               </button>
             </div>
@@ -1337,7 +1342,7 @@ function App() {
           index={selectedIndex}
           onClose={closeProject}
           onNavigate={navigateProject}
-          onOrder={(pr) => { closeProject(); setTimeout(() => openOrder({ title: `მსგავსი პროექტი: ${pr.title}`, price: 'ფასი შეთანხმებით', desc: pr.category, details: `პროექტი: ${pr.title}` }), 60); }}
+          onOrder={(pr) => { closeProject(); setTimeout(() => openOrder({ title: `${t('მსგავსი პროექტი', 'A project like')}: ${pr.title}`, price: t('ფასი შეთანხმებით', 'Price on request'), desc: pr.category, details: `${t('პროექტი', 'Project')}: ${pr.title}` }), 60); }}
           workTypeLabel={getWorkTypeLabel(selectedProject)}
         />
       )}
@@ -1345,9 +1350,9 @@ function App() {
       <section id="services" data-reveal className="reveal-section py-20 sm:py-24 bg-[#0a0a0a] border-y border-[#1e1e1e] relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto space-y-4 mb-16">
-            <h2 className="section-eyebrow text-xs font-bold text-[#E50914] tracking-widest uppercase">ᲠᲐᲡ ᲕᲐᲙᲔᲗᲔᲑᲗ</h2>
-            <p className="mersad-heading text-3xl sm:text-4xl tracking-tight text-white">ᲡᲠᲣᲚᲘ ᲪᲘᲤᲠᲣᲚᲘ ᲐᲠᲡᲔᲜᲐᲚᲘ ᲗᲥᲕᲔᲜᲘ ᲑᲘᲖᲜᲔᲡᲘᲡ ᲬᲐᲠᲛᲐᲢᲔᲑᲘᲡᲗᲕᲘᲡ</p>
-            <p className="text-gray-300">ჩვენი მომსახურებები მოიცავს ყველაფერს, რაც გჭირდებათ იდეიდან – მილიონიან ბრენდამდე მისასვლელად.</p>
+            <h2 className="section-eyebrow text-xs font-bold text-[#E50914] tracking-widest uppercase">{t('ᲠᲐᲡ ᲕᲐᲙᲔᲗᲔᲑᲗ', 'WHAT WE DO')}</h2>
+            <p className="mersad-heading text-3xl sm:text-4xl tracking-tight text-white">{t('ᲡᲠᲣᲚᲘ ᲪᲘᲤᲠᲣᲚᲘ ᲐᲠᲡᲔᲜᲐᲚᲘ ᲗᲥᲕᲔᲜᲘ ᲑᲘᲖᲜᲔᲡᲘᲡ ᲬᲐᲠᲛᲐᲢᲔᲑᲘᲡᲗᲕᲘᲡ', 'A FULL DIGITAL ARSENAL FOR YOUR BUSINESS')}</p>
+            <p className="text-gray-300">{t('ჩვენი მომსახურებები მოიცავს ყველაფერს, რაც გჭირდებათ იდეიდან – მილიონიან ბრენდამდე მისასვლელად.', 'Everything you need to go from an idea to a brand people remember.')}</p>
           </div>
           <div className="reveal-stagger grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-8">
             {/* Service 1 */}
@@ -1355,18 +1360,18 @@ function App() {
               <div className="w-12 h-12 rounded-xl bg-red-950/40 border border-red-500/30 flex items-center justify-center text-[#E50914] mb-6 group-hover:scale-110 transition duration-300">
                 <Compass className="w-6 h-6" />
               </div>
-              <h3 className="sf-georgian-semibold service-title text-white mb-3">ᲕᲘᲖᲣᲐᲚᲣᲠᲘ ᲘᲓᲔᲜᲢᲝᲑᲐ</h3>
+              <h3 className="sf-georgian-semibold service-title text-white mb-3">{t('ᲕᲘᲖᲣᲐᲚᲣᲠᲘ ᲘᲓᲔᲜᲢᲝᲑᲐ', 'VISUAL IDENTITY')}</h3>
               <p className="text-gray-300 text-[15px] leading-relaxed mb-5">
-                ლოგოების, ფერთა პალიტრის, ტიპოგრაფიისა და სტილის შექმნა. ბრენდბუქი, რომელიც განსაზღვრავს თქვენი ბრენდის სახესა და ხასიათს ნებისმიერ გარემოში.
+                {t('ლოგოების, ფერთა პალიტრის, ტიპოგრაფიისა და სტილის შექმნა. ბრენდბუქი, რომელიც განსაზღვრავს თქვენი ბრენდის სახესა და ხასიათს ნებისმიერ გარემოში.', 'Logos, colour palettes, typography and style. A brand book that defines your brand’s look and character everywhere.')}
               </p>
               <ul className="space-y-2.5 text-sm text-gray-400">
                 <li className="flex items-center space-x-2">
                   <span className="w-1.5 h-1.5 rounded-full bg-[#E50914]" />
-                  <span>გეომეტრიულად სრულყოფილი ლოგოები</span>
+                  <span>{t('გეომეტრიულად სრულყოფილი ლოგოები', 'Geometrically precise logos')}</span>
                 </li>
                 <li className="flex items-center space-x-2">
                   <span className="w-1.5 h-1.5 rounded-full bg-[#E50914]" />
-                  <span>სრული ტიპოგრაფიული სისტემა</span>
+                  <span>{t('სრული ტიპოგრაფიული სისტემა', 'Complete typography system')}</span>
                 </li>
               </ul>
             </div>
@@ -1375,18 +1380,18 @@ function App() {
               <div className="w-12 h-12 rounded-xl bg-orange-950/40 border border-orange-500/30 flex items-center justify-center text-orange-500 mb-6 group-hover:scale-110 transition duration-300">
                 <Smartphone className="w-6 h-6" />
               </div>
-              <h3 className="sf-georgian-semibold service-title text-white mb-3">ᲡᲝᲪᲘᲐᲚᲣᲠᲘ ᲛᲔᲓᲘᲘᲡ ᲛᲐᲠᲗᲕᲐ</h3>
+              <h3 className="sf-georgian-semibold service-title text-white mb-3">{t('ᲡᲝᲪᲘᲐᲚᲣᲠᲘ ᲛᲔᲓᲘᲘᲡ ᲛᲐᲠᲗᲕᲐ', 'SOCIAL MEDIA MANAGEMENT')}</h3>
               <p className="text-gray-300 text-[15px] leading-relaxed mb-5">
-                პოსტერების დიზაინი, რომელიც ზრდის ჩართულობას, ქოფირაითინგი, რომელიც აყალიბებს ბრენდის უნიკალურ ტონს და ყოველკვირეული სთორების რედიზაინი.
+                {t('პოსტერების დიზაინი, რომელიც ზრდის ჩართულობას, ქოფირაითინგი, რომელიც აყალიბებს ბრენდის უნიკალურ ტონს და ყოველკვირეული სთორების რედიზაინი.', 'Post design that drives engagement, copywriting that shapes a unique brand voice, and weekly story design.')}
               </p>
               <ul className="space-y-2.5 text-sm text-gray-400">
                 <li className="flex items-center space-x-2">
                   <span className="w-1.5 h-1.5 rounded-full bg-[#E50914]" />
-                  <span>კონტენტ კალენდრის შედგენა</span>
+                  <span>{t('კონტენტ კალენდრის შედგენა', 'Content calendar planning')}</span>
                 </li>
                 <li className="flex items-center space-x-2">
                   <span className="w-1.5 h-1.5 rounded-full bg-[#E50914]" />
-                  <span>ემოციური და კრეატიული ქოფირაითინგი</span>
+                  <span>{t('ემოციური და კრეატიული ქოფირაითინგი', 'Emotional, creative copywriting')}</span>
                 </li>
               </ul>
             </div>
@@ -1395,18 +1400,18 @@ function App() {
               <div className="w-12 h-12 rounded-xl bg-blue-950/40 border border-blue-500/30 flex items-center justify-center text-blue-500 mb-6 group-hover:scale-110 transition duration-300">
                 <TrendingUp className="w-6 h-6" />
               </div>
-              <h3 className="sf-georgian-semibold service-title text-white mb-3">ᲔᲓᲕᲔᲠᲗᲐᲘᲖᲘᲜᲒᲘ & ᲠᲔᲙᲚᲐᲛᲐ</h3>
+              <h3 className="sf-georgian-semibold service-title text-white mb-3">{t('ᲔᲓᲕᲔᲠᲗᲐᲘᲖᲘᲜᲒᲘ & ᲠᲔᲙᲚᲐᲛᲐ', 'ADVERTISING')}</h3>
               <p className="text-gray-300 text-[15px] leading-relaxed mb-5">
-                სარეკლამო კამპანიები, რომლებიც მიმართულია ზუსტ აუდიტორიაზე. შადოუ რეკლამების გამოყენება ტესტირებისა და ოპტიმალური ROI-სთვის.
+                {t('სარეკლამო კამპანიები, რომლებიც მიმართულია ზუსტ აუდიტორიაზე. შადოუ რეკლამების გამოყენება ტესტირებისა და ოპტიმალური ROI-სთვის.', 'Ad campaigns aimed at exactly the right audience, with shadow ads for testing and the best ROI.')}
               </p>
               <ul className="space-y-2.5 text-sm text-gray-400">
                 <li className="flex items-center space-x-2">
                   <span className="w-1.5 h-1.5 rounded-full bg-[#E50914]" />
-                  <span>სამიზნე აუდიტორიის კვლევა</span>
+                  <span>{t('სამიზნე აუდიტორიის კვლევა', 'Target audience research')}</span>
                 </li>
                 <li className="flex items-center space-x-2">
                   <span className="w-1.5 h-1.5 rounded-full bg-[#E50914]" />
-                  <span>A/B ტესტირება და ანალიტიკა</span>
+                  <span>{t('A/B ტესტირება და ანალიტიკა', 'A/B testing & analytics')}</span>
                 </li>
               </ul>
             </div>
@@ -1416,274 +1421,101 @@ function App() {
       {/* PRICING SECTION */}
       <section id="pricing" data-reveal className="reveal-section py-20 sm:py-24 bg-[#0d0d0d] relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-3xl mx-auto space-y-4 mb-16">
-            <h2 className="section-eyebrow text-xs font-bold text-[#E50914] tracking-widest uppercase">ფასები და პაკეტები</h2>
-            <p className="mersad-heading text-3xl sm:text-4xl text-white">ᲐᲘᲠᲩᲘᲔᲗ ᲗᲥᲕᲔᲜᲘ ᲔᲨᲔᲚᲝᲜᲘᲡ ᲞᲐᲙᲔᲢᲘ</p>
-            <p className="text-gray-300 text-sm sm:text-base">
-              ყველა ფასი გამჭვირვალეა. აირჩიეთ სრული ბრენდინგი ან ყოველთვიური სოციალური მედიის (SMM) მხარდაჭერა.
+          <div className="text-center max-w-3xl mx-auto space-y-4 mb-10 sm:mb-14">
+            <h2 className="section-eyebrow text-xs font-bold text-[#E50914] tracking-widest uppercase">{t('ფასები და პაკეტები', 'Pricing')}</h2>
+            <p className="mersad-heading text-[26px] leading-[1.15] sm:text-4xl text-white">{t('ᲐᲘᲠᲩᲘᲔᲗ ᲗᲥᲕᲔᲜᲘ ᲞᲐᲙᲔᲢᲘ', 'CHOOSE YOUR PACKAGE')}</p>
+            <p className="text-gray-300 text-[15px] sm:text-base">
+              {t('გამჭვირვალე ფასები — ერთჯერადი ბრენდინგი ან ყოველთვიური სოციალური მედია.', 'Transparent prices — one-time branding or monthly social media.')}
             </p>
-            {/* TAB SELECTOR */}
-            <div className="flex justify-center pt-4">
-              <div className="inline-flex bg-[#121212] p-1 rounded-xl border border-white/5">
-                <button
-                  onClick={() => setActiveTab('smm')}
-                  className={`px-4 sm:px-6 py-2.5 rounded-lg text-sm font-bold transition ${activeTab === 'smm' ? 'bg-[#E50914] text-white' : 'text-gray-400 hover:text-white'}`}
-                >
-                  სოციალური მედია (SMM)
-                </button>
-                <button
-                  onClick={() => setActiveTab('branding')}
-                  className={`px-4 sm:px-6 py-2.5 rounded-lg text-sm font-bold transition ${activeTab === 'branding' ? 'bg-[#E50914] text-white' : 'text-gray-400 hover:text-white'}`}
-                >
-                  ბრენდინგი & იდენტობა
-                </button>
-              </div>
-            </div>
-          </div>
-          {/* PRICING GRID */}
-          <div className="reveal-stagger grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 items-stretch">
-            {activeTab === 'branding' ? (
-              brandingList.map((pkg, idx) => (
-                <div
-                  key={idx}
-                  className={`surface-card bg-[#121212] border rounded-2xl p-8 flex flex-col justify-between transition duration-300 relative ${pkg.featured ? 'border-[#E50914] shadow-lg shadow-[#E50914]/5 ring-1 ring-[#E50914]' : 'border-white/5'}`}
-                >
-                  {pkg.featured && (
-                    <div className="absolute top-0 right-8 -translate-y-1/2 px-3 py-1 bg-[#E50914] text-white text-xs font-bold tracking-wider rounded-full uppercase">
-                      ყველაზე პოპულარული
-                    </div>
-                  )}
-                  <div className="space-y-6">
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <span className="text-xs tracking-wide text-gray-400 block mb-1">{pkg.badge}</span>
-                        <h4 className="text-xl font-bold text-white">{pkg.title}</h4>
-                      </div>
-                    </div>
-                    <div className="flex items-baseline text-white">
-                      <span className="text-4xl font-black tracking-tight">{pkg.price}</span>
-                    </div>
-                    <p className="text-sm text-gray-300 leading-relaxed">{pkg.desc}</p>
-                    {pkg.compareHint && (
-                      <p className="text-sm text-[#ff4d55] leading-relaxed">{pkg.compareHint}</p>
-                    )}
-                    {pkg.deltaFromPrev && (
-                      <div className="flex flex-wrap gap-2">
-                        {pkg.deltaFromPrev.map((item, itemIdx) => (
-                          <span
-                            key={itemIdx}
-                            className="text-xs uppercase tracking-wide px-2 py-1 rounded-md bg-black/35 border border-white/10 text-gray-200"
-                          >
-                            {item}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                    <div className="border-t border-white/5 pt-6 space-y-4">
-                      {pkg.features.map((feat, fIdx) => (
-                        (() => {
-                          const isDiscount = Boolean(feat.discount);
-                          return (
-                        <div key={fIdx} className={`flex items-start space-x-3 text-sm ${isDiscount ? 'bg-white/[0.03] border border-[#E50914]/35 rounded-lg px-3 py-2.5' : ''}`}>
-                          {feat.included ? (
-                            <Check className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-                          ) : (
-                            <Lock className="w-4 h-4 text-gray-600 mt-0.5 flex-shrink-0" />
-                          )}
-                          <div className="flex flex-col items-start gap-1.5">
-                            {isDiscount && (
-                              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-black tracking-wide bg-[#E50914] text-white">
-                                -50% ფასდაკლება
-                              </span>
-                            )}
-                            <span className={feat.included ? (isDiscount ? "text-white font-semibold" : "text-gray-300") : "text-gray-500 line-through"}>
-                              {feat.text}
-                            </span>
-                          </div>
-                        </div>
-                          );
-                        })()
-                      ))}
-                    </div>
-                  </div>
-                  <div className="pt-8">
-                    <button
-                      onClick={() => openOrder(pkg)}
-                      className={`w-full py-3.5 px-4 rounded-xl font-bold text-xs transition duration-200 ${pkg.featured ? 'bg-[#E50914] text-white hover:bg-red-700' : 'bg-[#1a1a1a] text-white hover:bg-white/5 border border-white/10'}`}
-                    >
-                      არჩევა და შეკვეთა
-                    </button>
-                  </div>
-                </div>
-              ))
-            ) : (
-              smmList.map((pkg, idx) => (
-                <div
-                  key={idx}
-                  className={`surface-card bg-[#121212] border rounded-2xl p-8 flex flex-col justify-between transition duration-300 relative ${pkg.featured ? 'border-[#E50914] shadow-lg shadow-[#E50914]/5 ring-1 ring-[#E50914]' : 'border-white/5'}`}
-                >
-                  {pkg.featured && (
-                    <div className="absolute top-0 right-8 -translate-y-1/2 px-3 py-1 bg-[#E50914] text-white text-xs font-bold tracking-wider rounded-full uppercase">
-                      რეკომენდებული
-                    </div>
-                  )}
-                  <div className="space-y-6">
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <span className="text-xs tracking-wide text-gray-400 block mb-1">{pkg.badge}</span>
-                        <h4 className="text-xl font-bold text-white">{pkg.title}</h4>
-                      </div>
-                    </div>
-                    <div className="flex items-baseline text-white">
-                      <span className="text-4xl font-black tracking-tight">{pkg.price}</span>
-                    </div>
-                    <p className="text-sm text-gray-300 leading-relaxed">{pkg.desc}</p>
-                    {pkg.compareHint && (
-                      <p className="text-sm text-[#ff4d55] leading-relaxed">{pkg.compareHint}</p>
-                    )}
-                    <div className="border-t border-white/5 pt-6 space-y-4">
-                      {pkg.features.map((feat, fIdx) => (
-                        (() => {
-                          const isDiscount = Boolean(feat.discount);
-                          return (
-                        <div key={fIdx} className={`flex items-start space-x-3 text-sm ${isDiscount ? 'bg-white/[0.03] border border-[#E50914]/35 rounded-lg px-3 py-2.5' : ''}`}>
-                          {feat.included ? (
-                            <Check className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-                          ) : (
-                            <Lock className="w-4 h-4 text-gray-600 mt-0.5 flex-shrink-0" />
-                          )}
-                          <div className="flex flex-col items-start gap-1.5">
-                            {isDiscount && (
-                              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-black tracking-wide bg-[#E50914] text-white">
-                                -50% ფასდაკლება
-                              </span>
-                            )}
-                            <span className={feat.included ? (isDiscount ? "text-white font-semibold" : "text-gray-300") : "text-gray-500 line-through"}>
-                              {feat.text}
-                            </span>
-                          </div>
-                        </div>
-                          );
-                        })()
-                      ))}
-                    </div>
-                  </div>
-                  <div className="pt-8">
-                    <button
-                      onClick={() => openOrder(pkg)}
-                      className={`w-full py-3.5 px-4 rounded-xl font-bold text-xs transition duration-200 ${pkg.featured ? 'bg-[#E50914] text-white hover:bg-red-700' : 'bg-[#1a1a1a] text-white hover:bg-white/5 border border-white/10'}`}
-                    >
-                      არჩევა და შეკვეთა
-                    </button>
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-          {/* PACKAGE FINDER */}
-          <div className="mt-16 sm:mt-20 max-w-4xl mx-auto" id="package-finder">
-            <PackageFinder
-              brandingList={brandingList}
-              smmList={smmList}
-              onOrder={openOrder}
-              onShowPricing={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })}
-            />
-          </div>
-          {/* DYNAMIC PRICE ESTIMATOR / CALCULATOR */}
-          <div className="surface-card mt-8 bg-[#121212] border border-white/5 rounded-2xl p-6 sm:p-10 max-w-4xl mx-auto">
-            <div className="flex items-center space-x-3 mb-6">
-              <Sliders className="w-6 h-6 text-[#E50914]" />
-              <h3 className="mersad-heading text-xl text-white">ᲘᲜᲓᲘᲕᲘᲓᲣᲐᲚᲣᲠᲘ ᲞᲐᲙᲔᲢᲘᲡ ᲐᲛᲬᲧᲝᲑᲘ</h3>
-            </div>
-            <p className="text-sm text-gray-300 mb-8 leading-relaxed">
-              გჭირდებათ სპეციფიკური მოთხოვნები? ააწყვეთ თქვენი პაკეტი და ნახეთ სავარაუდო ფასი.
-            </p>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {/* Controls */}
-              <div className="space-y-6">
-                <div className="flex items-center justify-between">
-                  <label className="text-sm font-semibold text-gray-200">ლოგოს დიზაინი (+{calc.logo} ₾)</label>
-                  <input
-                    type="checkbox"
-                    checked={customServices.logo}
-                    onChange={(e) => setCustomServices({ ...customServices, logo: e.target.checked })}
-                    className="w-5 h-5 rounded border-white/10 text-[#E50914] focus:ring-[#E50914] bg-black"
-                  />
-                </div>
-                <div className="flex items-center justify-between">
-                  <label className="text-sm font-semibold text-gray-200">ბრენდბუქი & გრიდები (+{calc.guidelines} ₾)</label>
-                  <input
-                    type="checkbox"
-                    checked={customServices.guidelines}
-                    onChange={(e) => setCustomServices({ ...customServices, guidelines: e.target.checked })}
-                    className="w-5 h-5 rounded border-white/10 text-[#E50914] focus:ring-[#E50914] bg-black"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <label className="text-sm font-semibold text-gray-200">პოსტების რაოდენობა: {customServices.posts}</label>
-                    <span className="text-xs font-mono text-[#E50914]">({customServices.posts * SMM_POST_UNIT_PRICE} ₾)</span>
-                  </div>
-                  <input
-                    type="range"
-                    min="4"
-                    max="30"
-                    value={customServices.posts}
-                    onChange={(e) => setCustomServices({ ...customServices, posts: parseInt(e.target.value, 10) })}
-                    className="w-full accent-[#E50914]"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <label className="text-sm font-semibold text-gray-200">სთორების რაოდენობა: {customServices.stories}</label>
-                    <span className="text-xs font-mono text-[#E50914]">({customServices.stories * SMM_STORY_UNIT_PRICE} ₾)</span>
-                  </div>
-                  <input
-                    type="range"
-                    min="0"
-                    max="30"
-                    value={customServices.stories}
-                    onChange={(e) => setCustomServices({ ...customServices, stories: parseInt(e.target.value, 10) })}
-                    className="w-full accent-[#E50914]"
-                  />
-                </div>
-                <div className="flex items-center justify-between">
-                  <label className="text-sm font-semibold text-gray-200">რეკლამის მართვა (Ad set) (+{calc.advertising} ₾)</label>
-                  <input
-                    type="checkbox"
-                    checked={customServices.advertising}
-                    onChange={(e) => setCustomServices({ ...customServices, advertising: e.target.checked })}
-                    className="w-5 h-5 rounded border-white/10 text-[#E50914] focus:ring-[#E50914] bg-black"
-                  />
-                </div>
-                <div className="flex items-center justify-between">
-                  <label className="text-sm font-semibold text-gray-200">შადოუ რეკლამების ტესტირება (+{calc.shadowTesting} ₾)</label>
-                  <input
-                    type="checkbox"
-                    checked={customServices.shadowTesting}
-                    onChange={(e) => setCustomServices({ ...customServices, shadowTesting: e.target.checked })}
-                    className="w-5 h-5 rounded border-white/10 text-[#E50914] focus:ring-[#E50914] bg-black"
-                  />
-                </div>
-              </div>
-              {/* Dynamic Calculation Output */}
-              <div className="bg-black/40 border border-white/5 rounded-xl p-6 flex flex-col justify-between text-center md:text-left">
-                <div className="space-y-4">
-                  <span className="text-xs font-mono tracking-widest text-[#E50914] uppercase block">კალკულაციის ჯამი:</span>
-                  <div className="text-4xl sm:text-5xl font-black text-white">{calculateCustomPrice()} ₾</div>
-                  <p className="text-xs text-gray-400 leading-relaxed">
-                    ეს არის ინდივიდუალური გაანგარიშება. საბოლოო პაკეტი დაზუსტდება თქვენთან დეტალური საუბრის შემდეგ.
-                  </p>
-                </div>
-                <div className="pt-6">
+            <div className="flex justify-center pt-3">
+              <div className="inline-flex bg-[#121212] p-1 rounded-xl border border-white/[0.08]">
+                {[['smm', t('სოციალური მედია', 'Social media')], ['branding', t('ბრენდინგი', 'Branding')]].map(([key, label]) => (
                   <button
-                    onClick={() => openOrder({ title: 'ინდივიდუალური პაკეტი', price: `${calculateCustomPrice()} ₾`, desc: 'თქვენს მიერ აწყობილი კალკულაცია', details: [customServices.logo && 'ლოგო', customServices.guidelines && 'ბრენდბუქი', `${customServices.posts} პოსტი`, `${customServices.stories} სთორი`, customServices.advertising && 'რეკლამის მართვა', customServices.shadowTesting && 'შადოუ ტესტირება'].filter(Boolean).join(', ') })}
-                    className="w-full py-4 bg-white text-black font-bold rounded-xl text-xs hover:bg-gray-100 transition active:scale-95"
+                    key={key}
+                    type="button"
+                    onClick={() => setActiveTab(key)}
+                    className={`px-5 sm:px-7 py-2.5 rounded-lg text-sm font-bold transition ${activeTab === key ? 'bg-[#E50914] text-white shadow-[0_8px_24px_-10px_rgba(229,9,20,0.9)]' : 'text-gray-400 hover:text-white'}`}
                   >
-                    არჩეული პაკეტის შეკვეთა
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+          {/* PRICING CARDS */}
+          <div key={activeTab} className="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-6 items-stretch pf-step">
+            {(activeTab === 'branding' ? brandingList : smmList).map((pkg, idx) => {
+              const included = (pkg.features || []).filter((f) => f.included && f.text);
+              return (
+                <div
+                  key={idx}
+                  className={`relative flex flex-col rounded-2xl p-6 sm:p-7 transition duration-300 ${pkg.featured ? 'bg-gradient-to-b from-[#1d1011] to-[#121212] border border-[#E50914]/70 shadow-[0_24px_60px_-30px_rgba(229,9,20,0.6)]' : 'surface-card bg-[#121212] border border-white/[0.08] hover:border-white/20'}`}
+                >
+                  {pkg.featured && (
+                    <span className="absolute -top-3 left-6 px-3 py-1 bg-[#E50914] text-white text-[11px] font-bold tracking-wide rounded-full">
+                      {activeTab === 'branding' ? t('ყველაზე პოპულარული', 'Most popular') : t('რეკომენდებული', 'Recommended')}
+                    </span>
+                  )}
+                  <div className="flex items-center justify-between gap-2">
+                    <h4 className="text-lg font-bold text-white">{pkg.title}</h4>
+                    {pkg.badge && !pkg.featured && <span className="text-[11px] text-gray-400 px-2 py-0.5 rounded-md border border-white/10">{pkg.badge}</span>}
+                  </div>
+                  <div className="mt-4 text-[34px] leading-none font-black text-white tracking-tight">{pkg.price}</div>
+                  {pkg.desc && <p className="mt-3 text-sm text-gray-400 leading-relaxed">{pkg.desc}</p>}
+                  <ul className="mt-6 pt-5 border-t border-white/[0.08] space-y-3 flex-1">
+                    {included.map((feat, fIdx) => (
+                      <li key={fIdx} className="flex items-start gap-3 text-sm">
+                        <Check className={`w-4 h-4 mt-0.5 shrink-0 ${feat.discount ? 'text-[#ff4d55]' : 'text-green-500'}`} />
+                        <span className={feat.discount ? 'text-white font-semibold' : 'text-gray-200'}>
+                          {feat.discount && <span className="mr-1.5 px-1.5 py-0.5 rounded bg-[#E50914] text-white text-[11px] font-black">-50%</span>}
+                          {feat.text}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                  <button
+                    onClick={() => openOrder(pkg)}
+                    className={`mt-7 w-full py-3.5 px-4 rounded-xl font-bold text-sm transition active:scale-[0.98] ${pkg.featured ? 'bg-[#E50914] text-white hover:bg-red-700' : 'bg-white/[0.06] text-white hover:bg-white/[0.12] border border-white/10'}`}
+                  >
+                    {t('არჩევა', 'Choose')}
                   </button>
                 </div>
+              );
+            })}
+          </div>
+          {/* HELPER: finder / calculator */}
+          <div className="mt-14 sm:mt-20 max-w-5xl mx-auto" id="package-finder">
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-5">
+              <div>
+                <p className="text-xl sm:text-2xl font-black text-white">{t('ვერ გადაწყვიტეთ?', 'Not sure yet?')}</p>
+                <p className="text-sm text-gray-400 mt-1">{t('უპასუხეთ 3 კითხვას ან ააწყვეთ პაკეტი თავად.', 'Answer 3 quick questions or build your own package.')}</p>
               </div>
+              <div className="inline-flex self-start sm:self-auto bg-[#121212] p-1 rounded-xl border border-white/[0.08]">
+                {[['finder', t('დამეხმარეთ არჩევაში', 'Help me choose')], ['calc', t('ავაწყობ თავად', 'Build my own')]].map(([key, label]) => (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={() => setHelperTab(key)}
+                    className={`px-4 py-2 rounded-lg text-sm font-semibold transition ${helperTab === key ? 'bg-white text-black' : 'text-gray-400 hover:text-white'}`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div key={helperTab} className="pf-step">
+              {helperTab === 'finder' ? (
+                <PackageFinder
+                  brandingList={brandingList}
+                  smmList={smmList}
+                  onOrder={openOrder}
+                  onShowPricing={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })}
+                />
+              ) : (
+                <div className="surface-card bg-[#121212] border border-white/[0.08] rounded-2xl p-5 sm:p-8">
+                  <PriceCalculator prices={calc} onOrder={openOrder} />
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -1700,10 +1532,10 @@ function App() {
             {/* Info panel */}
             <div className="lg:col-span-5 space-y-8">
               <div className="space-y-4">
-                <h2 className="section-eyebrow text-xs font-bold text-[#E50914] tracking-widest uppercase">კონტაქტი</h2>
-                <p className="mersad-heading text-[26px] leading-[1.15] sm:text-4xl text-white">ᲓᲐᲕᲘᲬᲧᲝᲗ ᲗᲥᲕᲔᲜᲘ ᲑᲠᲔᲜᲓᲘᲡ ᲐᲦᲛᲐᲕᲚᲝᲑᲐ</p>
+                <h2 className="section-eyebrow text-xs font-bold text-[#E50914] tracking-widest uppercase">{t('კონტაქტი', 'Contact')}</h2>
+                <p className="mersad-heading text-[26px] leading-[1.15] sm:text-4xl text-white">{t('ᲓᲐᲕᲘᲬᲧᲝᲗ ᲗᲥᲕᲔᲜᲘ ᲑᲠᲔᲜᲓᲘᲡ ᲐᲦᲛᲐᲕᲚᲝᲑᲐ', 'LET’S GROW YOUR BRAND')}</p>
                 <p className="text-gray-300 text-[15px] leading-relaxed">
-                  პირველი კონსულტაცია უფასოა. მოგვწერეთ ან დაგვირეკეთ — ერთად განვსაზღვრავთ, რა სჭირდება თქვენს ბრენდს.
+                  {t('პირველი კონსულტაცია უფასოა. მოგვწერეთ ან დაგვირეკეთ — ერთად განვსაზღვრავთ, რა სჭირდება თქვენს ბრენდს.', 'The first consultation is free. Message or call us — together we’ll figure out what your brand needs.')}
                 </p>
               </div>
               {/* quick actions */}
@@ -1712,7 +1544,7 @@ function App() {
                   <a href={phoneHref} className="contact-action group">
                     <Phone className="w-5 h-5 text-[#ff4d55]" />
                     <span>
-                      <span className="block text-[12px] text-gray-400">დარეკვა</span>
+                      <span className="block text-[12px] text-gray-400">{t('დარეკვა', 'Call')}</span>
                       <span className="block text-sm font-bold text-white">{settings.phone}</span>
                     </span>
                   </a>
@@ -1722,7 +1554,7 @@ function App() {
                     <WhatsAppIcon className="w-5 h-5 text-[#25D366]" />
                     <span>
                       <span className="block text-[12px] text-gray-400">WhatsApp</span>
-                      <span className="block text-sm font-bold text-white">მოგვწერეთ</span>
+                      <span className="block text-sm font-bold text-white">{t('მოგვწერეთ', 'Message us')}</span>
                     </span>
                   </a>
                 )}
@@ -1731,7 +1563,7 @@ function App() {
                     <MessengerIcon className="w-5 h-5 text-[#4f8cff]" />
                     <span>
                       <span className="block text-[12px] text-gray-400">Messenger</span>
-                      <span className="block text-sm font-bold text-white">მოგვწერეთ</span>
+                      <span className="block text-sm font-bold text-white">{t('მოგვწერეთ', 'Message us')}</span>
                     </span>
                   </a>
                 )}
@@ -1739,7 +1571,7 @@ function App() {
                   <a href={`mailto:${settings.email}`} className="contact-action group col-span-2">
                     <Mail className="w-5 h-5 text-[#ff4d55]" />
                     <span className="min-w-0">
-                      <span className="block text-[12px] text-gray-400">ელფოსტა</span>
+                      <span className="block text-[12px] text-gray-400">{t('ელფოსტა', 'Email')}</span>
                       <span className="block text-sm font-bold text-white truncate">{settings.email}</span>
                     </span>
                   </a>
@@ -1778,37 +1610,37 @@ function App() {
                     <div className="mx-auto w-16 h-16 rounded-full bg-green-500/15 border border-green-500/40 flex items-center justify-center">
                       <Check className="w-8 h-8 text-green-400" />
                     </div>
-                    <h3 className="text-2xl font-black text-white">მადლობა, მივიღეთ!</h3>
-                    <p className="text-gray-300 text-[15px]">{settings.responseTime ? `${settings.responseTime}.` : ''} მალე დაგიკავშირდებით მითითებულ ნომერზე.</p>
-                    <button type="button" onClick={() => setContactState('idle')} className="text-sm text-gray-400 hover:text-white underline underline-offset-4">კიდევ ერთი შეტყობინება</button>
+                    <h3 className="text-2xl font-black text-white">{t('მადლობა, მივიღეთ!', 'Thank you — got it!')}</h3>
+                    <p className="text-gray-300 text-[15px]">{settings.responseTime ? `${settings.responseTime}.` : ''} {t('მალე დაგიკავშირდებით მითითებულ ნომერზე.', 'We’ll call you back shortly.')}</p>
+                    <button type="button" onClick={() => setContactState('idle')} className="text-sm text-gray-400 hover:text-white underline underline-offset-4">{t('კიდევ ერთი შეტყობინება', 'Send another message')}</button>
                   </div>
                 ) : (
                   <>
-                    <h3 className="text-xl font-bold text-white mb-1">მოგვწერეთ პირდაპირ</h3>
+                    <h3 className="text-xl font-bold text-white mb-1">{t('მოგვწერეთ პირდაპირ', 'Send us a message')}</h3>
                     <p className="text-sm text-gray-400 mb-6">{settings.responseTime}</p>
                     <form onSubmit={handleContactSubmit} className="space-y-5">
                       <input type="text" name="website" tabIndex={-1} autoComplete="off" className="hidden" aria-hidden="true" />
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                         <label className="block">
-                          <span className="form-label">სახელი</span>
-                          <input type="text" name="name" autoComplete="name" className="form-input" placeholder="მაგ: გიორგი" required />
+                          <span className="form-label">{t('სახელი', 'Name')}</span>
+                          <input type="text" name="name" autoComplete="name" className="form-input" placeholder={t('მაგ: გიორგი', 'e.g. George')} required />
                         </label>
                         <label className="block">
-                          <span className="form-label">ტელეფონი</span>
+                          <span className="form-label">{t('ტელეფონი', 'Phone')}</span>
                           <input type="tel" name="phone" autoComplete="tel" inputMode="tel" className="form-input" placeholder="5XX XX XX XX" required />
                         </label>
                       </div>
                       <label className="block">
-                        <span className="form-label">ბრენდი ან კომპანია <span className="text-gray-500">(არასავალდებულო)</span></span>
-                        <input type="text" name="company" autoComplete="organization" className="form-input" placeholder="მაგ: ეშელონ კაფე" />
+                        <span className="form-label">{t('ბრენდი ან კომპანია', 'Brand or company')} <span className="text-gray-500">{t('(არასავალდებულო)', '(optional)')}</span></span>
+                        <input type="text" name="company" autoComplete="organization" className="form-input" placeholder={t('მაგ: ეშელონ კაფე', 'e.g. Eshelon Café')} />
                       </label>
                       <label className="block">
-                        <span className="form-label">რით შეგვიძლია დაგეხმაროთ?</span>
-                        <textarea name="message" className="form-input h-32 resize-none" placeholder="მოკლედ აღწერეთ თქვენი ბიზნესი და რა გჭირდებათ…" required />
+                        <span className="form-label">{t('რით შეგვიძლია დაგეხმაროთ?', 'How can we help?')}</span>
+                        <textarea name="message" className="form-input h-32 resize-none" placeholder={t('მოკლედ აღწერეთ თქვენი ბიზნესი და რა გჭირდებათ…', 'Tell us briefly about your business and what you need…')} required />
                       </label>
                       {contactState === 'error' && (
                         <p className="text-sm text-red-300 bg-red-950/40 border border-red-500/30 rounded-lg p-3">
-                          გაგზავნა ვერ მოხერხდა. სცადეთ თავიდან{phoneHref ? <> ან <a href={phoneHref} className="underline font-semibold">დაგვირეკეთ</a></> : ''}.
+                          {t('გაგზავნა ვერ მოხერხდა. სცადეთ თავიდან', 'Couldn’t send. Please try again')}{phoneHref ? <> {t('ან', 'or')} <a href={phoneHref} className="underline font-semibold">{t('დაგვირეკეთ', 'call us')}</a></> : ''}.
                         </p>
                       )}
                       <button
@@ -1816,7 +1648,7 @@ function App() {
                         disabled={contactState === 'sending'}
                         className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 bg-[#E50914] text-white font-bold rounded-xl text-sm hover:bg-red-700 transition active:scale-95 disabled:opacity-60"
                       >
-                        {contactState === 'sending' ? 'იგზავნება…' : 'გაგზავნა'}
+                        {contactState === 'sending' ? t('იგზავნება…', 'Sending…') : t('გაგზავნა', 'Send')}
                         {contactState !== 'sending' && <Send className="w-4 h-4" />}
                       </button>
                     </form>
@@ -1851,16 +1683,16 @@ function App() {
               )}
             </div>
             <div className="space-y-3">
-              <p className="text-xs font-bold tracking-widest text-gray-500 uppercase">ნავიგაცია</p>
+              <p className="text-xs font-bold tracking-widest text-gray-500 uppercase">{t('ნავიგაცია', 'Menu')}</p>
               <nav className="flex flex-col gap-2 text-sm">
-                <a href="#portfolio" className="text-gray-300 hover:text-white">პორტფოლიო</a>
-                <a href="#services" className="text-gray-300 hover:text-white">სერვისები</a>
-                <a href="#pricing" className="text-gray-300 hover:text-white">ფასები</a>
-                <a href="#about" className="text-gray-300 hover:text-white">ჩვენ შესახებ</a>
+                <a href="#portfolio" className="text-gray-300 hover:text-white">{t('პორტფოლიო', 'Portfolio')}</a>
+                <a href="#services" className="text-gray-300 hover:text-white">{t('სერვისები', 'Services')}</a>
+                <a href="#pricing" className="text-gray-300 hover:text-white">{t('ფასები', 'Pricing')}</a>
+                <a href="#about" className="text-gray-300 hover:text-white">{t('ჩვენ შესახებ', 'About')}</a>
               </nav>
             </div>
             <div className="space-y-3">
-              <p className="text-xs font-bold tracking-widest text-gray-500 uppercase">კონტაქტი</p>
+              <p className="text-xs font-bold tracking-widest text-gray-500 uppercase">{t('კონტაქტი', 'Contact')}</p>
               <div className="flex flex-col gap-2 text-sm">
                 {phoneHref && <a href={phoneHref} className="text-gray-300 hover:text-white">{settings.phone}</a>}
                 {settings.email && <a href={`mailto:${settings.email}`} className="text-gray-300 hover:text-white break-all">{settings.email}</a>}
@@ -1869,8 +1701,8 @@ function App() {
             </div>
           </div>
           <div className="mt-12 pt-6 border-t border-white/[0.06] flex flex-col sm:flex-row justify-between gap-3 text-xs text-gray-500">
-            <p>© {new Date().getFullYear()} ESHELON. ყველა უფლება დაცულია.</p>
-            <a href="#hero" onClick={scrollToTopSmooth} className="hover:text-white">↑ დასაწყისში დაბრუნება</a>
+            <p>© {new Date().getFullYear()} ESHELON. {t('ყველა უფლება დაცულია.', 'All rights reserved.')}</p>
+            <a href="#hero" onClick={scrollToTopSmooth} className="hover:text-white">↑ {t('დასაწყისში დაბრუნება', 'Back to top')}</a>
           </div>
         </div>
       </footer>
@@ -1882,12 +1714,12 @@ function App() {
           </a>
         )}
         {phoneHref && (
-          <a href={phoneHref} aria-label="დარეკვა" className="w-14 h-14 shrink-0 rounded-2xl bg-[#1b1b1b]/95 backdrop-blur border border-white/10 flex items-center justify-center text-white shadow-xl">
+          <a href={phoneHref} aria-label={t('დარეკვა', 'Call')} className="w-14 h-14 shrink-0 rounded-2xl bg-[#1b1b1b]/95 backdrop-blur border border-white/10 flex items-center justify-center text-white shadow-xl">
             <Phone className="w-5 h-5" />
           </a>
         )}
         <a href="#contact" className="flex-1 h-14 rounded-2xl bg-[#E50914] text-white font-bold text-sm flex items-center justify-center gap-2 shadow-[0_12px_30px_-10px_rgba(229,9,20,0.8)]">
-          უფასო კონსულტაცია
+          {t('უფასო კონსულტაცია', 'Free consultation')}
           <ArrowRight className="w-4 h-4" />
         </a>
       </div>
@@ -1904,7 +1736,7 @@ function App() {
             <button
               onClick={() => setOrderModal(null)}
               className="absolute top-4 right-4 w-10 h-10 flex items-center justify-center text-gray-300 hover:text-white bg-white/5 rounded-full border border-white/10 transition"
-              aria-label="დახურვა"
+              aria-label={t('დახურვა', 'Close')}
             >
               <X className="w-5 h-5" />
             </button>
@@ -1913,14 +1745,14 @@ function App() {
                 <div className="mx-auto w-16 h-16 rounded-full bg-green-500/15 border border-green-500/40 flex items-center justify-center">
                   <Check className="w-8 h-8 text-green-400" />
                 </div>
-                <h4 className="text-2xl font-black text-white">მოთხოვნა მიღებულია!</h4>
-                <p className="text-[15px] text-gray-300">მალე დაგიკავშირდებით მითითებულ ნომერზე.</p>
-                <button type="button" onClick={() => setOrderModal(null)} className="mt-2 px-6 py-3 rounded-xl bg-white text-black font-bold text-sm">დახურვა</button>
+                <h4 className="text-2xl font-black text-white">{t('მოთხოვნა მიღებულია!', 'Request received!')}</h4>
+                <p className="text-[15px] text-gray-300">{t('მალე დაგიკავშირდებით მითითებულ ნომერზე.', 'We’ll call you back shortly.')}</p>
+                <button type="button" onClick={() => setOrderModal(null)} className="mt-2 px-6 py-3 rounded-xl bg-white text-black font-bold text-sm">{t('დახურვა', 'Close')}</button>
               </div>
             ) : (
               <>
                 <div className="space-y-2 mb-6 pr-10">
-                  <span className="text-xs font-semibold tracking-wide text-[#ff4d55]">მოთხოვნის გაგზავნა</span>
+                  <span className="text-xs font-semibold tracking-wide text-[#ff4d55]">{t('მოთხოვნის გაგზავნა', 'Send a request')}</span>
                   <h3 className="text-2xl font-black text-white leading-tight">{orderModal.title}</h3>
                   {orderModal.price && <div className="text-lg font-bold text-white/90">{orderModal.price}</div>}
                   {orderModal.details && <p className="text-sm text-gray-400">{orderModal.details}</p>}
@@ -1928,26 +1760,26 @@ function App() {
                 <form onSubmit={handleOrderSubmit} className="space-y-4">
                   <input type="text" name="website" tabIndex={-1} autoComplete="off" className="hidden" aria-hidden="true" />
                   <label className="block">
-                    <span className="form-label">სახელი</span>
-                    <input type="text" autoComplete="name" value={orderForm.name} onChange={(e) => setOrderForm({ ...orderForm, name: e.target.value })} className="form-input" placeholder="მაგ: გიორგი" required />
+                    <span className="form-label">{t('სახელი', 'Name')}</span>
+                    <input type="text" autoComplete="name" value={orderForm.name} onChange={(e) => setOrderForm({ ...orderForm, name: e.target.value })} className="form-input" placeholder={t('მაგ: გიორგი', 'e.g. George')} required />
                   </label>
                   <label className="block">
-                    <span className="form-label">ტელეფონი</span>
+                    <span className="form-label">{t('ტელეფონი', 'Phone')}</span>
                     <input type="tel" inputMode="tel" autoComplete="tel" value={orderForm.phone} onChange={(e) => setOrderForm({ ...orderForm, phone: e.target.value })} className="form-input" placeholder="5XX XX XX XX" required />
                   </label>
                   <label className="block">
-                    <span className="form-label">კომენტარი <span className="text-gray-500">(არასავალდებულო)</span></span>
-                    <textarea value={orderForm.note} onChange={(e) => setOrderForm({ ...orderForm, note: e.target.value })} className="form-input h-20 resize-none" placeholder="ბრენდის სახელი, სურვილები…" />
+                    <span className="form-label">{t('კომენტარი', 'Comment')} <span className="text-gray-500">{t('(არასავალდებულო)', '(optional)')}</span></span>
+                    <textarea value={orderForm.note} onChange={(e) => setOrderForm({ ...orderForm, note: e.target.value })} className="form-input h-20 resize-none" placeholder={t('ბრენდის სახელი, სურვილები…', 'Brand name, wishes…')} />
                   </label>
                   {orderState === 'error' && (
                     <p className="text-sm text-red-300 bg-red-950/40 border border-red-500/30 rounded-lg p-3">
-                      გაგზავნა ვერ მოხერხდა. სცადეთ თავიდან{phoneHref ? <> ან <a href={phoneHref} className="underline font-semibold">დაგვირეკეთ</a></> : ''}.
+                      {t('გაგზავნა ვერ მოხერხდა. სცადეთ თავიდან', 'Couldn’t send. Please try again')}{phoneHref ? <> {t('ან', 'or')} <a href={phoneHref} className="underline font-semibold">{t('დაგვირეკეთ', 'call us')}</a></> : ''}.
                     </p>
                   )}
                   <button type="submit" disabled={orderState === 'sending'} className="w-full py-4 bg-[#E50914] text-white font-bold rounded-xl text-sm hover:bg-red-700 transition disabled:opacity-60">
-                    {orderState === 'sending' ? 'იგზავნება…' : 'გაგზავნა'}
+                    {orderState === 'sending' ? t('იგზავნება…', 'Sending…') : t('გაგზავნა', 'Send')}
                   </button>
-                  <p className="text-[12px] text-gray-500 text-center">საბოლოო ფასი დაზუსტდება საუბრის შემდეგ.</p>
+                  <p className="text-[12px] text-gray-500 text-center">{t('საბოლოო ფასი დაზუსტდება საუბრის შემდეგ.', 'The final price is confirmed after a short call.')}</p>
                 </form>
               </>
             )}
