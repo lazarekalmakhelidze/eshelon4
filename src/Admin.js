@@ -22,7 +22,7 @@ async function api(path, { body, raw, type } = {}) {
   const res = await fetch(path, {
     method: 'POST',
     headers: {
-      Authorization: `Bearer ${getPw()}`,
+      Authorization: `Bearer ${encodeURIComponent(getPw())}`,
       'Content-Type': raw ? type : 'application/json'
     },
     body: raw ? raw : JSON.stringify(body || {})
