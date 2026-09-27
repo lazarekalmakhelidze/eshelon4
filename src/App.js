@@ -2,7 +2,7 @@ import './style.css';
 
 import React, { useEffect, useRef, useState } from 'react';
 import PosterFolio from './components/PosterFolio';
-import Img, { webpSrcSet, webpUrl } from './Img';
+import Img, { webpSrcSet } from './Img';
 
 import {
   Compass,
@@ -35,9 +35,12 @@ import {
 import { useSiteContent, pickList } from './siteContent';
 import { mergeSettings, telHref, whatsappHref, sendLead } from './siteSettings';
 import ProjectViewer from './components/ProjectViewer';
-import { useLang, localizeProject, localizePackage, localizeNews, localizeOffer, localizeTerms, localizeSettings } from './i18n';
+import { useLang, localizeItem, localizeProject, localizePackage, localizeNews, localizeOffer, localizeTerms, localizeSettings } from './i18n';
 import PackageFinder from './components/PackageFinder';
 import PriceCalculator from './components/PriceCalculator';
+import Testimonials from './components/Testimonials';
+import Faq from './components/Faq';
+import { DEFAULT_PROCESS, DEFAULT_FAQ, DEFAULT_TESTIMONIALS } from './extraContent';
 import { FacebookIcon, InstagramIcon, WhatsAppIcon, MessengerIcon } from './components/BrandIcons';
 
 // Echelon Branding Assets and Case Studies
@@ -267,13 +270,21 @@ function PortfolioCard({ project, onSelect }) {
                 {project.category}
               </p>
             </div>
-            <div className="absolute -bottom-10 -right-10 w-24 h-24 rounded-full bg-[#E50914]/10 blur-xl group-hover:bg-[#E50914]/20 transition duration-300" />
+            <div className="absolute -bottom-10 -right-10 w-32 h-32 rounded-full bg-[radial-gradient(closest-side,rgba(229,9,20,0.18),transparent)] opacity-70 group-hover:opacity-100 transition duration-300" />
           </div>
         )}
       </div>
       <div className="p-6 space-y-4">
-        <div className="inline-flex items-center px-2.5 py-1 rounded-md bg-white/[0.02] border border-white/5 text-xs font-medium tracking-normal text-gray-500">
-          {getWorkTypeLabel(project)}
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="inline-flex items-center px-2.5 py-1 rounded-md bg-white/[0.02] border border-white/5 text-xs font-medium tracking-normal text-gray-500">
+            {getWorkTypeLabel(project)}
+          </span>
+          {project.resultBadge && (
+            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-[#E50914]/10 border border-[#E50914]/35 text-xs font-bold text-[#ff6b72]">
+              <TrendingUp className="w-3.5 h-3.5" />
+              {project.resultBadge}
+            </span>
+          )}
         </div>
         <p className="text-sm text-gray-400 line-clamp-3">{project.description}</p>
         <div className="pt-4 border-t border-white/5 flex items-center justify-between">
@@ -661,14 +672,15 @@ function PartnersStrip() {
   );
 }
 
-function AboutSection() {
+function AboutSection({ steps = [] }) {
   const { t } = useLang();
+  const list = steps.filter((st) => st && st.title);
   return (
-    <section id="about" data-reveal className="reveal-section py-24 bg-[#09090a] border-y border-[#1a1a1f] relative overflow-hidden">
-      <div className="absolute -top-24 -right-10 w-72 h-72 bg-[#E50914]/12 blur-3xl rounded-full pointer-events-none" />
-      <div className="absolute -bottom-24 -left-10 w-80 h-80 bg-red-700/10 blur-3xl rounded-full pointer-events-none" />
+    <section id="about" data-reveal className="reveal-section py-24 bg-[#09090a] border-y border-[#1a1a1f] relative overflow-hidden overflow-clip">
+      <div className="absolute -top-40 -right-24 w-[28rem] h-[28rem] bg-[radial-gradient(closest-side,rgba(229,9,20,0.13),transparent)] pointer-events-none" />
+      <div className="absolute -bottom-40 -left-24 w-[30rem] h-[30rem] bg-[radial-gradient(closest-side,rgba(185,28,28,0.11),transparent)] pointer-events-none" />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-stretch">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
           <div className="lg:col-span-6 space-y-6">
             <h2 className="section-eyebrow text-xs font-bold text-[#E50914] tracking-widest uppercase">{t('ჩვენ და გუნდი', 'About us')}</h2>
             <p className="mersad-heading text-3xl sm:text-4xl text-white leading-tight">
@@ -688,23 +700,9 @@ function AboutSection() {
                   'Today ESHELON works as a team — fast, responsive and accountable. Together with our partners we build steady growth and brands with their own character and a strong voice.')}
               </p>
             </div>
-            <div className="reveal-stagger grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
-              <div className="surface-card bg-[#121217] border border-white/10 rounded-xl p-4">
-                <p className="text-xs tracking-wide text-gray-400">{t('პრიორიტეტი', 'Priority')}</p>
-                <p className="text-sm font-bold text-white mt-1">{t('ხარისხზე ორიენტაცია', 'Quality first')}</p>
-              </div>
-              <div className="surface-card bg-[#121217] border border-white/10 rounded-xl p-4">
-                <p className="text-xs tracking-wide text-gray-400">{t('განვითარება', 'Growth')}</p>
-                <p className="text-sm font-bold text-white mt-1">{t('ინოვაციური სიახლეების ძიება', 'Always exploring what’s new')}</p>
-              </div>
-              <div className="surface-card bg-[#121217] border border-white/10 rounded-xl p-4">
-                <p className="text-xs tracking-wide text-gray-400">{t('დისციპლინა', 'Discipline')}</p>
-                <p className="text-sm font-bold text-white mt-1">{t('დედლაინების ზუსტი დაცვა', 'Deadlines we keep')}</p>
-              </div>
-            </div>
           </div>
           <div className="lg:col-span-6">
-            <div className="surface-card h-full bg-[#121212] border border-white/10 rounded-2xl p-3 sm:p-4">
+            <div className="surface-card bg-[#121212] border border-white/10 rounded-2xl p-3 sm:p-4">
               <div className="relative rounded-xl overflow-hidden border border-white/10">
                 <Img
                   src="/optimized/about/team-story.jpg"
@@ -720,6 +718,25 @@ function AboutSection() {
             </div>
           </div>
         </div>
+        {list.length > 0 && (
+          <div className="mt-14 sm:mt-16" id="process">
+            <p className="text-xl sm:text-2xl font-black text-white mb-5">{t('როგორ ვმუშაობთ', 'How we work')}</p>
+            <ol className={`reveal-stagger grid grid-cols-1 sm:grid-cols-2 gap-3 ${list.length >= 4 ? 'lg:grid-cols-4' : list.length === 3 ? 'lg:grid-cols-3' : ''}`}>
+              {list.map((st, n) => (
+                <li key={st.id || n} className="surface-card bg-[#121217] border border-white/10 rounded-xl p-4 sm:p-5 flex gap-3.5 lg:flex-col lg:gap-3">
+                  <span className="text-sm lg:text-base font-black text-[#ff4d55] tabular-nums leading-6">{String(n + 1).padStart(2, '0')}</span>
+                  <span className="min-w-0">
+                    <span className="flex flex-wrap items-baseline gap-x-2">
+                      <span className="text-[15px] font-bold text-white">{st.title}</span>
+                      {st.duration && <span className="text-[11px] text-gray-500">{st.duration}</span>}
+                    </span>
+                    {st.text && <span className="block text-[13px] leading-relaxed text-gray-400 mt-1">{st.text}</span>}
+                  </span>
+                </li>
+              ))}
+            </ol>
+          </div>
+        )}
       </div>
     </section>
   );
@@ -727,6 +744,7 @@ function AboutSection() {
 
 function FacebookNewsSection({ posts = facebookNewsPosts, facebookUrl = '' }) {
   const { t } = useLang();
+  const [showAll, setShowAll] = useState(false);
   return (
     <section id="facebook-news" data-reveal className="reveal-section py-14 sm:py-16 bg-[#0c0c0f] border-y border-[#1e1e24]">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -749,13 +767,13 @@ function FacebookNewsSection({ posts = facebookNewsPosts, facebookUrl = '' }) {
           )}
         </div>
         <div className="reveal-stagger grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-          {posts.map((post) => (
+          {posts.map((post, n) => (
             <a
               key={post.id}
               href={post.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="surface-card group bg-[#121217] border border-white/10 rounded-xl overflow-hidden hover:border-[#E50914]/45 transition duration-300 flex items-stretch sm:block lg:flex"
+              className={`${n >= 2 && !showAll ? 'max-sm:hidden' : ''} surface-card group bg-[#121217] border border-white/10 rounded-xl overflow-hidden hover:border-[#E50914]/45 transition duration-300 flex items-stretch sm:block lg:flex`}
             >
               <div className="w-28 min-w-[7rem] sm:w-auto sm:min-w-0 aspect-[4/5] overflow-hidden relative lg:w-36 lg:min-w-[9rem]">
                 <Img
@@ -782,6 +800,15 @@ function FacebookNewsSection({ posts = facebookNewsPosts, facebookUrl = '' }) {
             </a>
           ))}
         </div>
+        {posts.length > 2 && !showAll && (
+          <button
+            type="button"
+            onClick={() => setShowAll(true)}
+            className="sm:hidden mt-3 w-full py-3 rounded-xl border border-white/10 text-sm font-semibold text-gray-300 hover:text-white"
+          >
+            {t('კიდევ', 'Show')} {posts.length - 2} {t('პოსტი', 'more')}
+          </button>
+        )}
       </div>
     </section>
   );
@@ -987,6 +1014,9 @@ function App() {
   const brandingList = pickList(siteContent.branding, brandingPackages).map((pk) => localizePackage(pk, lang));
   const smmList = pickList(siteContent.smm, smmPackages).map((pk) => localizePackage(pk, lang));
   const newsList = pickList(siteContent.news, facebookNewsPosts).map((n) => localizeNews(n, lang));
+  const testimonialsList = pickList(siteContent.testimonials, DEFAULT_TESTIMONIALS).map((x) => localizeItem(x, lang, ['quote', 'role', 'company']));
+  const processList = pickList(siteContent.process, DEFAULT_PROCESS).map((x) => localizeItem(x, lang, ['title', 'text', 'duration']));
+  const faqList = pickList(siteContent.faq, DEFAULT_FAQ).map((x) => localizeItem(x, lang, ['q', 'a']));
   const collaborationContent = siteContent.collaboration || {};
   const settings = localizeSettings(mergeSettings(siteContent.settings), lang);
   const phoneHref = telHref(settings.phone);
@@ -1032,28 +1062,47 @@ function App() {
     setMenuOpen(false);
   };
   useEffect(() => {
-    const revealSections = Array.from(document.querySelectorAll('[data-reveal]'));
-    if (!revealSections.length) return undefined;
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (prefersReducedMotion) {
-      revealSections.forEach((el) => el.classList.add('reveal-visible'));
-      return undefined;
-    }
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (!entry.isIntersecting) return;
-          entry.target.classList.add('reveal-visible');
-          observer.unobserve(entry.target);
-        });
-      },
-      {
-        threshold: 0.12,
-        rootMargin: '0px 0px -8% 0px'
-      }
-    );
-    revealSections.forEach((section) => observer.observe(section));
-    return () => observer.disconnect();
+    const observer = prefersReducedMotion
+      ? null
+      : new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (!entry.isIntersecting) return;
+              entry.target.classList.add('reveal-visible');
+              observer.unobserve(entry.target);
+            });
+          },
+          {
+            threshold: 0.12,
+            rootMargin: '0px 0px -8% 0px'
+          }
+        );
+    const seen = new WeakSet();
+    const scan = () => {
+      document.querySelectorAll('[data-reveal]:not(.reveal-visible)').forEach((el) => {
+        if (seen.has(el)) return;
+        seen.add(el);
+        if (observer) observer.observe(el);
+        else el.classList.add('reveal-visible');
+      });
+    };
+    scan();
+    // Sections that appear later (e.g. testimonials once the content arrives) are picked up too.
+    let raf = 0;
+    const mutations = new MutationObserver(() => {
+      if (raf) return;
+      raf = requestAnimationFrame(() => {
+        raf = 0;
+        scan();
+      });
+    });
+    mutations.observe(document.getElementById('root') || document.body, { childList: true, subtree: true });
+    return () => {
+      mutations.disconnect();
+      if (raf) cancelAnimationFrame(raf);
+      if (observer) observer.disconnect();
+    };
   }, []);
   useEffect(() => {
     const isAnyModalOpen = Boolean(selectedProject || orderModal);
@@ -1136,6 +1185,12 @@ function App() {
     const boot = window.__boot;
     if (!boot) return undefined;
     boot.mark('app');
+    const warmFonts = () => {
+      if (document.fonts && document.fonts.load) {
+        document.fonts.load('600 16px "SF Georgian"').catch(() => {});
+      }
+    };
+    window.addEventListener('eshelon:warm', warmFonts, { once: true });
     if (lang === 'en' || isCollaborationPage) boot.mark('headline');
     if (isCollaborationPage) boot.mark('cover');
     // wait for the brand fonts, but never more than 2.5 s after the page itself is ready
@@ -1150,28 +1205,6 @@ function App() {
     const stop = setTimeout(() => clearInterval(id), 10000);
     return () => { clearInterval(id); clearTimeout(stop); clearTimeout(fontCap); };
     // run once on first render
-  }, []); // eslint-disable-line
-  // after the loading screen: quietly fetch the next images people will scroll to
-  useEffect(() => {
-    const run = () => {
-      const urls = [
-        ...allPortfolioProjects.slice(0, 6).map((pr) => webpUrl(pr.coverImage, 480)),
-        ...folioPosterImages.map((src) => webpUrl(src, 480))
-      ].filter(Boolean);
-      let i = 0;
-      const next = () => {
-        if (i >= urls.length) return;
-        const img = new Image();
-        img.decoding = 'async';
-        img.onload = img.onerror = () => { i += 1; setTimeout(next, 60); };
-        img.src = urls[i];
-      };
-      next();
-    };
-    const start = () => ('requestIdleCallback' in window ? window.requestIdleCallback(run, { timeout: 2500 }) : setTimeout(run, 1200));
-    if (!window.__boot || window.__boot.ready) { start(); return undefined; }
-    window.addEventListener('eshelon:ready', start, { once: true });
-    return () => window.removeEventListener('eshelon:ready', start);
   }, []); // eslint-disable-line
   useEffect(() => {
     let rafId = null;
@@ -1411,6 +1444,8 @@ function App() {
           workTypeLabel={getWorkTypeLabel(selectedProject)}
         />
       )}
+      {/* TESTIMONIALS (hidden until real quotes are added in /admin) */}
+      <Testimonials items={testimonialsList} />
       {/* CORE SERVICES */}
       <section id="services" data-reveal className="reveal-section py-20 sm:py-24 bg-[#0a0a0a] border-y border-[#1e1e1e] relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -1596,15 +1631,19 @@ function App() {
               )}
             </div>
           </div>
+          {/* FAQ */}
+          <div className="mt-14 sm:mt-20">
+            <Faq items={faqList} />
+          </div>
         </div>
       </section>
       {/* ABOUT US */}
-      <AboutSection />
+      <AboutSection steps={processList} />
       {/* FACEBOOK NEWS */}
       <FacebookNewsSection posts={newsList} facebookUrl={settings.facebook} />
       {/* CONTACT */}
       <section id="contact" data-reveal className="reveal-section py-20 sm:py-24 bg-[#0a0a0a] border-t border-[#1e1e1e] relative overflow-hidden">
-        <div className="pointer-events-none absolute -top-32 left-1/2 -translate-x-1/2 w-[640px] h-[320px] rounded-full bg-[#E50914]/[0.07] blur-3xl" />
+        <div className="pointer-events-none absolute -top-40 left-1/2 -translate-x-1/2 w-[760px] h-[420px] bg-[radial-gradient(closest-side,rgba(229,9,20,0.08),transparent)]" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <div className="reveal-stagger grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12">
             {/* Info panel */}
@@ -1787,12 +1826,12 @@ function App() {
       {/* FLOATING CONTACT (mobile) */}
       <div className={`lg:hidden fixed bottom-4 inset-x-4 z-40 flex gap-2 transition-all duration-500 ${showFloat && !nearContact && !selectedProject && !orderModal && !menuOpen ? 'translate-y-0 opacity-100' : 'translate-y-24 opacity-0 pointer-events-none'}`}>
         {waHref && (
-          <a href={waHref} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" className="w-14 h-14 shrink-0 rounded-2xl bg-[#1b1b1b]/95 backdrop-blur border border-white/10 flex items-center justify-center text-[#25D366] shadow-xl">
+          <a href={waHref} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" className="w-14 h-14 shrink-0 rounded-2xl bg-[#1b1b1b] border border-white/10 flex items-center justify-center text-[#25D366] shadow-xl">
             <WhatsAppIcon className="w-6 h-6" />
           </a>
         )}
         {phoneHref && (
-          <a href={phoneHref} aria-label={t('დარეკვა', 'Call')} className="w-14 h-14 shrink-0 rounded-2xl bg-[#1b1b1b]/95 backdrop-blur border border-white/10 flex items-center justify-center text-white shadow-xl">
+          <a href={phoneHref} aria-label={t('დარეკვა', 'Call')} className="w-14 h-14 shrink-0 rounded-2xl bg-[#1b1b1b] border border-white/10 flex items-center justify-center text-white shadow-xl">
             <Phone className="w-5 h-5" />
           </a>
         )}

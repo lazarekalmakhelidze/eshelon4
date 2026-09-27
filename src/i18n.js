@@ -58,8 +58,20 @@ export function localizeProject(p, lang) {
     description: pick(en, 'description', p.description),
     longDescription: pick(en, 'longDescription', p.longDescription),
     features: pick(en, 'features', p.features),
-    workType: pick(en, 'workType', WORK_TYPE_EN[p.workType] || p.workType)
+    workType: pick(en, 'workType', WORK_TYPE_EN[p.workType] || p.workType),
+    challenge: pick(en, 'challenge', p.challenge),
+    solution: pick(en, 'solution', p.solution),
+    result: pick(en, 'result', p.result),
+    resultBadge: pick(en, 'resultBadge', p.resultBadge)
   };
+}
+
+// Generic: replace the given text fields with their English versions (item.en) when present.
+export function localizeItem(item, lang, fields) {
+  if (lang !== 'en' || !item || !item.en) return item;
+  const out = { ...item };
+  fields.forEach((f) => { out[f] = pick(item.en, f, item[f]); });
+  return out;
 }
 
 export function localizePackage(pkg, lang) {

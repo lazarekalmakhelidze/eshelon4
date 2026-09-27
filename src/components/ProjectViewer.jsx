@@ -183,6 +183,33 @@ export default function ProjectViewer({ projects, index, onClose, onNavigate, on
       {project.longDescription && (
         <p className="text-[15px] leading-relaxed text-gray-300">{project.longDescription}</p>
       )}
+      {(project.result || project.resultBadge || project.challenge || project.solution) && (
+        <div className="rounded-2xl border border-white/10 bg-white/[0.03] overflow-hidden">
+          {(project.result || project.resultBadge) && (
+            <div className="p-4 sm:p-5 bg-gradient-to-br from-[#E50914]/20 via-[#E50914]/5 to-transparent">
+              <p className="text-[11px] font-bold tracking-wide text-[#ff4d55]">{t('შედეგი', 'Result')}</p>
+              {project.resultBadge && <p className="text-2xl sm:text-3xl font-black text-white mt-1 leading-tight">{project.resultBadge}</p>}
+              {project.result && <p className="text-sm text-gray-200 mt-1.5 leading-relaxed">{project.result}</p>}
+            </div>
+          )}
+          {(project.challenge || project.solution) && (
+            <dl className="p-4 sm:p-5 space-y-4 border-t border-white/[0.06] first:border-t-0">
+              {project.challenge && (
+                <div>
+                  <dt className="text-[11px] font-bold tracking-wide text-gray-400">{t('ამოცანა', 'The challenge')}</dt>
+                  <dd className="text-sm text-gray-200 mt-1 leading-relaxed">{project.challenge}</dd>
+                </div>
+              )}
+              {project.solution && (
+                <div>
+                  <dt className="text-[11px] font-bold tracking-wide text-gray-400">{t('რა გავაკეთეთ', 'What we did')}</dt>
+                  <dd className="text-sm text-gray-200 mt-1 leading-relaxed">{project.solution}</dd>
+                </div>
+              )}
+            </dl>
+          )}
+        </div>
+      )}
       {!compact && features.length > 0 && (
         <ul className="space-y-2.5">
           {features.map((f, i) => (
@@ -226,7 +253,7 @@ export default function ProjectViewer({ projects, index, onClose, onNavigate, on
       </div>
 
       {/* top bar */}
-      <div className="absolute top-[3px] left-0 right-0 z-10 h-16 flex items-center justify-between gap-3 px-3 sm:px-6 bg-[#0a0a0a]/85 backdrop-blur-md border-b border-white/[0.06]">
+      <div className="absolute top-[3px] left-0 right-0 z-10 h-16 flex items-center justify-between gap-3 px-3 sm:px-6 bg-[#0a0a0a]/95 border-b border-white/[0.06]">
         <div className="flex items-center gap-2 min-w-0">
           <button type="button" onClick={onClose} className="w-10 h-10 shrink-0 rounded-full bg-white/[0.06] hover:bg-white/10 flex items-center justify-center text-white" aria-label={t('დახურვა', 'Close')}>
             <X className="w-5 h-5" />

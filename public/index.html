@@ -60,19 +60,34 @@
         html.classList.add('is-booting');
         var seen = false;
         try { seen = sessionStorage.getItem('esh-boot') === '1'; } catch (e) {}
-        var MIN = seen ? 0 : 1100, MAX = 9000, t0 = Date.now();
-        var weights = { app: 40, fonts: 15, cover: 30, headline: 15 }, got = {}, shown = 0, finished = false;
+        // Phase 1 ("boot"): the first screen — app, fonts, hero cover and headline.
+        // Phase 2 ("warm"): on the first visit, keep loading the images further down the page
+        // (up to WARM ms more) so scrolling the whole site is smooth. Same session: phase 1 only.
+        var MIN = seen ? 0 : 1100, WARM = seen ? 0 : 4500, MAX = 12000, t0 = Date.now();
+        var weights = { app: 40, fonts: 15, cover: 30, headline: 15 }, got = {};
+        var phase = 'boot', warmAt = 0, expected = 0, loaded = 0, shown = 0, finished = false;
         var pct = el.querySelector('.b-pct');
         function real() { var p = 0; for (var k in got) p += weights[k] || 0; return p; }
+        function target(now) {
+          if (phase === 'boot') {
+            var r = real() * 0.75;
+            return Math.min(74, r + (74 - r) * (1 - Math.exp(-(now - t0) / 3500)));
+          }
+          var byFiles = 75 + 25 * (expected ? Math.min(1, loaded / expected) : 0);
+          var byTime = 75 + 24 * Math.min(1, (now - warmAt) / WARM);
+          return Math.min(99, Math.max(byFiles, byTime));
+        }
         function frame() {
           if (finished) return;
-          var elapsed = Date.now() - t0;
-          // keeps moving smoothly towards 95% while real parts arrive, so it never looks frozen
-          var r = real();
-          var want = Math.min(99, r + (95 - r) * (1 - Math.exp(-elapsed / 3500)));
-          shown += (want - shown) * 0.1;
+          var now = Date.now();
+          if (phase === 'boot' && real() >= 100 && now - t0 >= MIN) {
+            if (!WARM) return finish();
+            phase = 'warm'; warmAt = now;
+            try { window.dispatchEvent(new Event('eshelon:warm')); } catch (e) {}
+          }
+          if (phase === 'warm' && ((now - warmAt > 400 && loaded >= expected) || now - warmAt >= WARM)) return finish();
+          shown = Math.max(shown, shown + (target(now) - shown) * 0.12); // never goes backwards
           paint(shown);
-          if (real() >= 100 && elapsed >= MIN) return finish();
           requestAnimationFrame(frame);
         }
         function paint(v) { el.style.setProperty('--p', (v / 100).toFixed(3)); pct.textContent = Math.round(v) + '%'; }
@@ -88,7 +103,16 @@
             setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); }, 1000);
           }, 220);
         }
-        window.__boot = { mark: function (k) { if (!got[k]) got[k] = Date.now() - t0; }, got: got, done: finish, get ready() { return finished; } };
+        window.__boot = {
+          mark: function (k) { if (!got[k]) got[k] = Date.now() - t0; },
+          got: got,
+          expect: function () { expected += 1; },
+          loaded: function () { loaded += 1; },
+          get phase() { return finished ? 'ready' : phase; },
+          get stats() { return { phase: phase, expected: expected, loaded: loaded, ms: Date.now() - t0 }; },
+          done: finish,
+          get ready() { return finished; }
+        };
         setTimeout(finish, MAX);
         requestAnimationFrame(frame);
       })();

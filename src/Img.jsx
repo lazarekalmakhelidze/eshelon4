@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import manifest from './imageManifest.json';
 
 // Static images get light WebP copies (see scripts/make-image-variants.py).
@@ -25,30 +25,74 @@ export function webpUrl(src, maxWidth = 960) {
   return encodeURI(`/v${base}-${w}.webp`);
 }
 
-// true once the loading screen (public/index.html) has finished
-export function useBootReady() {
-  const [ready, setReady] = useState(() => typeof window === 'undefined' || !window.__boot || window.__boot.ready);
+// Loading-screen phase (see public/index.html): 'boot' → 'warm' → 'ready'
+const currentPhase = () => (typeof window === 'undefined' || !window.__boot ? 'ready' : window.__boot.phase);
+
+export function useBootPhase() {
+  const [phase, setPhase] = useState(currentPhase);
   useEffect(() => {
-    if (ready) return undefined;
-    const on = () => setReady(true);
-    window.addEventListener('eshelon:ready', on, { once: true });
-    const fallback = setTimeout(on, 12000);
-    return () => { window.removeEventListener('eshelon:ready', on); clearTimeout(fallback); };
-  }, [ready]);
-  return ready;
+    if (phase === 'ready') return undefined;
+    const update = () => setPhase(currentPhase());
+    window.addEventListener('eshelon:warm', update);
+    window.addEventListener('eshelon:ready', update);
+    const fallback = setTimeout(() => setPhase('ready'), 14000);
+    update();
+    return () => {
+      window.removeEventListener('eshelon:warm', update);
+      window.removeEventListener('eshelon:ready', update);
+      clearTimeout(fallback);
+    };
+  }, [phase]);
+  return phase;
 }
 
-// Lazy images wait until the loading screen is gone, so on slow connections
-// the first screen gets the whole bandwidth.
-export default function Img({ src, sizes = '100vw', alt = '', pictureClassName = 'contents', ...rest }) {
-  const ready = useBootReady();
-  if (rest.loading === 'lazy' && !ready) return <img alt="" aria-hidden="true" {...rest} />;
+export function useBootReady() {
+  return useBootPhase() === 'ready';
+}
+
+// Lazy images:
+//  · while the first screen loads ('boot') they wait, so it gets the whole connection;
+//  · while the loading screen is still up ('warm') they load right away and report to it,
+//    so on a first visit the whole page is ready before it opens;
+//  · afterwards they behave like normal lazy images.
+export default function Img({ src, sizes = '100vw', alt = '', pictureClassName = 'contents', onLoad, onError, ...rest }) {
+  const phase = useBootPhase();
+  const imgRef = useRef(null);
+  const tracked = useRef(false);
+  const settled = useRef(false);
+  const lazy = rest.loading === 'lazy';
+  const warm = lazy && phase === 'warm' && Boolean(src);
+  const settle = () => {
+    if (tracked.current && !settled.current && window.__boot) {
+      settled.current = true;
+      window.__boot.loaded();
+    }
+  };
+  useEffect(() => {
+    if (!warm || tracked.current || !window.__boot) return;
+    tracked.current = true;
+    window.__boot.expect();
+    const img = imgRef.current;
+    if (img && img.complete) settle();
+  }, [warm]); // eslint-disable-line
+  if (lazy && phase === 'boot') return <img alt="" aria-hidden="true" {...rest} />;
   const set = webpSrcSet(src);
-  if (!set) return <img src={src} alt={alt} {...rest} />;
+  const img = (
+    <img
+      ref={imgRef}
+      src={src}
+      alt={alt}
+      {...rest}
+      loading={warm ? 'eager' : rest.loading}
+      onLoad={(e) => { settle(); if (onLoad) onLoad(e); }}
+      onError={(e) => { settle(); if (onError) onError(e); }}
+    />
+  );
+  if (!set) return img;
   return (
     <picture className={pictureClassName}>
       <source type="image/webp" srcSet={set} sizes={sizes} />
-      <img src={src} alt={alt} {...rest} />
+      {img}
     </picture>
   );
 }

@@ -69,7 +69,7 @@ export default function PackageFinder({ brandingList, smmList, onOrder, onShowPr
 
   return (
     <div className="surface-card relative overflow-hidden bg-gradient-to-br from-[#161013] via-[#121212] to-[#121212] border border-[#E50914]/20 rounded-2xl p-6 sm:p-10">
-      <div className="pointer-events-none absolute -top-20 -right-20 w-64 h-64 rounded-full bg-[#E50914]/10 blur-3xl" />
+      <div className="pointer-events-none absolute -top-32 -right-32 w-96 h-96 bg-[radial-gradient(closest-side,rgba(229,9,20,0.12),transparent)]" />
       <div className="relative">
         <div className="flex items-center justify-between gap-4 mb-6">
           <div className="inline-flex items-center gap-2 text-[#ff4d55] text-sm font-bold">

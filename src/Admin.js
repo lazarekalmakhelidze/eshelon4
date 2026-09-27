@@ -12,6 +12,7 @@ import {
 import { DEFAULT_SETTINGS, telHref, whatsappHref } from './siteSettings';
 import { PORTFOLIO_EN, PACKAGE_EN, NEWS_EN, COLLAB_EN, SETTINGS_EN, priceEn } from './contentEn';
 import { featureTextEn } from './i18n';
+import { DEFAULT_PROCESS, DEFAULT_FAQ, DEFAULT_TESTIMONIALS } from './extraContent';
 
 const PW_KEY = 'eshelon-admin-pw';
 const getPw = () => {
@@ -52,7 +53,10 @@ const DEFAULTS = {
   smm: smmPackages,
   calculator: { logo: 500, guidelines: 3000, post: 220, story: 40, advertising: 400, shadowTesting: 250 },
   collaboration: { offers: collaborationOffers, terms: collaborationTerms },
-  settings: DEFAULT_SETTINGS
+  settings: DEFAULT_SETTINGS,
+  testimonials: DEFAULT_TESTIMONIALS,
+  process: DEFAULT_PROCESS,
+  faq: DEFAULT_FAQ
 };
 
 function withEnglish(key, data) {
@@ -108,6 +112,9 @@ const TABS = [
   { key: 'smm', label: 'SMM ფასები' },
   { key: 'calculator', label: 'კალკულატორი' },
   { key: 'collaboration', label: 'თანამშრომლობა' },
+  { key: 'testimonials', label: 'შეფასებები' },
+  { key: 'process', label: 'როგორ ვმუშაობთ' },
+  { key: 'faq', label: 'კითხვები' },
   { key: 'settings', label: 'კონტაქტები & ციფრები' }
 ];
 const ALL_TABS = [{ key: 'inbox', label: 'მოთხოვნები' }, ...TABS];
@@ -386,6 +393,16 @@ function PortfolioEditor({ value, onChange }) {
             value={p.modalImage}
             onChange={(v) => set({ modalImage: v, modalImageScrollable: !!v })}
           />
+          <div className="rounded-xl border border-[#E50914]/25 bg-[#E50914]/[0.04] p-4 space-y-4">
+            <div>
+              <p className="text-sm font-bold text-white">შედეგი <span className="font-normal text-gray-500">— არასავალდებულო, მხოლოდ ნამდვილი ციფრები</span></p>
+              <p className="text-[11px] text-gray-500 mt-0.5">ცარიელი ველები საიტზე არ ჩანს. ნიშანი ბარათზეც გამოჩნდება.</p>
+            </div>
+            <Field label="შედეგის ნიშანი (მოკლედ)" value={p.resultBadge} onChange={(v) => set({ resultBadge: v })} placeholder="მაგ: +32% შეკვეთები" />
+            <Field label="ამოცანა" textarea rows={2} value={p.challenge} onChange={(v) => set({ challenge: v })} placeholder="რა პრობლემა ჰქონდა კლიენტს?" />
+            <Field label="რა გავაკეთეთ" textarea rows={2} value={p.solution} onChange={(v) => set({ solution: v })} />
+            <Field label="შედეგი" textarea rows={2} value={p.result} onChange={(v) => set({ result: v })} placeholder="მაგ: 2 თვეში ონლაინ შეკვეთები 32%-ით გაიზარდა." />
+          </div>
           <EnBox>
             {(() => {
               const en = p.en || {};
@@ -400,6 +417,10 @@ function PortfolioEditor({ value, onChange }) {
                   <Field label="Short description" textarea value={en.description} onChange={(v) => setEn({ description: v })} />
                   <Field label="Full description" textarea rows={5} value={en.longDescription} onChange={(v) => setEn({ longDescription: v })} />
                   <LinesField label="Key points (one per line)" value={en.features} onChange={(v) => setEn({ features: v })} />
+                  <Field label="Result badge" value={en.resultBadge} onChange={(v) => setEn({ resultBadge: v })} placeholder="e.g. +32% orders" />
+                  <Field label="The challenge" textarea rows={2} value={en.challenge} onChange={(v) => setEn({ challenge: v })} />
+                  <Field label="What we did" textarea rows={2} value={en.solution} onChange={(v) => setEn({ solution: v })} />
+                  <Field label="Result" textarea rows={2} value={en.result} onChange={(v) => setEn({ result: v })} />
                 </>
               );
             })()}
@@ -407,6 +428,92 @@ function PortfolioEditor({ value, onChange }) {
         </>
       )}
     />
+  );
+}
+
+function TestimonialsEditor({ value, onChange }) {
+  return (
+    <div className="space-y-3">
+      <p className="text-sm text-gray-400 max-w-2xl">მხოლოდ ნამდვილი შეფასებები, კლიენტის თანხმობით. სანამ ერთს მაინც არ დაამატებ, ბლოკი საიტზე არ ჩანს.</p>
+      <ItemList
+        items={value}
+        onChange={onChange}
+        addLabel="ახალი შეფასება"
+        renderTitle={(x) => (x.name ? `${x.name}${x.company ? ' — ' + x.company : ''}` : '')}
+        makeNew={() => ({ id: newId('quote'), quote: '', name: '', role: '', company: '', photo: '', en: { quote: '', role: '' } })}
+        renderEditor={(x, set) => (
+          <>
+            <Field label="ციტატა" textarea rows={4} value={x.quote} onChange={(v) => set({ quote: v })} />
+            <div className="grid sm:grid-cols-3 gap-4">
+              <Field label="სახელი, გვარი" value={x.name} onChange={(v) => set({ name: v })} />
+              <Field label="თანამდებობა" value={x.role} onChange={(v) => set({ role: v })} placeholder="მაგ: დამფუძნებელი" />
+              <Field label="კომპანია" value={x.company} onChange={(v) => set({ company: v })} />
+            </div>
+            <ImageField label="ფოტო (არასავალდებულო)" folder="people" value={x.photo} onChange={(v) => set({ photo: v })} />
+            <EnBox>
+              <Field label="Quote" textarea rows={4} value={(x.en || {}).quote} onChange={(v) => set({ en: { ...(x.en || {}), quote: v } })} />
+              <Field label="Role" value={(x.en || {}).role} onChange={(v) => set({ en: { ...(x.en || {}), role: v } })} placeholder="e.g. Founder" />
+            </EnBox>
+          </>
+        )}
+      />
+    </div>
+  );
+}
+
+function ProcessEditor({ value, onChange }) {
+  return (
+    <div className="space-y-3">
+      <p className="text-sm text-gray-400 max-w-2xl">ნაბიჯები „ჩვენ შესახებ“ ბლოკში. ვადას თუ ცარიელს დატოვებ, არ გამოჩნდება.</p>
+      <ItemList
+        items={value}
+        onChange={onChange}
+        addLabel="ახალი ნაბიჯი"
+        renderTitle={(x) => x.title}
+        makeNew={() => ({ id: newId('step'), title: '', text: '', duration: '', en: { title: '', text: '', duration: '' } })}
+        renderEditor={(x, set) => (
+          <>
+            <div className="grid sm:grid-cols-[2fr_1fr] gap-4">
+              <Field label="სათაური" value={x.title} onChange={(v) => set({ title: v })} />
+              <Field label="ვადა (არასავალდებულო)" value={x.duration} onChange={(v) => set({ duration: v })} placeholder="მაგ: 1–2 დღე" />
+            </div>
+            <Field label="აღწერა" textarea rows={2} value={x.text} onChange={(v) => set({ text: v })} />
+            <EnBox>
+              <div className="grid sm:grid-cols-[2fr_1fr] gap-4">
+                <Field label="Title" value={(x.en || {}).title} onChange={(v) => set({ en: { ...(x.en || {}), title: v } })} />
+                <Field label="Duration" value={(x.en || {}).duration} onChange={(v) => set({ en: { ...(x.en || {}), duration: v } })} placeholder="e.g. 1–2 days" />
+              </div>
+              <Field label="Text" textarea rows={2} value={(x.en || {}).text} onChange={(v) => set({ en: { ...(x.en || {}), text: v } })} />
+            </EnBox>
+          </>
+        )}
+      />
+    </div>
+  );
+}
+
+function FaqEditor({ value, onChange }) {
+  return (
+    <div className="space-y-3">
+      <p className="text-sm text-gray-400 max-w-2xl">ფასების ქვეშ, დახურულ სიაში ჩანს. გადაამოწმე პასუხები — განსაკუთრებით ვადები, გადახდა და რეკლამის ბიუჯეტი.</p>
+      <ItemList
+        items={value}
+        onChange={onChange}
+        addLabel="ახალი კითხვა"
+        renderTitle={(x) => x.q}
+        makeNew={() => ({ id: newId('faq'), q: '', a: '', en: { q: '', a: '' } })}
+        renderEditor={(x, set) => (
+          <>
+            <Field label="კითხვა" value={x.q} onChange={(v) => set({ q: v })} />
+            <Field label="პასუხი" textarea rows={4} value={x.a} onChange={(v) => set({ a: v })} />
+            <EnBox>
+              <Field label="Question" value={(x.en || {}).q} onChange={(v) => set({ en: { ...(x.en || {}), q: v } })} />
+              <Field label="Answer" textarea rows={4} value={(x.en || {}).a} onChange={(v) => set({ en: { ...(x.en || {}), a: v } })} />
+            </EnBox>
+          </>
+        )}
+      />
+    </div>
   );
 }
 
@@ -731,6 +838,15 @@ function normalize(key, data) {
     Object.entries(data).forEach(([k, v]) => { out[k] = Number(v) || 0; });
     return out;
   }
+  if (key === 'testimonials') {
+    return data.filter((x) => (x.quote || '').trim() && (x.name || '').trim());
+  }
+  if (key === 'process') {
+    return data.filter((x) => (x.title || '').trim());
+  }
+  if (key === 'faq') {
+    return data.filter((x) => (x.q || '').trim() && (x.a || '').trim());
+  }
   if (key === 'settings') {
     return { ...data, stats: (data.stats || []).filter((st) => st && (st.value || '').trim()) };
   }
@@ -878,7 +994,7 @@ export default function Admin() {
           </Btn>
           <button type="button" className="text-xs text-gray-500 hover:text-white" onClick={logout}>გასვლა</button>
         </div>
-        <nav className="max-w-6xl mx-auto px-4 flex gap-1 overflow-x-auto">
+        <nav className="max-w-6xl mx-auto px-4 flex gap-1 overflow-x-auto lg:flex-wrap lg:overflow-visible">
           {ALL_TABS.map((t) => (
             <button
               key={t.key}
@@ -910,6 +1026,9 @@ export default function Admin() {
             {tab === 'calculator' && <CalculatorEditor value={data.calculator} onChange={(v) => setSection('calculator', v)} />}
             {tab === 'collaboration' && <CollaborationEditor value={data.collaboration} onChange={(v) => setSection('collaboration', v)} />}
             {tab === 'settings' && <SettingsEditor value={data.settings} onChange={(v) => setSection('settings', v)} />}
+            {tab === 'testimonials' && <TestimonialsEditor value={data.testimonials} onChange={(v) => setSection('testimonials', v)} />}
+            {tab === 'process' && <ProcessEditor value={data.process} onChange={(v) => setSection('process', v)} />}
+            {tab === 'faq' && <FaqEditor value={data.faq} onChange={(v) => setSection('faq', v)} />}
             {tab === 'inbox' && <LeadsInbox />}
           </>
         )}
