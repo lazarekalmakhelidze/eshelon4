@@ -529,8 +529,8 @@ function HeroSection({ settings }) {
       {/* Cover image — stays still */}
       <div className="absolute inset-0 scale-[1.02] lg:scale-[1.04]">
         <picture className="block w-full h-full">
-          <source media="(min-width: 1024px)" type="image/webp" srcSet={webpSrcSet('/cover-landscape.jpg')} sizes="100vw" />
-          <source media="(min-width: 1024px)" srcSet="/cover-landscape.jpg" />
+          <source media="(min-width: 1024px)" type="image/webp" srcSet={webpSrcSet('/cover-desktop.jpg')} sizes="100vw" />
+          <source media="(min-width: 1024px)" srcSet="/cover-desktop.jpg" />
           <source type="image/webp" srcSet={webpSrcSet('/cover-portrait.jpg')} sizes="100vw" />
           <img
             src="/cover-portrait.jpg"
