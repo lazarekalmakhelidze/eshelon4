@@ -669,7 +669,7 @@ function SettingsEditor({ value, onChange }) {
   );
 }
 
-const LEAD_TYPES = { contact: 'შეტყობინება', order: 'შეკვეთა', finder: 'კითხვარი' };
+const LEAD_TYPES = { contact: 'შეტყობინება', order: 'შეკვეთა', finder: 'პაკეტის შერჩევა' };
 
 function LeadsInbox() {
   const [leads, setLeads] = useState(null);

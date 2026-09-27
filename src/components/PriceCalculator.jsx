@@ -111,8 +111,8 @@ export default function PriceCalculator({ prices, onOrder }) {
         </div>
       </div>
 
-      <div className="lg:col-span-5">
-        <div className="lg:sticky lg:top-28 rounded-2xl border border-white/10 bg-gradient-to-b from-[#1a1112] to-[#0f0f0f] p-6 sm:p-7">
+      <div className="hidden lg:block lg:col-span-5">
+        <div className="lg:sticky lg:top-6 rounded-2xl border border-white/10 bg-gradient-to-b from-[#1a1112] to-[#0f0f0f] p-6 sm:p-7">
           <p className="text-xs font-bold tracking-wide text-[#ff4d55]">{t('საორიენტაციო ღირებულება', 'Indicative cost')}</p>
           <div className="mt-3">
             <div className="flex items-baseline gap-1.5 sm:gap-2 whitespace-nowrap">
@@ -148,6 +148,32 @@ export default function PriceCalculator({ prices, onOrder }) {
             <ArrowRight className="w-4 h-4" />
           </button>
           <p className="mt-3 text-[12px] text-gray-500 leading-relaxed">{t('ეს მხოლოდ საორიენტაციო ციფრია — საბოლოო შეთავაზებას თქვენს ბიზნესზე მოვარგებთ.', 'This is only an indicative figure — we tailor the final offer to your business.')}</p>
+        </div>
+      </div>
+
+      {/* Phones: the total and the button stay pinned to the bottom of the sheet */}
+      <div className="lg:hidden sticky bottom-0 z-10 -mx-5 sm:-mx-8 -mb-5 sm:-mb-8 px-5 sm:px-8 pt-3 pb-[max(14px,env(safe-area-inset-bottom))] bg-[#121212] border-t border-white/10 shadow-[0_-18px_30px_-12px_rgba(0,0,0,0.8)]">
+        <div className="flex items-center gap-3">
+          <div className="flex-1 min-w-0">
+            <p className="text-[11px] font-semibold text-[#ff4d55]">{t('საორიენტაციო ღირებულება', 'Indicative cost')}</p>
+            <p className="text-[22px] leading-tight font-black text-white tabular-nums whitespace-nowrap">
+              ≈ {fmt(round50(monthly))} ₾ <span className="text-xs font-semibold text-gray-400">{perMonth}</span>
+            </p>
+            {once > 0 && <p className="text-[12px] text-gray-300 tabular-nums">+ ≈ {fmt(once)} ₾ {t('ერთჯერადად', 'one-time')}</p>}
+          </div>
+          <button
+            type="button"
+            disabled={!lines.length}
+            onClick={() => onOrder({
+              title: t('ინდივიდუალური პაკეტი', 'Custom package'),
+              price: priceLabel,
+              details: lines.map(([l]) => l).join(', ')
+            })}
+            className="shrink-0 inline-flex items-center gap-1.5 px-4 py-3.5 rounded-xl bg-white text-black font-bold text-sm active:scale-[0.98] transition disabled:opacity-40"
+          >
+            {t('მოთხოვნა', 'Request')}
+            <ArrowRight className="w-4 h-4" />
+          </button>
         </div>
       </div>
     </div>

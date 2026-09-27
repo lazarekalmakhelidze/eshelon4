@@ -170,6 +170,13 @@ body {
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
 }
 
+/* eyebrow pill on the light "What we do" band */
+.section-eyebrow.on-light {
+  color: #c8101a;
+  border-color: rgba(229, 9, 20, 0.3);
+  background: rgba(229, 9, 20, 0.07);
+}
+
 .surface-card {
   background-image: linear-gradient(
     165deg,
@@ -224,8 +231,6 @@ body {
 .reveal-section {
   opacity: 0;
   transform: translate3d(0, 28px, 0);
-  content-visibility: auto;
-  contain-intrinsic-size: auto 720px;
   transition:
     opacity 620ms cubic-bezier(0.22, 1, 0.36, 1),
     transform 620ms cubic-bezier(0.22, 1, 0.36, 1);
@@ -486,3 +491,42 @@ body { background: #0d0d0d; }
 .anim-paused, .anim-paused * { animation-play-state: paused !important; }
 .no-scrollbar { scrollbar-width: none; }
 .no-scrollbar::-webkit-scrollbar { display: none; }
+
+/* ── Hero fades away while scrolling ──
+   Only transform and opacity, each on its own layer. Where the browser supports
+   scroll-driven animations this runs off the main thread, so it can't stutter. */
+.hero-scroll { will-change: transform, opacity; }
+.hero-cover { transform: scale(1.03); transform-origin: 50% 30%; }
+.hero-shade { opacity: 0; }
+
+/* Longhands only: a minifier may reorder declarations, and the "animation" shorthand
+   would silently reset the scroll timeline. */
+@supports (animation-timeline: scroll()) {
+  .hero-scroll {
+    animation-duration: auto;
+    animation-timing-function: linear;
+    animation-fill-mode: both;
+    animation-timeline: scroll(root block);
+  }
+  .hero-cover { animation-name: heroCoverOut; animation-range: 0px 100vh; }
+  .hero-shade { animation-name: heroShadeIn; animation-range: 0px 90vh; }
+  .hero-content { animation-name: heroContentOut; animation-range: 0px 80vh; }
+}
+
+@keyframes heroCoverOut {
+  from { transform: translate3d(0, 0, 0) scale(1.03); }
+  to { transform: translate3d(0, 20vh, 0) scale(1.08); }
+}
+@keyframes heroShadeIn {
+  from { opacity: 0; }
+  to { opacity: 0.6; }
+}
+@keyframes heroContentOut {
+  from { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+  to { opacity: 0; transform: translate3d(0, -8vh, 0) scale(0.97); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-scroll { animation: none !important; will-change: auto; }
+  .hero-cover { transform: none; }
+}

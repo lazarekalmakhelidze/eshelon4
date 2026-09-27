@@ -23,6 +23,7 @@ export default function Testimonials({ items }) {
 
   if (!count) return null;
   const go = (d) => setI((v) => (v + d + count) % count);
+  const samples = list.every((x) => x.sample);
 
   return (
     <section id="testimonials" data-reveal className="reveal-section py-16 sm:py-20 bg-[#0b0b0c] border-y border-[#1a1a1f] relative overflow-hidden">
@@ -32,6 +33,12 @@ export default function Testimonials({ items }) {
           <h2 className="section-eyebrow text-xs font-bold text-[#E50914] tracking-widest uppercase">
             {t('რას ამბობენ კლიენტები', 'What clients say')}
           </h2>
+          {samples && (
+            <p className="mt-3 text-[12px] text-amber-300/90">
+              <span className="inline-block mr-1.5 px-2 py-0.5 rounded-md border border-amber-300/40 bg-amber-300/10 font-bold">{t('ნიმუში', 'Sample')}</span>
+              {t('ჩანს მხოლოდ სატესტო ბმულზე — ნამდვილი შეფასებები ადმინიდან ემატება.', 'Shown on the test link only — real quotes are added in admin.')}
+            </p>
+          )}
         </div>
         <div
           className="grid"
@@ -56,9 +63,13 @@ export default function Testimonials({ items }) {
                 {item.quote}
               </blockquote>
               <figcaption className="mt-6 sm:mt-8 flex items-center justify-center gap-3">
-                {item.photo && (
+                {item.photo ? (
                   <span className="w-11 h-11 rounded-full overflow-hidden border border-white/15 shrink-0 bg-white/5">
                     <Img src={item.photo} sizes="44px" alt="" className="w-full h-full object-cover" loading="lazy" />
+                  </span>
+                ) : (
+                  <span className="w-11 h-11 rounded-full shrink-0 border border-[#E50914]/35 bg-[#E50914]/10 flex items-center justify-center text-[15px] font-black text-[#ff6b72]" aria-hidden="true">
+                    {String(item.company || item.name || '').trim().charAt(0).toUpperCase()}
                   </span>
                 )}
                 <span className="text-left">

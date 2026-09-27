@@ -49,11 +49,12 @@ export default function PosterFolio({
                 >
                   <Img
                     src={src}
-                    sizes="(max-width: 920px) 190px, 286px"
+                    sizes="(max-width: 920px) 160px, 286px"
                     alt={`Poster ${originalIndex + 1}`}
                     className={styles.poster}
                     loading="lazy"
                     decoding="async"
+                    critical
                   />
                 </article>
               );

@@ -4,7 +4,7 @@ import { useLang } from '../i18n';
 
 const pick = (list, i) => (list && list.length ? list[Math.min(i, list.length - 1)] : null);
 
-export default function PackageFinder({ brandingList, smmList, onOrder, onShowPricing }) {
+export default function PackageFinder({ brandingList, smmList, onOrder, onShowPricing, bare = false }) {
   const { t } = useLang();
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState({});
@@ -67,16 +67,18 @@ export default function PackageFinder({ brandingList, smmList, onOrder, onShowPr
   const reset = () => { setAnswers({}); setStep(0); };
   const q = questions[step];
 
-  return (
-    <div className="surface-card relative overflow-hidden bg-gradient-to-br from-[#161013] via-[#121212] to-[#121212] border border-[#E50914]/20 rounded-2xl p-6 sm:p-10">
-      <div className="pointer-events-none absolute -top-32 -right-32 w-96 h-96 bg-[radial-gradient(closest-side,rgba(229,9,20,0.12),transparent)]" />
+  const body = (
       <div className="relative">
-        <div className="flex items-center justify-between gap-4 mb-6">
-          <div className="inline-flex items-center gap-2 text-[#ff4d55] text-sm font-bold">
-            <Sparkles className="w-4 h-4" />
-            {t('არ იცით, რომელი აირჩიოთ?', 'Not sure which one to pick?')}
-          </div>
-          {!done && <span className="text-xs text-gray-400 tabular-nums">{step + 1} / {questions.length}</span>}
+        <div className={`flex items-center justify-between gap-4 ${bare ? 'mb-4' : 'mb-6'}`}>
+          {bare ? (
+            <span className="text-xs font-semibold text-gray-400 tabular-nums">{!done ? `${t('კითხვა', 'Question')} ${step + 1} / ${questions.length}` : t('შედეგი', 'Result')}</span>
+          ) : (
+            <div className="inline-flex items-center gap-2 text-[#ff4d55] text-sm font-bold">
+              <Sparkles className="w-4 h-4" />
+              {t('არ იცით, რომელი აირჩიოთ?', 'Not sure which one to pick?')}
+            </div>
+          )}
+          {!done && !bare && <span className="text-xs text-gray-400 tabular-nums">{step + 1} / {questions.length}</span>}
         </div>
 
         {!done && (
@@ -133,7 +135,7 @@ export default function PackageFinder({ brandingList, smmList, onOrder, onShowPr
                   onOrder({
                     title: valid.map((r) => r.pkg.title).join(' + '),
                     price: valid.map((r) => r.pkg.price).join(' + '),
-                    desc: t('შერჩეულია კითხვარით', 'Picked with the quiz'),
+                    desc: t('შერჩეულია პაკეტის შერჩევით', 'Picked with the package finder'),
                     source: 'finder'
                   });
                 }}
@@ -151,6 +153,12 @@ export default function PackageFinder({ brandingList, smmList, onOrder, onShowPr
           </div>
         )}
       </div>
+  );
+  if (bare) return body;
+  return (
+    <div className="surface-card relative overflow-hidden bg-gradient-to-br from-[#161013] via-[#121212] to-[#121212] border border-[#E50914]/20 rounded-2xl p-6 sm:p-10">
+      <div className="pointer-events-none absolute -top-32 -right-32 w-96 h-96 bg-[radial-gradient(closest-side,rgba(229,9,20,0.12),transparent)]" />
+      {body}
     </div>
   );
 }

@@ -5,14 +5,35 @@
   overflow: hidden;
 }
 
+/* Soft fade at both edges. Plain gradients on top are much cheaper than a mask
+   over the whole moving strip. */
+.section::before,
+.section::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 9%;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.section::before {
+  left: 0;
+  background: linear-gradient(to right, #0d0d0d 0%, rgba(13, 13, 13, 0) 100%);
+}
+
+.section::after {
+  right: 0;
+  background: linear-gradient(to left, #0d0d0d 0%, rgba(13, 13, 13, 0) 100%);
+}
+
 .viewport {
   position: relative;
   width: 100%;
   overflow: hidden;
   perspective: 1800px;
   transform-style: preserve-3d;
-  mask-image: linear-gradient(to right, transparent 0, black 8%, black 92%, transparent 100%);
-  -webkit-mask-image: linear-gradient(to right, transparent 0, black 8%, black 92%, transparent 100%);
 }
 
 .rail {
@@ -28,9 +49,8 @@
   right: -4%;
   bottom: 30px;
   left: -4%;
-  height: 24px;
-  background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.84), transparent 72%);
-  filter: blur(9px);
+  height: 40px;
+  background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.7), transparent 70%);
   pointer-events: none;
 }
 
@@ -133,10 +153,6 @@
   .card:hover,
   .card:focus-within {
     transform: translateY(-24px) translateZ(64px) rotateY(0deg) rotateX(0deg) rotateZ(1.2deg) scale(1.06);
-  }
-
-  .rail::after {
-    filter: blur(5px);
   }
 
   .card {

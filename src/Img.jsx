@@ -25,7 +25,7 @@ export function webpUrl(src, maxWidth = 960) {
   return encodeURI(`/v${base}-${w}.webp`);
 }
 
-// Loading-screen phase (see public/index.html): 'boot' → 'warm' → 'ready'
+// Loading-screen phase (see public/index.html): 'boot' → 'warm' → 'warm2' → 'ready'
 const currentPhase = () => (typeof window === 'undefined' || !window.__boot ? 'ready' : window.__boot.phase);
 
 export function useBootPhase() {
@@ -34,11 +34,13 @@ export function useBootPhase() {
     if (phase === 'ready') return undefined;
     const update = () => setPhase(currentPhase());
     window.addEventListener('eshelon:warm', update);
+    window.addEventListener('eshelon:warm2', update);
     window.addEventListener('eshelon:ready', update);
-    const fallback = setTimeout(() => setPhase('ready'), 14000);
+    const fallback = setTimeout(() => setPhase('ready'), 18000);
     update();
     return () => {
       window.removeEventListener('eshelon:warm', update);
+      window.removeEventListener('eshelon:warm2', update);
       window.removeEventListener('eshelon:ready', update);
       clearTimeout(fallback);
     };
@@ -52,30 +54,37 @@ export function useBootReady() {
 
 // Lazy images:
 //  · while the first screen loads ('boot') they wait, so it gets the whole connection;
-//  · while the loading screen is still up ('warm') they load right away and report to it,
-//    so on a first visit the whole page is ready before it opens;
+//  · 'critical' ones (logos, posters, first portfolio covers) load next ('warm') and are decoded
+//    before the loading screen opens, so the first thing people scroll to never stutters;
+//  · the rest load while the loading screen is still up ('warm2') on a first visit;
 //  · afterwards they behave like normal lazy images.
-export default function Img({ src, sizes = '100vw', alt = '', pictureClassName = 'contents', onLoad, onError, ...rest }) {
+export default function Img({ src, sizes = '100vw', alt = '', pictureClassName = 'contents', critical = false, onLoad, onError, ...rest }) {
   const phase = useBootPhase();
   const imgRef = useRef(null);
   const tracked = useRef(false);
   const settled = useRef(false);
   const lazy = rest.loading === 'lazy';
-  const warm = lazy && phase === 'warm' && Boolean(src);
+  const crit = Boolean(critical);
+  const active = lazy && Boolean(src) && ((phase === 'warm' && crit) || phase === 'warm2');
   const settle = () => {
-    if (tracked.current && !settled.current && window.__boot) {
+    if (!tracked.current || settled.current || !window.__boot) return;
+    const done = () => {
+      if (settled.current) return;
       settled.current = true;
-      window.__boot.loaded();
-    }
+      window.__boot.loaded(crit);
+    };
+    const el = imgRef.current;
+    if (crit && el && typeof el.decode === 'function') el.decode().then(done, done);
+    else done();
   };
   useEffect(() => {
-    if (!warm || tracked.current || !window.__boot) return;
+    if (!active || tracked.current || !window.__boot) return;
     tracked.current = true;
-    window.__boot.expect();
-    const img = imgRef.current;
-    if (img && img.complete) settle();
-  }, [warm]); // eslint-disable-line
-  if (lazy && phase === 'boot') return <img alt="" aria-hidden="true" {...rest} />;
+    window.__boot.expect(crit);
+    const el = imgRef.current;
+    if (el && el.complete) settle();
+  }, [active]); // eslint-disable-line
+  if (lazy && (phase === 'boot' || (phase === 'warm' && !crit))) return <img alt="" aria-hidden="true" {...rest} />;
   const set = webpSrcSet(src);
   const img = (
     <img
@@ -83,7 +92,7 @@ export default function Img({ src, sizes = '100vw', alt = '', pictureClassName =
       src={src}
       alt={alt}
       {...rest}
-      loading={warm ? 'eager' : rest.loading}
+      loading={active ? 'eager' : rest.loading}
       onLoad={(e) => { settle(); if (onLoad) onLoad(e); }}
       onError={(e) => { settle(); if (onError) onError(e); }}
     />

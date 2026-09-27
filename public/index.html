@@ -25,7 +25,7 @@
 
     <style>
       html.is-booting { overflow: hidden; }
-      html.is-booting #hero * { animation-play-state: paused !important; }
+      html.is-booting #hero *:not(.hero-scroll) { animation-play-state: paused !important; }
       #boot { position: fixed; inset: 0; z-index: 9999; background: #0b0b0b; color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px; font-family: "Helvetica Neue", Arial, sans-serif; transition: transform .9s cubic-bezier(.76,0,.24,1), opacity .5s ease .45s; will-change: transform; }
       #boot::before { content: ""; position: absolute; inset: 0; background: radial-gradient(60% 45% at 50% 42%, rgba(229,9,20,.16), transparent 70%); animation: bGlow 2.6s ease-in-out infinite alternate; }
       #boot::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: #E50914; transform-origin: left; transform: scaleX(var(--p, 0)); transition: transform .35s ease; box-shadow: 0 0 18px rgba(229,9,20,.8); }
@@ -60,32 +60,42 @@
         html.classList.add('is-booting');
         var seen = false;
         try { seen = sessionStorage.getItem('esh-boot') === '1'; } catch (e) {}
-        // Phase 1 ("boot"): the first screen — app, fonts, hero cover and headline.
-        // Phase 2 ("warm"): on the first visit, keep loading the images further down the page
-        // (up to WARM ms more) so scrolling the whole site is smooth. Same session: phase 1 only.
-        var MIN = seen ? 0 : 1100, WARM = seen ? 0 : 4500, MAX = 12000, t0 = Date.now();
+        // Phase 1 "boot":  the first screen — app, fonts, hero cover and headline.
+        // Phase 2 "warm":  the partner logos, the poster strip and the first portfolio covers,
+        //                  downloaded AND decoded, so the first thing people scroll to opens smoothly.
+        // Phase 3 "warm2": every other image further down the page (first visit only).
+        var MIN = seen ? 0 : 1400, CRIT = seen ? 1500 : 7000, REST = seen ? 0 : 2500, MAX = 16000, t0 = Date.now();
         var weights = { app: 40, fonts: 15, cover: 30, headline: 15 }, got = {};
-        var phase = 'boot', warmAt = 0, expected = 0, loaded = 0, shown = 0, finished = false;
+        var phase = 'boot', warmAt = 0, restAt = 0, shown = 0, finished = false;
+        var crit = { e: 0, l: 0 }, rest = { e: 0, l: 0 };
         var pct = el.querySelector('.b-pct');
+        function fire(name) { try { window.dispatchEvent(new Event(name)); } catch (e) {} }
         function real() { var p = 0; for (var k in got) p += weights[k] || 0; return p; }
         function target(now) {
           if (phase === 'boot') {
-            var r = real() * 0.75;
-            return Math.min(74, r + (74 - r) * (1 - Math.exp(-(now - t0) / 3500)));
+            var r = real() * 0.7;
+            return Math.min(69, r + (69 - r) * (1 - Math.exp(-(now - t0) / 3500)));
           }
-          var byFiles = 75 + 25 * (expected ? Math.min(1, loaded / expected) : 0);
-          var byTime = 75 + 24 * Math.min(1, (now - warmAt) / WARM);
-          return Math.min(99, Math.max(byFiles, byTime));
+          if (phase === 'warm') {
+            var f = crit.e ? Math.min(1, crit.l / crit.e) : 0;
+            return Math.min(94, Math.max(70 + 24 * f, 70 + 22 * Math.min(1, (now - warmAt) / CRIT)));
+          }
+          var g = rest.e ? Math.min(1, rest.l / rest.e) : 1;
+          return Math.min(99, Math.max(94 + 5 * g, 94 + 5 * Math.min(1, (now - restAt) / REST)));
         }
         function frame() {
           if (finished) return;
           var now = Date.now();
           if (phase === 'boot' && real() >= 100 && now - t0 >= MIN) {
-            if (!WARM) return finish();
             phase = 'warm'; warmAt = now;
-            try { window.dispatchEvent(new Event('eshelon:warm')); } catch (e) {}
+            fire('eshelon:warm');
           }
-          if (phase === 'warm' && ((now - warmAt > 400 && loaded >= expected) || now - warmAt >= WARM)) return finish();
+          if (phase === 'warm' && ((now - warmAt > 350 && crit.l >= crit.e) || now - warmAt >= CRIT)) {
+            if (!REST) return finish();
+            phase = 'warm2'; restAt = now;
+            fire('eshelon:warm2');
+          }
+          if (phase === 'warm2' && ((now - restAt > 350 && rest.l >= rest.e) || now - restAt >= REST)) return finish();
           shown = Math.max(shown, shown + (target(now) - shown) * 0.12); // never goes backwards
           paint(shown);
           requestAnimationFrame(frame);
@@ -99,17 +109,17 @@
             el.classList.add('b-out');
             html.classList.remove('is-booting');
             try { sessionStorage.setItem('esh-boot', '1'); } catch (e) {}
-            try { window.dispatchEvent(new Event('eshelon:ready')); } catch (e) {}
+            fire('eshelon:ready');
             setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); }, 1000);
           }, 220);
         }
         window.__boot = {
           mark: function (k) { if (!got[k]) got[k] = Date.now() - t0; },
           got: got,
-          expect: function () { expected += 1; },
-          loaded: function () { loaded += 1; },
+          expect: function (isCritical) { (isCritical ? crit : rest).e += 1; },
+          loaded: function (isCritical) { (isCritical ? crit : rest).l += 1; },
           get phase() { return finished ? 'ready' : phase; },
-          get stats() { return { phase: phase, expected: expected, loaded: loaded, ms: Date.now() - t0 }; },
+          get stats() { return { phase: finished ? 'ready' : phase, critical: crit.l + '/' + crit.e, rest: rest.l + '/' + rest.e, ms: Date.now() - t0 }; },
           done: finish,
           get ready() { return finished; }
         };

@@ -81,3 +81,46 @@ export const DEFAULT_FAQ = [
 ];
 
 export const DEFAULT_TESTIMONIALS = [];
+
+// Placeholder quotes that show ONLY on the test link (preview / localhost) while no real
+// testimonials exist, so the design can be judged. They are marked "ნიმუში / Sample" on the
+// page and never appear on the live site. Real quotes (with the client's consent) are added
+// in /admin → „შეფასებები“.
+export const SAMPLE_TESTIMONIALS = [
+  {
+    id: 'sample-1',
+    sample: true,
+    quote: 'ეშელონთან მუშაობის შემდეგ ჩვენი ბრენდი ბევრად უფრო ცნობადი გახდა. გუნდი ყოველთვის დროულად აბარებს სამუშაოს და ყველა დეტალს წინასწარ გვითანხმებს.',
+    name: 'კლიენტის სახელი',
+    role: 'დამფუძნებელი',
+    company: 'კომპანია',
+    en: { quote: 'Since working with Eshelon our brand has become far more recognisable. The team always delivers on time and agrees every detail with us in advance.', name: 'Client name', role: 'Founder', company: 'Company' }
+  },
+  {
+    id: 'sample-2',
+    sample: true,
+    quote: 'სოციალური მედია სრულად ეშელონს გადავაბარეთ — ახლა მეტი შეტყობინება და შეკვეთა შემოდის, ჩვენ კი ჩვენს საქმეზე ვართ კონცენტრირებული.',
+    name: 'კლიენტის სახელი',
+    role: 'მარკეტინგის მენეჯერი',
+    company: 'კომპანია',
+    en: { quote: 'We handed our social media over to Eshelon completely — more messages and orders come in now, and we can focus on our own work.', name: 'Client name', role: 'Marketing manager', company: 'Company' }
+  },
+  {
+    id: 'sample-3',
+    sample: true,
+    quote: 'ლოგოდან ბრენდბუქამდე — ყველაფერი ერთ ადგილას და მაღალ დონეზე გაკეთდა.',
+    name: 'კლიენტის სახელი',
+    role: 'დირექტორი',
+    company: 'კომპანია',
+    en: { quote: 'From the logo to the brand book — everything done in one place, and done well.', name: 'Client name', role: 'Director', company: 'Company' }
+  }
+];
+
+// The test link (preview.eshelon4.pages.dev, other *.eshelon4.pages.dev builds) and local testing.
+export function isTestHost() {
+  if (typeof window === 'undefined') return false;
+  const h = window.location.hostname;
+  if (h === 'localhost' || h === '127.0.0.1') return true;
+  return h.endsWith('.eshelon4.pages.dev');
+}
+

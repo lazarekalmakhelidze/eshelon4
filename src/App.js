@@ -30,7 +30,10 @@ import {
   Send,
   Check,
   BrainCircuit,
-  Lock
+  Lock,
+  ArrowUpRight,
+  Sparkles,
+  Calculator
 } from 'lucide-react';
 import { useSiteContent, pickList } from './siteContent';
 import { mergeSettings, telHref, whatsappHref, sendLead } from './siteSettings';
@@ -40,7 +43,9 @@ import PackageFinder from './components/PackageFinder';
 import PriceCalculator from './components/PriceCalculator';
 import Testimonials from './components/Testimonials';
 import Faq from './components/Faq';
-import { DEFAULT_PROCESS, DEFAULT_FAQ, DEFAULT_TESTIMONIALS } from './extraContent';
+import PackageCards from './components/PackageCards';
+import ToolSheet from './components/ToolSheet';
+import { DEFAULT_PROCESS, DEFAULT_FAQ, DEFAULT_TESTIMONIALS, SAMPLE_TESTIMONIALS, isTestHost } from './extraContent';
 import { FacebookIcon, InstagramIcon, WhatsAppIcon, MessengerIcon } from './components/BrandIcons';
 
 // Echelon Branding Assets and Case Studies
@@ -232,7 +237,7 @@ function getWorkTypeLabel(project) {
   return project.workType || workTypeByProjectId[project.id] || 'სოც. მედია';
 }
 
-function PortfolioCard({ project, onSelect }) {
+function PortfolioCard({ project, onSelect, critical = false }) {
   const { t } = useLang();
   return (
     <div
@@ -251,6 +256,7 @@ function PortfolioCard({ project, onSelect }) {
               className="w-full h-full object-cover transition duration-700 group-hover:scale-110"
               loading="lazy"
               decoding="async"
+              critical={critical}
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
             <div className="absolute bottom-4 left-4 z-10">
@@ -496,6 +502,46 @@ function CountUp({ value }) {
 function HeroSection({ settings }) {
   const { t, en } = useLang();
   const stats = (settings.stats || []).filter((st) => st && st.value);
+  const coverRef = useRef(null);
+  const shadeRef = useRef(null);
+  const contentRef = useRef(null);
+  // The hero fades away while scrolling. Modern browsers do it in CSS on the compositor
+  // (see .hero-scroll in style.css); this is the fallback for the rest. Only transform and
+  // opacity change, on three separate layers, so nothing has to be repainted.
+  useEffect(() => {
+    const cssDriven = typeof CSS !== 'undefined' && CSS.supports && CSS.supports('animation-timeline: scroll()');
+    if (cssDriven || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return undefined;
+    const cover = coverRef.current;
+    const shade = shadeRef.current;
+    const content = contentRef.current;
+    if (!cover || !shade || !content) return undefined;
+    let raf = 0;
+    let last = -1;
+    const clamp = (v) => Math.max(0, Math.min(1, v));
+    const update = () => {
+      raf = 0;
+      const vh = window.innerHeight || 800;
+      const y = Math.min(window.scrollY, vh * 1.1);
+      if (y === last) return;
+      last = y;
+      const pc = clamp(y / vh);
+      const ps = clamp(y / (vh * 0.9));
+      const pt = clamp(y / (vh * 0.8));
+      cover.style.transform = `translate3d(0, ${(0.2 * vh * pc).toFixed(1)}px, 0) scale(${(1.03 + 0.05 * pc).toFixed(4)})`;
+      shade.style.opacity = (0.6 * ps).toFixed(3);
+      content.style.opacity = (1 - pt).toFixed(3);
+      content.style.transform = `translate3d(0, ${(-0.08 * vh * pt).toFixed(1)}px, 0) scale(${(1 - 0.03 * pt).toFixed(4)})`;
+    };
+    const onScroll = () => { if (!raf) raf = requestAnimationFrame(update); };
+    update();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, []);
   return (
     <section
       id="hero"
@@ -516,10 +562,8 @@ function HeroSection({ settings }) {
         }
         html { scroll-behavior: smooth; }
       `}</style>
-      {/* Cover image wrapper */}
-      <div
-        className="absolute inset-0 scale-[1.02] lg:scale-[1.04]"
-      >
+      {/* Cover image wrapper (moves slower than the page and zooms in slightly while scrolling) */}
+      <div ref={coverRef} className="hero-scroll hero-cover absolute inset-0">
         <picture className="block w-full h-full">
           <source media="(min-width: 1024px)" type="image/webp" srcSet={webpSrcSet('/cover-landscape.jpg')} sizes="100vw" />
           <source media="(min-width: 1024px)" srcSet="/cover-landscape.jpg" />
@@ -545,9 +589,11 @@ function HeroSection({ settings }) {
       <div className="absolute inset-0 lg:hidden bg-[radial-gradient(95%_58%_at_25%_46%,rgba(13,13,13,0.52),rgba(13,13,13,0)_75%)] pointer-events-none" />
       <div className="absolute inset-0 bg-[radial-gradient(110%_70%_at_50%_10%,rgba(229,9,20,0.08),rgba(13,13,13,0)_58%)] pointer-events-none" />
       <div className="absolute inset-0 opacity-8 pointer-events-none [background-image:radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.1)_0,rgba(255,255,255,0)_40%),radial-gradient(circle_at_80%_0,rgba(229,9,20,0.12)_0,rgba(229,9,20,0)_35%)]" />
+      {/* Darkens the picture while scrolling away */}
+      <div ref={shadeRef} className="hero-scroll hero-shade absolute inset-0 bg-[#0d0d0d] pointer-events-none" />
       {/* Content */}
       <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-14 sm:py-20 lg:py-16">
-        <div className="max-w-[620px] space-y-7 sm:space-y-8">
+        <div ref={contentRef} className="hero-scroll hero-content max-w-[620px] space-y-7 sm:space-y-8">
           {/* Headline — Georgian calligraphy PNG, English set in the brand display font */}
           {en ? (
             <h1
@@ -632,6 +678,7 @@ function PartnersStrip() {
                     style={logo.scale ? { '--logo-scale': logo.scale } : undefined}
                     loading="lazy"
                     decoding="async"
+                    critical
                   />
                 </div>
               ))}
@@ -647,6 +694,7 @@ function PartnersStrip() {
                     style={logo.scale ? { '--logo-scale': logo.scale } : undefined}
                     loading="lazy"
                     decoding="async"
+                    critical
                   />
                 </div>
               ))}
@@ -1014,7 +1062,10 @@ function App() {
   const brandingList = pickList(siteContent.branding, brandingPackages).map((pk) => localizePackage(pk, lang));
   const smmList = pickList(siteContent.smm, smmPackages).map((pk) => localizePackage(pk, lang));
   const newsList = pickList(siteContent.news, facebookNewsPosts).map((n) => localizeNews(n, lang));
-  const testimonialsList = pickList(siteContent.testimonials, DEFAULT_TESTIMONIALS).map((x) => localizeItem(x, lang, ['quote', 'role', 'company']));
+  const realTestimonials = pickList(siteContent.testimonials, DEFAULT_TESTIMONIALS).filter((x) => x && x.quote && x.name);
+  // labelled placeholders on the test link only, until real quotes are added in /admin
+  const testimonialsList = (realTestimonials.length || !isTestHost() ? realTestimonials : SAMPLE_TESTIMONIALS)
+    .map((x) => localizeItem(x, lang, x.sample ? ['quote', 'role', 'company', 'name'] : ['quote', 'role', 'company']));
   const processList = pickList(siteContent.process, DEFAULT_PROCESS).map((x) => localizeItem(x, lang, ['title', 'text', 'duration']));
   const faqList = pickList(siteContent.faq, DEFAULT_FAQ).map((x) => localizeItem(x, lang, ['q', 'a']));
   const collaborationContent = siteContent.collaboration || {};
@@ -1052,7 +1103,18 @@ function App() {
   const [showFloat, setShowFloat] = useState(false);
   const [contactState, setContactState] = useState('idle'); // idle | sending | sent | error
   const [orderState, setOrderState] = useState('idle');
-  const [helperTab, setHelperTab] = useState('finder');
+  const [toolSheet, setToolSheet] = useState(null); // 'finder' | 'calc' | null
+  // "What we do": three short lines; each one opens the matching price tab
+  const serviceRows = [
+    { key: 'identity', tab: 'branding', title: t('ᲕᲘᲖᲣᲐᲚᲣᲠᲘ ᲘᲓᲔᲜᲢᲝᲑᲐ', 'VISUAL IDENTITY'), tags: [t('ლოგო', 'Logo'), t('ფერები', 'Colours'), t('ტიპოგრაფია', 'Typography'), t('ბრენდბუქი', 'Brand book')] },
+    { key: 'smm', tab: 'smm', title: t('ᲡᲝᲪᲘᲐᲚᲣᲠᲘ ᲛᲔᲓᲘᲐ', 'SOCIAL MEDIA'), tags: [t('პოსტები', 'Posts'), t('სთორები', 'Stories'), t('ქოფირაითინგი', 'Copywriting'), t('კონტენტ-კალენდარი', 'Content calendar')] },
+    { key: 'ads', tab: 'smm', title: t('ᲠᲔᲙᲚᲐᲛᲐ', 'ADVERTISING'), tags: [t('აუდიტორიის კვლევა', 'Audience research'), t('A/B ტესტები', 'A/B tests'), t('ანალიტიკა', 'Analytics')] }
+  ];
+  const showPrices = (tab) => {
+    if (tab) setActiveTab(tab);
+    const el = document.getElementById('pricing');
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
   // Order modal state
   const [orderModal, setOrderModal] = useState(null); // package object or null
   const [orderForm, setOrderForm] = useState({ name: '', phone: '', note: '' });
@@ -1105,20 +1167,25 @@ function App() {
     };
   }, []);
   useEffect(() => {
-    const isAnyModalOpen = Boolean(selectedProject || orderModal);
+    const isAnyModalOpen = Boolean(selectedProject || orderModal || toolSheet);
     if (!isAnyModalOpen) return undefined;
+    // the page scrolls on <html>, so both html and body are locked while a window is open
+    const root = document.documentElement;
+    const previousRootOverflow = root.style.overflow;
     const previousOverflow = document.body.style.overflow;
     const previousPaddingRight = document.body.style.paddingRight;
-    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+    const scrollbarWidth = window.innerWidth - root.clientWidth;
+    root.style.overflow = 'hidden';
     document.body.style.overflow = 'hidden';
     if (scrollbarWidth > 0) {
       document.body.style.paddingRight = `${scrollbarWidth}px`;
     }
     return () => {
+      root.style.overflow = previousRootOverflow;
       document.body.style.overflow = previousOverflow;
       document.body.style.paddingRight = previousPaddingRight;
     };
-  }, [selectedProject, orderModal]);
+  }, [selectedProject, orderModal, toolSheet]);
   // open project from shareable link (#project-<id>) and close on browser back
   const projectsKey = allPortfolioProjects.map((pr) => pr.id).join('|');
   useEffect(() => {
@@ -1413,6 +1480,7 @@ function App() {
                 <PortfolioCard
                   project={project}
                   onSelect={openProject}
+                  critical={idx < 3}
                 />
               </div>
             ))}
@@ -1446,88 +1514,41 @@ function App() {
       )}
       {/* TESTIMONIALS (hidden until real quotes are added in /admin) */}
       <Testimonials items={testimonialsList} />
-      {/* CORE SERVICES */}
-      <section id="services" data-reveal className="reveal-section py-20 sm:py-24 bg-[#0a0a0a] border-y border-[#1e1e1e] relative">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-3xl mx-auto space-y-4 mb-16">
-            <h2 className="section-eyebrow text-xs font-bold text-[#E50914] tracking-widest uppercase">{t('ᲠᲐᲡ ᲕᲐᲙᲔᲗᲔᲑᲗ', 'WHAT WE DO')}</h2>
-            <p className="mersad-heading text-3xl sm:text-4xl tracking-tight text-white">{t('ᲡᲠᲣᲚᲘ ᲪᲘᲤᲠᲣᲚᲘ ᲐᲠᲡᲔᲜᲐᲚᲘ ᲗᲥᲕᲔᲜᲘ ᲑᲘᲖᲜᲔᲡᲘᲡ ᲬᲐᲠᲛᲐᲢᲔᲑᲘᲡᲗᲕᲘᲡ', 'A FULL DIGITAL ARSENAL FOR YOUR BUSINESS')}</p>
-            <p className="text-balance text-gray-300">{t('ჩვენი მომსახურებები მოიცავს ყველაფერს, რაც გჭირდებათ იდეიდან – მილიონიან ბრენდამდე მისასვლელად.', 'Everything you need to go from an idea to a brand people remember.')}</p>
+      {/* SERVICES — a light band for contrast: three short lines, each one leads to its prices */}
+      <section id="services" className="relative py-20 sm:py-28 bg-[#f2f0eb] text-[#0d0d0d]">
+        {/* the light background stays put; only the content slides in */}
+        <div data-reveal className="reveal-section max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16">
+          <div className="lg:col-span-5 space-y-5">
+            <h2 className="section-eyebrow on-light text-xs font-bold tracking-widest uppercase">{t('რას ვაკეთებთ', 'What we do')}</h2>
+            <p className="mersad-heading text-[30px] leading-[1.08] sm:text-5xl sm:leading-[1.02] text-[#0d0d0d]">{t('ᲡᲠᲣᲚᲘ ᲪᲘᲤᲠᲣᲚᲘ ᲐᲠᲡᲔᲜᲐᲚᲘ', 'A FULL DIGITAL ARSENAL')}</p>
+            <p className="text-[15px] sm:text-base text-black/60 max-w-sm leading-relaxed">{t('იდეიდან — ბრენდამდე, რომელიც ახსოვთ.', 'From an idea to a brand people remember.')}</p>
           </div>
-          <div className="reveal-stagger grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-8">
-            {/* Service 1 */}
-            <div className="surface-card bg-[#121212] border border-white/5 p-7 sm:p-8 rounded-2xl hover:border-[#E50914]/40 hover:-translate-y-1 transition duration-300 group">
-              <div className="w-12 h-12 rounded-xl bg-red-950/40 border border-red-500/30 flex items-center justify-center text-[#E50914] mb-6 group-hover:scale-110 transition duration-300">
-                <Compass className="w-6 h-6" />
-              </div>
-              <h3 className="sf-georgian-semibold service-title text-white mb-3">{t('ᲕᲘᲖᲣᲐᲚᲣᲠᲘ ᲘᲓᲔᲜᲢᲝᲑᲐ', 'VISUAL IDENTITY')}</h3>
-              <p className="text-gray-300 text-[15px] leading-relaxed mb-5">
-                {t('ლოგოების, ფერთა პალიტრის, ტიპოგრაფიისა და სტილის შექმნა. ბრენდბუქი, რომელიც განსაზღვრავს თქვენი ბრენდის სახესა და ხასიათს ნებისმიერ გარემოში.', 'Logos, colour palettes, typography and style. A brand book that defines your brand’s look and character everywhere.')}
-              </p>
-              <ul className="space-y-2.5 text-sm text-gray-400">
-                <li className="flex items-center space-x-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#E50914]" />
-                  <span>{t('გეომეტრიულად სრულყოფილი ლოგოები', 'Geometrically precise logos')}</span>
-                </li>
-                <li className="flex items-center space-x-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#E50914]" />
-                  <span>{t('სრული ტიპოგრაფიული სისტემა', 'Complete typography system')}</span>
-                </li>
-              </ul>
-            </div>
-            {/* Service 2 */}
-            <div className="surface-card bg-[#121212] border border-white/5 p-7 sm:p-8 rounded-2xl hover:border-[#E50914]/40 hover:-translate-y-1 transition duration-300 group">
-              <div className="w-12 h-12 rounded-xl bg-orange-950/40 border border-orange-500/30 flex items-center justify-center text-orange-500 mb-6 group-hover:scale-110 transition duration-300">
-                <Smartphone className="w-6 h-6" />
-              </div>
-              <h3 className="sf-georgian-semibold service-title text-white mb-3">{t('ᲡᲝᲪᲘᲐᲚᲣᲠᲘ ᲛᲔᲓᲘᲘᲡ ᲛᲐᲠᲗᲕᲐ', 'SOCIAL MEDIA MANAGEMENT')}</h3>
-              <p className="text-gray-300 text-[15px] leading-relaxed mb-5">
-                {t('პოსტერების დიზაინი, რომელიც ზრდის ჩართულობას, ქოფირაითინგი, რომელიც აყალიბებს ბრენდის უნიკალურ ტონს და ყოველკვირეული სთორების რედიზაინი.', 'Post design that drives engagement, copywriting that shapes a unique brand voice, and weekly story design.')}
-              </p>
-              <ul className="space-y-2.5 text-sm text-gray-400">
-                <li className="flex items-center space-x-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#E50914]" />
-                  <span>{t('კონტენტ კალენდრის შედგენა', 'Content calendar planning')}</span>
-                </li>
-                <li className="flex items-center space-x-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#E50914]" />
-                  <span>{t('ემოციური და კრეატიული ქოფირაითინგი', 'Emotional, creative copywriting')}</span>
-                </li>
-              </ul>
-            </div>
-            {/* Service 3 */}
-            <div className="surface-card bg-[#121212] border border-white/5 p-7 sm:p-8 rounded-2xl hover:border-[#E50914]/40 hover:-translate-y-1 transition duration-300 group">
-              <div className="w-12 h-12 rounded-xl bg-blue-950/40 border border-blue-500/30 flex items-center justify-center text-blue-500 mb-6 group-hover:scale-110 transition duration-300">
-                <TrendingUp className="w-6 h-6" />
-              </div>
-              <h3 className="sf-georgian-semibold service-title text-white mb-3">{t('ᲔᲓᲕᲔᲠᲗᲐᲘᲖᲘᲜᲒᲘ & ᲠᲔᲙᲚᲐᲛᲐ', 'ADVERTISING')}</h3>
-              <p className="text-gray-300 text-[15px] leading-relaxed mb-5">
-                {t('სარეკლამო კამპანიები, რომლებიც მიმართულია ზუსტ აუდიტორიაზე. შადოუ რეკლამების გამოყენება ტესტირებისა და ოპტიმალური ROI-სთვის.', 'Ad campaigns aimed at exactly the right audience, with shadow ads for testing and the best ROI.')}
-              </p>
-              <ul className="space-y-2.5 text-sm text-gray-400">
-                <li className="flex items-center space-x-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#E50914]" />
-                  <span>{t('სამიზნე აუდიტორიის კვლევა', 'Target audience research')}</span>
-                </li>
-                <li className="flex items-center space-x-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#E50914]" />
-                  <span>{t('A/B ტესტირება და ანალიტიკა', 'A/B testing & analytics')}</span>
-                </li>
-              </ul>
-            </div>
-          </div>
+          <ol className="reveal-stagger lg:col-span-7 border-t border-black/15">
+            {serviceRows.map((sv, i) => (
+              <li key={sv.key} className="border-b border-black/15">
+                <button type="button" onClick={() => showPrices(sv.tab)} className="group w-full text-left py-6 sm:py-8 flex items-center gap-4 sm:gap-6">
+                  <span className="self-start pt-1 sm:pt-2 text-sm sm:text-base font-black text-[#E50914] tabular-nums">{String(i + 1).padStart(2, '0')}</span>
+                  <span className="flex-1 min-w-0">
+                    <span className="block mersad-heading text-[21px] leading-tight sm:text-[32px] text-[#0d0d0d] group-hover:text-[#E50914] transition-colors">{sv.title}</span>
+                    <span className="mt-2 block text-[14px] sm:text-[15px] text-black/55">{sv.tags.join(' · ')}</span>
+                  </span>
+                  <span className="hidden sm:inline text-sm font-semibold text-black/45 group-hover:text-[#0d0d0d] transition">{t('ფასები', 'Prices')}</span>
+                  <span className="shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-full border border-black/15 flex items-center justify-center text-[#0d0d0d] group-hover:bg-[#E50914] group-hover:border-[#E50914] group-hover:text-white transition">
+                    <ArrowUpRight className="w-5 h-5" />
+                  </span>
+                </button>
+              </li>
+            ))}
+          </ol>
         </div>
       </section>
-      {/* PRICING SECTION */}
+      {/* PRICING — cards, one line of fine print, and two helpers that open in a window */}
       <section id="pricing" data-reveal className="reveal-section py-20 sm:py-24 bg-[#0d0d0d] relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-3xl mx-auto space-y-4 mb-10 sm:mb-14">
-            <h2 className="section-eyebrow text-xs font-bold text-[#E50914] tracking-widest uppercase">{t('ფასები და პაკეტები', 'Pricing')}</h2>
-            <p className="mersad-heading text-[26px] leading-[1.15] sm:text-4xl text-white">{t('ᲐᲘᲠᲩᲘᲔᲗ ᲗᲥᲕᲔᲜᲘ ᲞᲐᲙᲔᲢᲘ', 'CHOOSE YOUR PACKAGE')}</p>
-            <p className="text-balance text-gray-300 text-[15px] sm:text-base">
-              {t('გამჭვირვალე ფასები — ერთჯერადი ბრენდინგი ან ყოველთვიური სოციალური მედია.', 'Transparent prices — one-time branding or monthly social media.')}
-            </p>
-            <div className="flex justify-center pt-3">
+          <div className="text-center max-w-3xl mx-auto space-y-4 mb-6 sm:mb-12">
+            <h2 className="section-eyebrow text-xs font-bold text-[#E50914] tracking-widest uppercase">{t('ფასები', 'Pricing')}</h2>
+            <p className="mersad-heading text-[26px] leading-[1.15] sm:text-4xl text-white">{t('ᲐᲘᲠᲩᲘᲔᲗ ᲞᲐᲙᲔᲢᲘ', 'CHOOSE A PACKAGE')}</p>
+            <div className="flex justify-center pt-2">
               <div className="inline-flex bg-[#121212] p-1 rounded-xl border border-white/[0.08]">
                 {[['smm', t('სოციალური მედია', 'Social media')], ['branding', t('ბრენდინგი', 'Branding')]].map(([key, label]) => (
                   <button
@@ -1542,98 +1563,45 @@ function App() {
               </div>
             </div>
           </div>
-          {/* PRICING NOTE */}
+          <PackageCards
+            key={activeTab}
+            kind={activeTab}
+            list={activeTab === 'branding' ? brandingList : smmList}
+            onChoose={openOrder}
+          />
+          {/* PRICING NOTE — fine print under the cards */}
           {settings.pricingNote && (() => {
             const m = settings.pricingNote.match(/^(.+?[.!?])\s+(.*)$/s);
             return (
-              <div className="max-w-3xl mx-auto -mt-2 mb-8 sm:mb-10 flex items-start gap-3 rounded-xl border border-white/[0.08] bg-white/[0.03] px-4 py-3.5 text-left">
-                <Info className="w-5 h-5 text-[#ff4d55] shrink-0 mt-0.5" />
-                <p className="text-sm text-gray-300 leading-relaxed">
-                  {m ? <><span className="font-bold text-white">{m[1]}</span> {m[2]}</> : settings.pricingNote}
-                </p>
-              </div>
+              <p className="mt-6 sm:mt-8 max-w-2xl mx-auto text-center text-[13px] sm:text-sm leading-relaxed text-gray-400 text-balance">
+                <Info className="inline-block w-4 h-4 -mt-0.5 mr-1.5 text-[#ff4d55]" />
+                {m ? <><span className="font-bold text-gray-100">{m[1]}</span> {m[2]}</> : settings.pricingNote}
+              </p>
             );
           })()}
-          {/* PRICING CARDS */}
-          <div key={activeTab} className="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-6 items-stretch pf-step">
-            {(activeTab === 'branding' ? brandingList : smmList).map((pkg, idx) => {
-              const included = (pkg.features || []).filter((f) => f.included && f.text);
-              return (
-                <div
-                  key={idx}
-                  className={`relative flex flex-col rounded-2xl p-6 sm:p-7 transition duration-300 ${pkg.featured ? 'bg-gradient-to-b from-[#1d1011] to-[#121212] border border-[#E50914]/70 shadow-[0_24px_60px_-30px_rgba(229,9,20,0.6)]' : 'surface-card bg-[#121212] border border-white/[0.08] hover:border-white/20'}`}
+          {/* HELPERS — open in a window, so they take one line here */}
+          <div className="mt-12 sm:mt-16 max-w-4xl mx-auto rounded-2xl border border-white/[0.08] bg-gradient-to-r from-[#171012] to-[#111] p-4 sm:p-5 flex flex-col md:flex-row md:items-center gap-4 md:gap-6">
+            <div className="md:flex-1 px-1">
+              <p className="text-lg font-black text-white">{t('ვერ გადაწყვიტეთ?', 'Not sure yet?')}</p>
+              <p className="text-sm text-gray-400">{t('ორი სწრაფი დამხმარე', 'Two quick helpers')}</p>
+            </div>
+            <div className="grid grid-cols-2 gap-2 sm:gap-3 md:w-[440px]">
+              {[
+                ['finder', <Sparkles className="w-5 h-5 text-[#ff4d55]" />, t('პაკეტის შერჩევა', 'Find my package'), t('3 მარტივი კითხვა', '3 quick questions')],
+                ['calc', <Calculator className="w-5 h-5 text-[#ff4d55]" />, t('კალკულატორი', 'Calculator'), t('ააწყვეთ თავად', 'Build your own')]
+              ].map(([key, icon, label, hint]) => (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => setToolSheet(key)}
+                  className="group text-left rounded-xl border border-white/10 bg-black/30 hover:border-[#E50914]/60 hover:bg-[#E50914]/[0.06] active:scale-[0.98] transition p-3.5 sm:p-4"
                 >
-                  {pkg.featured && (
-                    <span className="absolute -top-3 left-6 px-3 py-1 bg-[#E50914] text-white text-[11px] font-bold tracking-wide rounded-full">
-                      {activeTab === 'branding' ? t('ყველაზე პოპულარული', 'Most popular') : t('რეკომენდებული', 'Recommended')}
-                    </span>
-                  )}
-                  <div className="flex items-center justify-between gap-2">
-                    <h4 className="text-lg font-bold text-white">{pkg.title}</h4>
-                    {pkg.badge && !pkg.featured && <span className="text-[11px] text-gray-400 px-2 py-0.5 rounded-md border border-white/10">{pkg.badge}</span>}
-                  </div>
-                  <p className="mt-4 text-[11px] font-semibold tracking-wide text-gray-500">{t('საორიენტაციო ფასი', 'Indicative price')}</p>
-                  <div className="mt-1 text-[34px] leading-none font-black text-white tracking-tight">{pkg.price}</div>
-                  {pkg.desc && <p className="mt-3 text-sm text-gray-400 leading-relaxed">{pkg.desc}</p>}
-                  <ul className="mt-6 pt-5 border-t border-white/[0.08] space-y-3 flex-1">
-                    {included.map((feat, fIdx) => (
-                      <li key={fIdx} className="flex items-start gap-3 text-sm">
-                        <Check className={`w-4 h-4 mt-0.5 shrink-0 ${feat.discount ? 'text-[#ff4d55]' : 'text-green-500'}`} />
-                        <span className={feat.discount ? 'text-white font-semibold' : 'text-gray-200'}>
-                          {feat.discount && <span className="mr-1.5 px-1.5 py-0.5 rounded bg-[#E50914] text-white text-[11px] font-black">-50%</span>}
-                          {feat.text}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                  <button
-                    onClick={() => openOrder(pkg)}
-                    className={`mt-7 w-full py-3.5 px-4 rounded-xl font-bold text-sm transition active:scale-[0.98] ${pkg.featured ? 'bg-[#E50914] text-white hover:bg-red-700' : 'bg-white/[0.06] text-white hover:bg-white/[0.12] border border-white/10'}`}
-                  >
-                    {t('არჩევა', 'Choose')}
-                  </button>
-                </div>
-              );
-            })}
-          </div>
-          {/* HELPER: finder / calculator */}
-          <div className="mt-14 sm:mt-20 max-w-5xl mx-auto" id="package-finder">
-            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-5">
-              <div>
-                <p className="text-xl sm:text-2xl font-black text-white">{t('ვერ გადაწყვიტეთ?', 'Not sure yet?')}</p>
-                <p className="text-sm text-gray-400 mt-1">{t('უპასუხეთ 3 კითხვას ან ააწყვეთ პაკეტი თავად.', 'Answer 3 quick questions or build your own package.')}</p>
-              </div>
-              <div className="grid grid-cols-2 sm:inline-grid self-stretch sm:self-auto bg-[#121212] p-1 rounded-xl border border-white/[0.08]">
-                {[['finder', t('კითხვარი', 'Quick quiz')], ['calc', t('კალკულატორი', 'Calculator')]].map(([key, label]) => (
-                  <button
-                    key={key}
-                    type="button"
-                    onClick={() => setHelperTab(key)}
-                    className={`px-4 py-2.5 rounded-lg text-sm font-semibold whitespace-nowrap transition ${helperTab === key ? 'bg-white text-black' : 'text-gray-400 hover:text-white'}`}
-                  >
-                    {label}
-                  </button>
-                ))}
-              </div>
+                  {icon}
+                  <span className="block mt-2 text-[14px] sm:text-[15px] font-bold text-white">{label}</span>
+                  <span className="block text-[12px] text-gray-400">{hint}</span>
+                </button>
+              ))}
             </div>
-            <div key={helperTab} className="pf-step">
-              {helperTab === 'finder' ? (
-                <PackageFinder
-                  brandingList={brandingList}
-                  smmList={smmList}
-                  onOrder={openOrder}
-                  onShowPricing={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })}
-                />
-              ) : (
-                <div className="surface-card bg-[#121212] border border-white/[0.08] rounded-2xl p-5 sm:p-8">
-                  <PriceCalculator prices={calc} onOrder={openOrder} />
-                </div>
-              )}
-            </div>
-          </div>
-          {/* FAQ */}
-          <div className="mt-14 sm:mt-20">
-            <Faq items={faqList} />
           </div>
         </div>
       </section>
@@ -1641,6 +1609,8 @@ function App() {
       <AboutSection steps={processList} />
       {/* FACEBOOK NEWS */}
       <FacebookNewsSection posts={newsList} facebookUrl={settings.facebook} />
+      {/* FAQ — its own quiet section before the contact form */}
+      <Faq items={faqList} />
       {/* CONTACT */}
       <section id="contact" data-reveal className="reveal-section py-20 sm:py-24 bg-[#0a0a0a] border-t border-[#1e1e1e] relative overflow-hidden">
         <div className="pointer-events-none absolute -top-40 left-1/2 -translate-x-1/2 w-[760px] h-[420px] bg-[radial-gradient(closest-side,rgba(229,9,20,0.08),transparent)]" />
@@ -1824,7 +1794,7 @@ function App() {
         </div>
       </footer>
       {/* FLOATING CONTACT (mobile) */}
-      <div className={`lg:hidden fixed bottom-4 inset-x-4 z-40 flex gap-2 transition-all duration-500 ${showFloat && !nearContact && !selectedProject && !orderModal && !menuOpen ? 'translate-y-0 opacity-100' : 'translate-y-24 opacity-0 pointer-events-none'}`}>
+      <div className={`lg:hidden fixed bottom-4 inset-x-4 z-40 flex gap-2 transition-all duration-500 ${showFloat && !nearContact && !selectedProject && !orderModal && !toolSheet && !menuOpen ? 'translate-y-0 opacity-100' : 'translate-y-24 opacity-0 pointer-events-none'}`}>
         {waHref && (
           <a href={waHref} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" className="w-14 h-14 shrink-0 rounded-2xl bg-[#1b1b1b] border border-white/10 flex items-center justify-center text-[#25D366] shadow-xl">
             <WhatsAppIcon className="w-6 h-6" />
@@ -1840,6 +1810,32 @@ function App() {
           <ArrowRight className="w-4 h-4" />
         </a>
       </div>
+      {/* HELPERS — package finder / calculator in a window */}
+      {toolSheet === 'finder' && (
+        <ToolSheet
+          title={t('პაკეტის შერჩევა', 'Find my package')}
+          subtitle={t('უპასუხეთ 2–3 კითხვას — შემოგთავაზებთ შესაფერის პაკეტს.', 'Answer 2–3 questions and we’ll suggest the right package.')}
+          onClose={() => setToolSheet(null)}
+        >
+          <PackageFinder
+            bare
+            brandingList={brandingList}
+            smmList={smmList}
+            onOrder={(pkg) => { setToolSheet(null); openOrder(pkg); }}
+            onShowPricing={() => { setToolSheet(null); setTimeout(() => showPrices(), 60); }}
+          />
+        </ToolSheet>
+      )}
+      {toolSheet === 'calc' && (
+        <ToolSheet
+          wide
+          title={t('ფასის კალკულატორი', 'Price calculator')}
+          subtitle={t('აირჩიეთ, რა გჭირდებათ — ფასი მაშინვე დაითვლება.', 'Pick what you need and see the price instantly.')}
+          onClose={() => setToolSheet(null)}
+        >
+          <PriceCalculator prices={calc} onOrder={(pkg) => { setToolSheet(null); openOrder(pkg); }} />
+        </ToolSheet>
+      )}
       {/* ORDER MODAL — bottom sheet on phones */}
       {orderModal && (
         <div className="fixed inset-0 bg-black/80 z-[60] flex items-end sm:items-center justify-center sm:p-4 pv-fade" onClick={() => setOrderModal(null)}>
