@@ -546,10 +546,13 @@ function HeroSection({ settings }) {
         </picture>
       </div>
       {/* Multi-layer blending to avoid hard image edges */}
-      <div className="absolute inset-0 bg-gradient-to-r from-[#0d0d0d]/70 via-[#0d0d0d]/40 to-[#0d0d0d]/10 lg:from-[#0d0d0d]/74 lg:via-[#0d0d0d]/56 lg:to-[#0d0d0d]/10" />
-      <div className="absolute inset-x-0 top-0 h-36 sm:h-40 bg-gradient-to-b from-[#0d0d0d]/58 via-[#0d0d0d]/22 to-transparent lg:from-[#0d0d0d]/45 lg:via-[#0d0d0d]/12" />
-      <div className="absolute bottom-0 left-0 right-0 h-72 sm:h-80 bg-gradient-to-t from-[#0d0d0d]/95 via-[#0d0d0d]/84 to-transparent lg:from-[#0d0d0d]/74 lg:via-[#0d0d0d]/56" />
-      <div className="absolute inset-y-0 right-0 w-40 lg:w-48 bg-gradient-to-l from-[#0d0d0d]/36 via-[#0d0d0d]/14 to-transparent lg:from-[#0d0d0d]/24 lg:via-[#0d0d0d]/6" />
+      {/* desktop: dark only behind the text, the boy and the chess piece stay bright */}
+      <div className="absolute inset-0 bg-gradient-to-r from-[#0d0d0d]/70 via-[#0d0d0d]/40 to-[#0d0d0d]/10 lg:bg-[linear-gradient(90deg,rgba(13,13,13,0.78)_0%,rgba(13,13,13,0.6)_30%,rgba(13,13,13,0.28)_47%,rgba(13,13,13,0.05)_63%,rgba(13,13,13,0)_80%)]" />
+      <div className="absolute inset-x-0 top-0 h-36 sm:h-40 bg-gradient-to-b from-[#0d0d0d]/58 via-[#0d0d0d]/22 to-transparent lg:from-[#0d0d0d]/40 lg:via-[#0d0d0d]/10" />
+      <div className="absolute bottom-0 left-0 right-0 h-72 sm:h-80 bg-gradient-to-t from-[#0d0d0d]/95 via-[#0d0d0d]/84 to-transparent lg:h-60 lg:bg-[linear-gradient(0deg,rgba(13,13,13,0.9)_0%,rgba(13,13,13,0.4)_34%,rgba(13,13,13,0)_100%)]" />
+      <div className="absolute inset-y-0 right-0 w-40 lg:w-48 bg-gradient-to-l from-[#0d0d0d]/36 via-[#0d0d0d]/14 to-transparent lg:from-[#0d0d0d]/14 lg:via-[#0d0d0d]/4" />
+      {/* desktop: a soft warm light on the face and the chess piece */}
+      <div aria-hidden="true" className="hidden lg:block absolute inset-0 pointer-events-none mix-blend-screen bg-[radial-gradient(30%_44%_at_70%_50%,rgba(255,186,150,0.16),rgba(255,186,150,0)_72%)]" />
       <div className="absolute inset-0 lg:hidden bg-[radial-gradient(95%_58%_at_25%_46%,rgba(13,13,13,0.52),rgba(13,13,13,0)_75%)] pointer-events-none" />
       <div className="absolute inset-0 bg-[radial-gradient(110%_70%_at_50%_10%,rgba(229,9,20,0.08),rgba(13,13,13,0)_58%)] pointer-events-none" />
       <div className="absolute inset-0 opacity-8 pointer-events-none [background-image:radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.1)_0,rgba(255,255,255,0)_40%),radial-gradient(circle_at_80%_0,rgba(229,9,20,0.12)_0,rgba(229,9,20,0)_35%)]" />
@@ -921,7 +924,7 @@ function CollaborationPage({ offers = collaborationOffers, terms = collaboration
             <div className="relative">
               <div className="absolute -inset-1 bg-gradient-to-r from-[#E50914] to-orange-600 rounded-lg blur opacity-60 group-hover:opacity-100 transition duration-300" />
               <div className="relative w-12 h-12 rounded-lg overflow-hidden border border-[#E50914]/50">
-                <Img src="/logod.jpg" sizes="48px" alt="ESHELON" className="w-full h-full object-cover" />
+                <Img src="/eshelon-logo.jpg" sizes="48px" alt="ESHELON" className="w-full h-full object-cover" />
               </div>
             </div>
             <div>
@@ -1354,7 +1357,7 @@ function App() {
                 <div className="relative cursor-pointer">
                   <div className="absolute -inset-1 bg-gradient-to-r from-[#E50914] to-orange-600 rounded-lg blur opacity-60 group-hover:opacity-100 transition duration-300" />
                   <div className="relative w-12 h-12 rounded-lg overflow-hidden border border-[#E50914]/50">
-                    <Img src="/logod.jpg" sizes="48px" alt="ESHELON" className="w-full h-full object-cover" />
+                    <Img src="/eshelon-logo.jpg" sizes="48px" alt="ESHELON" className="w-full h-full object-cover" />
                   </div>
                 </div>
                 <div>
@@ -1739,7 +1742,7 @@ function App() {
             <div className="space-y-4 lg:col-span-2 flex flex-col items-center lg:items-start">
               <a href="#hero" onClick={scrollToTopSmooth} className="inline-flex items-center space-x-3 group">
                 <div className="w-11 h-11 rounded-lg overflow-hidden border border-[#E50914]/30 group-hover:border-[#E50914]/60 transition-colors">
-                  <Img src="/logod.jpg" sizes="48px" alt="ESHELON" className="w-full h-full object-cover" />
+                  <Img src="/eshelon-logo.jpg" sizes="48px" alt="ESHELON" className="w-full h-full object-cover" />
                 </div>
                 <div className="text-left">
                   <span className="text-lg font-black tracking-widest text-white block">ESHELON</span>
