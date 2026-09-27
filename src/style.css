@@ -492,41 +492,92 @@ body { background: #0d0d0d; }
 .no-scrollbar { scrollbar-width: none; }
 .no-scrollbar::-webkit-scrollbar { display: none; }
 
-/* ── Hero fades away while scrolling ──
-   Only transform and opacity, each on its own layer. Where the browser supports
-   scroll-driven animations this runs off the main thread, so it can't stutter. */
-.hero-scroll { will-change: transform, opacity; }
-.hero-cover { transform: scale(1.03); transform-origin: 50% 30%; }
+/* ── Hero: while scrolling, the text fades and lifts and a dark veil covers the photo ──
+   The photo itself never moves (a moving full-screen picture stuttered on fast scrolls).
+   Scroll-driven animations run off the main thread; browsers without them show a still hero.
+   Longhands only: a minifier may reorder declarations, and the "animation" shorthand
+   would silently reset the scroll timeline. */
 .hero-shade { opacity: 0; }
 
-/* Longhands only: a minifier may reorder declarations, and the "animation" shorthand
-   would silently reset the scroll timeline. */
 @supports (animation-timeline: scroll()) {
   .hero-scroll {
+    will-change: opacity, transform;
     animation-duration: auto;
     animation-timing-function: linear;
     animation-fill-mode: both;
     animation-timeline: scroll(root block);
   }
-  .hero-cover { animation-name: heroCoverOut; animation-range: 0px 100vh; }
   .hero-shade { animation-name: heroShadeIn; animation-range: 0px 90vh; }
   .hero-content { animation-name: heroContentOut; animation-range: 0px 80vh; }
 }
 
-@keyframes heroCoverOut {
-  from { transform: translate3d(0, 0, 0) scale(1.03); }
-  to { transform: translate3d(0, 20vh, 0) scale(1.08); }
-}
 @keyframes heroShadeIn {
   from { opacity: 0; }
   to { opacity: 0.6; }
 }
 @keyframes heroContentOut {
-  from { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
-  to { opacity: 0; transform: translate3d(0, -8vh, 0) scale(0.97); }
+  from { opacity: 1; transform: translate3d(0, 0, 0); }
+  to { opacity: 0; transform: translate3d(0, -8vh, 0); }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .hero-scroll { animation: none !important; will-change: auto; }
-  .hero-cover { transform: none; }
 }
+
+/* ── "How we work": steps on a path that draws itself ── */
+.process-num {
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(255, 255, 255, 0.4);
+  transition: color 0.35s ease, -webkit-text-stroke-color 0.35s ease;
+}
+.process-step:hover .process-num {
+  color: #e50914;
+  -webkit-text-stroke-color: #e50914;
+}
+.process-dot {
+  background: #0e0e10;
+  border-color: rgba(229, 9, 20, 0.5);
+  transition: background-color 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
+}
+.process-panel.reveal-visible .process-dot {
+  background: #e50914;
+  border-color: #e50914;
+  box-shadow: 0 0 0 5px rgba(229, 9, 20, 0.14);
+}
+.process-link {
+  background: rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+}
+.process-link > span {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, #e50914, rgba(229, 9, 20, 0.55));
+  transform: scaleY(0);
+  transform-origin: top;
+  transition: transform 0.5s cubic-bezier(0.45, 0, 0.2, 1);
+}
+@media (min-width: 1024px) {
+  .process-link > span {
+    background: linear-gradient(to right, #e50914, rgba(229, 9, 20, 0.55));
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+}
+.process-panel.reveal-visible .process-link > span { transform: none; }
+.process-step {
+  opacity: 0;
+  transform: translate3d(0, 14px, 0);
+  transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1), transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.process-panel.reveal-visible .process-step {
+  opacity: 1;
+  transform: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .process-step,
+  .process-dot,
+  .process-link > span { transition: none !important; }
+  .process-step { opacity: 1; transform: none; }
+  .process-link > span { transform: none; }
+}
+

@@ -502,46 +502,10 @@ function CountUp({ value }) {
 function HeroSection({ settings }) {
   const { t, en } = useLang();
   const stats = (settings.stats || []).filter((st) => st && st.value);
-  const coverRef = useRef(null);
-  const shadeRef = useRef(null);
-  const contentRef = useRef(null);
-  // The hero fades away while scrolling. Modern browsers do it in CSS on the compositor
-  // (see .hero-scroll in style.css); this is the fallback for the rest. Only transform and
-  // opacity change, on three separate layers, so nothing has to be repainted.
-  useEffect(() => {
-    const cssDriven = typeof CSS !== 'undefined' && CSS.supports && CSS.supports('animation-timeline: scroll()');
-    if (cssDriven || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return undefined;
-    const cover = coverRef.current;
-    const shade = shadeRef.current;
-    const content = contentRef.current;
-    if (!cover || !shade || !content) return undefined;
-    let raf = 0;
-    let last = -1;
-    const clamp = (v) => Math.max(0, Math.min(1, v));
-    const update = () => {
-      raf = 0;
-      const vh = window.innerHeight || 800;
-      const y = Math.min(window.scrollY, vh * 1.1);
-      if (y === last) return;
-      last = y;
-      const pc = clamp(y / vh);
-      const ps = clamp(y / (vh * 0.9));
-      const pt = clamp(y / (vh * 0.8));
-      cover.style.transform = `translate3d(0, ${(0.2 * vh * pc).toFixed(1)}px, 0) scale(${(1.03 + 0.05 * pc).toFixed(4)})`;
-      shade.style.opacity = (0.6 * ps).toFixed(3);
-      content.style.opacity = (1 - pt).toFixed(3);
-      content.style.transform = `translate3d(0, ${(-0.08 * vh * pt).toFixed(1)}px, 0) scale(${(1 - 0.03 * pt).toFixed(4)})`;
-    };
-    const onScroll = () => { if (!raf) raf = requestAnimationFrame(update); };
-    update();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', onScroll);
-    return () => {
-      window.removeEventListener('scroll', onScroll);
-      window.removeEventListener('resize', onScroll);
-      if (raf) cancelAnimationFrame(raf);
-    };
-  }, []);
+  // While scrolling, the text fades and lifts and a dark veil slides over the photo.
+  // The photo itself never moves — moving a full-screen picture is what stuttered on fast
+  // scrolls. It's all CSS (.hero-scroll in style.css) and runs off the main thread;
+  // browsers without scroll-driven animations simply show a still hero.
   return (
     <section
       id="hero"
@@ -549,8 +513,8 @@ function HeroSection({ settings }) {
     >
       <style>{`
         @keyframes coverReveal {
-          from { opacity: 0; transform: scale(1.08); }
-          to   { opacity: 1; transform: scale(1); }
+          from { opacity: 0.25; }
+          to   { opacity: 1; }
         }
         @keyframes headlineGlow {
           0%,100% { opacity: 1; }
@@ -562,8 +526,8 @@ function HeroSection({ settings }) {
         }
         html { scroll-behavior: smooth; }
       `}</style>
-      {/* Cover image wrapper (moves slower than the page and zooms in slightly while scrolling) */}
-      <div ref={coverRef} className="hero-scroll hero-cover absolute inset-0">
+      {/* Cover image — stays still */}
+      <div className="absolute inset-0 scale-[1.02] lg:scale-[1.04]">
         <picture className="block w-full h-full">
           <source media="(min-width: 1024px)" type="image/webp" srcSet={webpSrcSet('/cover-landscape.jpg')} sizes="100vw" />
           <source media="(min-width: 1024px)" srcSet="/cover-landscape.jpg" />
@@ -575,9 +539,9 @@ function HeroSection({ settings }) {
             onLoad={() => window.__boot && window.__boot.mark('cover')}
             onError={() => window.__boot && window.__boot.mark('cover')}
             className="w-full h-full object-cover object-[62%_20%] lg:object-right"
-            style={{ animation: 'coverReveal 2.4s cubic-bezier(0.22,1,0.36,1) both' }}
+            style={{ animation: 'coverReveal 0.9s ease-out both' }}
             fetchPriority="high"
-            decoding="async"
+            decoding="sync"
           />
         </picture>
       </div>
@@ -590,10 +554,10 @@ function HeroSection({ settings }) {
       <div className="absolute inset-0 bg-[radial-gradient(110%_70%_at_50%_10%,rgba(229,9,20,0.08),rgba(13,13,13,0)_58%)] pointer-events-none" />
       <div className="absolute inset-0 opacity-8 pointer-events-none [background-image:radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.1)_0,rgba(255,255,255,0)_40%),radial-gradient(circle_at_80%_0,rgba(229,9,20,0.12)_0,rgba(229,9,20,0)_35%)]" />
       {/* Darkens the picture while scrolling away */}
-      <div ref={shadeRef} className="hero-scroll hero-shade absolute inset-0 bg-[#0d0d0d] pointer-events-none" />
+      <div className="hero-scroll hero-shade absolute inset-0 bg-[#0d0d0d] pointer-events-none" />
       {/* Content */}
       <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-14 sm:py-20 lg:py-16">
-        <div ref={contentRef} className="hero-scroll hero-content max-w-[620px] space-y-7 sm:space-y-8">
+        <div className="hero-scroll hero-content max-w-[620px] space-y-7 sm:space-y-8">
           {/* Headline — Georgian calligraphy PNG, English set in the brand display font */}
           {en ? (
             <h1
@@ -614,7 +578,7 @@ function HeroSection({ settings }) {
                 onError={() => window.__boot && window.__boot.mark('headline')}
                 className="w-full max-w-[90vw] sm:max-w-lg mt-1 sm:-mt-4 lg:-mt-12 drop-shadow-[0_10px_30px_rgba(0,0,0,0.75)]"
                 fetchPriority="high"
-                decoding="async"
+                decoding="sync"
                 style={{
                   animation: 'headlineIn 1s 0.4s cubic-bezier(0.22,1,0.36,1) both',
                   filter: 'drop-shadow(0 0 14px rgba(229,9,20,0.22))'
@@ -767,19 +731,41 @@ function AboutSection({ steps = [] }) {
           </div>
         </div>
         {list.length > 0 && (
-          <div className="mt-14 sm:mt-16" id="process">
-            <p className="text-xl sm:text-2xl font-black text-white mb-5">{t('როგორ ვმუშაობთ', 'How we work')}</p>
-            <ol className={`reveal-stagger grid grid-cols-1 sm:grid-cols-2 gap-3 ${list.length >= 4 ? 'lg:grid-cols-4' : list.length === 3 ? 'lg:grid-cols-3' : ''}`}>
+          <div id="process" data-reveal className="process-panel reveal-section relative mt-16 sm:mt-20 rounded-3xl border border-white/[0.07] bg-[linear-gradient(180deg,rgba(255,255,255,0.035),rgba(255,255,255,0.008))] p-6 sm:p-10 lg:p-12 overflow-hidden">
+            <div aria-hidden="true" className="pointer-events-none absolute -top-28 -right-28 w-[26rem] h-[26rem] bg-[radial-gradient(closest-side,rgba(229,9,20,0.10),transparent)]" />
+            <div className="relative flex flex-col lg:flex-row lg:items-end lg:justify-between gap-3 sm:gap-4 mb-10 lg:mb-14">
+              <div className="space-y-3">
+                <h3 className="section-eyebrow text-xs font-bold text-[#E50914] tracking-widest uppercase">{t('პროცესი', 'Process')}</h3>
+                <p className="mersad-heading text-[26px] leading-[1.1] sm:text-4xl text-white">{t('ᲠᲝᲒᲝᲠ ᲕᲛᲣᲨᲐᲝᲑᲗ', 'HOW WE WORK')}</p>
+              </div>
+              <p className="text-sm sm:text-[15px] text-gray-400 lg:text-right lg:max-w-xs">
+                {t(`${list.length} ნაბიჯი — პირველი საუბრიდან შედეგამდე.`, `${list.length} steps — from the first chat to results.`)}
+              </p>
+            </div>
+            {/* a path through the steps: down on phones, across on big screens; it draws itself step by step */}
+            <ol className={`relative grid grid-cols-1 gap-9 lg:gap-8 ${list.length >= 5 ? 'lg:grid-cols-5' : list.length === 4 ? 'lg:grid-cols-4' : list.length === 3 ? 'lg:grid-cols-3' : 'lg:grid-cols-2'}`}>
               {list.map((st, n) => (
-                <li key={st.id || n} className="surface-card bg-[#121217] border border-white/10 rounded-xl p-4 sm:p-5 flex gap-3.5 lg:flex-col lg:gap-3">
-                  <span className="text-sm lg:text-base font-black text-[#ff4d55] tabular-nums leading-6">{String(n + 1).padStart(2, '0')}</span>
-                  <span className="min-w-0">
-                    <span className="flex flex-wrap items-baseline gap-x-2">
-                      <span className="text-[15px] font-bold text-white">{st.title}</span>
-                      {st.duration && <span className="text-[11px] text-gray-500">{st.duration}</span>}
+                <li
+                  key={st.id || n}
+                  className="process-step group relative pl-11 lg:pl-0 lg:pt-12"
+                  style={{ transitionDelay: `${0.1 + n * 0.3}s` }}
+                >
+                  {n < list.length - 1 && (
+                    <span aria-hidden="true" className="process-link absolute left-[7px] top-[25px] -bottom-[46px] w-px lg:left-[15px] lg:-right-[32px] lg:top-[7px] lg:bottom-auto lg:w-auto lg:h-px">
+                      <span style={{ transitionDelay: `${0.35 + n * 0.3}s` }} />
                     </span>
-                    {st.text && <span className="block text-[13px] leading-relaxed text-gray-400 mt-1">{st.text}</span>}
-                  </span>
+                  )}
+                  <span
+                    aria-hidden="true"
+                    className="process-dot absolute left-0 top-[10px] lg:top-0 w-[15px] h-[15px] rounded-full border-2"
+                    style={{ transitionDelay: `${0.2 + n * 0.3}s` }}
+                  />
+                  <div className="flex items-baseline gap-3 lg:block">
+                    <span className="process-num mersad-heading block text-[34px] lg:text-[60px] leading-none tabular-nums">{String(n + 1).padStart(2, '0')}</span>
+                    <span className="text-[17px] lg:text-lg font-bold text-white lg:block lg:mt-5">{st.title}</span>
+                  </div>
+                  {st.duration && <span className="inline-block mt-2.5 px-2 py-0.5 rounded-md text-[11px] font-semibold text-[#ff6b72] bg-[#E50914]/10 border border-[#E50914]/25">{st.duration}</span>}
+                  {st.text && <p className="mt-2 text-[14px] leading-relaxed text-gray-400 lg:max-w-[30ch]">{st.text}</p>}
                 </li>
               ))}
             </ol>
