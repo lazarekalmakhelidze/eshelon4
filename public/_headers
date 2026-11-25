@@ -7,3 +7,10 @@
   Cache-Control: public, max-age=2592000
 /logos/*
   Cache-Control: public, max-age=2592000
+# Rioni TV brand book (eshelon.ge/rioni-tv): video, frames and fonts rarely change.
+/rioni-tv/media/*
+  Cache-Control: public, max-age=604800
+/rioni-tv/fonts/*
+  Cache-Control: public, max-age=2592000
+/rioni-tv/img/*
+  Cache-Control: public, max-age=86400
