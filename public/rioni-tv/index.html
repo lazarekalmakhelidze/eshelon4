@@ -156,7 +156,7 @@ button{font:inherit;color:inherit}
 @media (prefers-reduced-motion: reduce){.js-rv .rv:not(.in){opacity:1;transform:none}}
 
 /* ---------- topbar ---------- */
-.topbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:60;height:var(--header-h);display:flex;align-items:center;gap:16px;padding-inline:var(--gutter);background:color-mix(in srgb,var(--bg) 84%,transparent);-webkit-backdrop-filter:saturate(1.4) blur(16px);backdrop-filter:saturate(1.4) blur(16px);transition:transform .5s var(--ease)}
+.topbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:60;height:var(--header-h);display:flex;align-items:center;gap:16px;padding-inline:var(--gutter);background:color-mix(in srgb,var(--bg) 95%,transparent);transition:transform .5s var(--ease)}
 .topbar.hide{transform:translateY(-110%)}
 .tb-brand{display:flex;align-items:center;gap:12px;text-decoration:none;min-width:0}
 .tb-mark{width:44px;height:auto;color:var(--brand)}
@@ -207,13 +207,13 @@ button{font:inherit;color:inherit}
 .hero-cue svg{width:20px;height:20px;animation:nudge 2.4s var(--ease-io) infinite}
 @keyframes nudge{0%,100%{transform:translateY(0)}50%{transform:translateY(6px)}}
 .orb-beat{position:absolute;visibility:hidden}
-.orb-w{display:inline-block;opacity:0;will-change:transform,opacity,filter}
+.orb-w{display:inline-block;opacity:0}
 .orb-label{font-size:12.5px;font-weight:700;letter-spacing:.08em;color:rgba(255,255,255,.72)}
 /* The Rioni's own course, small and orange, in front of each text's label. */
 .orb-river{display:inline-block;width:1.9em;height:1.02em;margin-right:.65em;vertical-align:-.16em;fill:var(--brand);overflow:visible}
 .orb-body{margin-top:12px;font-size:clamp(16px,1.3vw,19px);font-weight:400;line-height:1.55;color:#fff}
 .orb-origin{left:clamp(20px,2.4vw,36px);bottom:12svh;max-width:min(32rem,calc(100% - 40px))}
-.orb-card{width:min(23rem,calc(100vw - 40px));padding:clamp(20px,1.8vw,26px);border-radius:var(--r-md);background:rgba(20,20,20,.88);box-shadow:0 30px 80px rgba(0,0,0,.35);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
+.orb-card{width:min(23rem,calc(100vw - 40px));padding:clamp(20px,1.8vw,26px);border-radius:var(--r-md);background:rgba(20,20,20,.92);box-shadow:0 30px 80px rgba(0,0,0,.35)}
 .orb-card .orb-body{font-size:15.5px;color:rgba(255,255,255,.9)}
 .orb-premise{right:clamp(20px,2.4vw,36px);bottom:10svh}
 .orb-process{inset:0}
@@ -226,7 +226,7 @@ button{font:inherit;color:inherit}
 @media (prefers-reduced-motion: reduce){.hero-sheet::before{animation:none}}
 @media (max-width:767px),(max-aspect-ratio:5/4){
   /* On phones and upright tablets the mic fills the middle of the frame, so the origin text gets a card too. */
-  .orb-origin{right:clamp(20px,2.4vw,36px);padding:20px;border-radius:var(--r-md);background:rgba(20,20,20,.88);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
+  .orb-origin{right:clamp(20px,2.4vw,36px);padding:20px;border-radius:var(--r-md);background:rgba(20,20,20,.92)}
   .orb-origin .orb-body{font-size:15.5px}
 }
 @media (min-width:768px) and (min-aspect-ratio:1251/1000){
@@ -1599,27 +1599,129 @@ img{max-width:100%}
 
   // The film comes in four parts, one per swing between texts, each a full-quality video
   // of its own. Neighbouring parts share their boundary frame — a text stop, where the
-  // film rests — so handing over from one part to the next is never seen. They load in
-  // order: the first is in within a second or so, and each later one usually lands while
-  // the reader is still on a text. Films play from blobs, which can always be seeked
-  // (Cloudflare Pages and claude.ai don't answer range requests); a part whose blob can't be
-  // had plays straight from its file instead.
-  // Each part keeps one seek in flight, always to wherever the playhead is when it lands.
+  // film rests — so handing over from one part to the next is never seen. Each part also
+  // comes reversed (hero-*-k-r.mp4). While the camera moves, the film *plays*: the part
+  // forwards, or its reversed copy for a swing back, at whatever speed keeps up with the
+  // scroll, so the browser decodes it in order and it runs smoothly. (Seeking every frame
+  // instead makes the decoder start again from a keyframe each time: most machines then
+  // show a few frames per swing.) Seeks happen only out of sight: a clip waiting at a stop
+  // is parked on its first frame, and a swing that turns back halfway seeks once.
+  // Films play from blobs, which can always be seeked (Cloudflare Pages and claude.ai don't
+  // answer range requests); a forward part whose blob can't be had plays straight from its
+  // file, and without a reversed part (or where a browser won't play) the film seeks instead.
+  const CUTS = [0, 123, 246, 437, N - 1];
   let parts = [];
-  let dirty = true, active = null, everLive = false;
-  const addPart = (start, end, src) => {
+  let dirty = true, active = null, playing = null, everLive = false, pos = 0;
+  let canPlay = !reduce;
+  const makeClip = (part, rev, src) => {
     const video = document.createElement('video');
     video.className = 'orb-video';
-    video.muted = true; video.playsInline = true; video.preload = 'auto'; video.tabIndex = -1;
-    video.setAttribute('aria-hidden', 'true');
+    video.muted = true; video.defaultMuted = true; video.playsInline = true; video.preload = 'auto'; video.tabIndex = -1;
+    video.setAttribute('playsinline', ''); video.setAttribute('aria-hidden', 'true');
     scene.prepend(video);
-    const part = { start, end, video, src, ready: false, shown: -1, seekingTo: -1 };
-    video.addEventListener('loadeddata', () => { part.ready = true; if (part.shown < 0) part.shown = 0; dirty = true; });
-    video.addEventListener('seeked', () => { if (part.seekingTo >= 0) { part.shown = part.seekingTo; dirty = true; } });
-    // iOS only hands out frames for seeking once the video has played.
-    video.addEventListener('loadedmetadata', () => { video.play().then(() => video.pause(), () => {}); }, { once: true });
+    const clip = { part, rev, video, src, ready: false, failed: false };
+    video.addEventListener('loadeddata', () => { clip.ready = true; dirty = true; });
+    video.addEventListener('seeked', () => { dirty = true; });
+    video.addEventListener('error', () => { clip.failed = true; });
+    // iOS only hands out frames for seeking once the video has played: play it a moment, then park it.
+    video.addEventListener('loadedmetadata', () => {
+      video.play().then(() => { if (clip !== playing) { video.pause(); video.currentTime = 0; } },
+        (e) => { if (e && e.name === 'NotAllowedError') canPlay = false; });
+    }, { once: true });
     video.src = src;
+    return clip;
+  };
+  const addPart = (start, end, src) => {
+    const part = { start, end, len: end - start + 1, f: null, r: null, rDone: false };
+    part.f = makeClip(part, false, src);
     parts.push(part);
+  };
+  /** The film frame a clip shows (fractional while it plays; a clip that has played out shows its last frame). */
+  const frameOf = (c) => {
+    const i = c.video.ended ? c.part.len - 1 : Math.min(c.part.len - 1, Math.max(0, c.video.currentTime * FPS));
+    return c.rev ? c.part.end - i : c.part.start + i;
+  };
+  /** The time in a clip that shows film frame f. */
+  const timeIn = (c, f) => Math.min(c.part.len - 1, Math.max(0, c.rev ? c.part.end - f : f - c.part.start)) / FPS;
+  /** The clip that takes the film on from frame f, forwards (dir 1) or back (dir -1); null if it isn't in. */
+  const clipFrom = (f, dir) => {
+    if (parts.length < 4) return null;
+    let k;
+    if (dir > 0) { k = 0; while (k < 3 && f >= parts[k].end - 0.5) k++; return parts[k].f; }
+    k = 3; while (k > 0 && f <= parts[k].start + 0.5) k--;
+    const c = parts[k].r;
+    return c && !c.failed ? c : null;
+  };
+  /** A clip nobody is watching waits on its first frame, so a swing out of a stop starts at once. */
+  const park = (c) => {
+    if (!c || c === active || c === playing || !c.ready || c.video.seeking) return;
+    if (!c.video.paused) c.video.pause();
+    if (c.video.currentTime > 0.001) c.video.currentTime = 0;
+  };
+  const halt = () => {
+    if (!playing) return;
+    if (!playing.video.paused) playing.video.pause();
+    playing = null; dirty = true; // one more draw, at full quality
+  };
+  /** At rest on a stop, both clips that leave it, on and back, wait parked. */
+  const settle = () => {
+    for (let i = 0; i < CUTS.length; i++) {
+      if (Math.abs(pos - CUTS[i]) > 0.6) continue;
+      if (parts[i]) park(parts[i].f);
+      if (parts[i - 1]) park(parts[i - 1].r);
+    }
+  };
+  /** Without playback (reduced motion, a browser that won't play, a missing reversed part): show
+   *  frame `to` by seeking a forward part, one seek in flight. */
+  const seekTo = (to) => {
+    halt();
+    const want = Math.round(to);
+    let c = active && !active.rev && active.ready && want >= active.part.start && want <= active.part.end ? active : null;
+    if (!c) { const pt = parts.find((q) => q.f.ready && want >= q.start && want <= q.end); c = pt ? pt.f : null; }
+    if (!c || c.video.seeking) return;
+    // the stage keeps its last frame until this clip shows the one asked for (see the drawing in tick)
+    active = c;
+    const t = want === c.part.start ? 0 : (want - c.part.start + 0.5) / FPS;
+    if (Math.abs(c.video.currentTime - t) > 0.4 / FPS) c.video.currentTime = t;
+  };
+  /** The film trails the scroll by about LAG seconds of its own motion, and never runs faster than RATE_MAX. */
+  const LAG = 0.12, RATE_MAX = 8, JUMP = 90;
+  const follow = (to) => {
+    if (!canPlay || !active) { seekTo(to); return; }
+    // a stop is a part's first or last frame: the film lands on it exactly (the clip plays out)
+    const stop = CUTS.find((c) => Math.abs(to - c) < 0.6);
+    if (stop !== undefined) to = stop;
+    const d = to - pos, far = Math.abs(d), dir = Math.sign(d);
+    // a jump (back into the hero from elsewhere, the scrollbar dragged far) cuts straight to the frame
+    if (far > JUMP) { seekTo(to); return; }
+    // once moving, the film runs until it reaches the scroll; from rest it moves for a whole frame or
+    // more (or to its stop)
+    if (playing && (far < (stop !== undefined ? 0.02 : 0.3) || dir !== (playing.rev ? -1 : 1))) halt();
+    if (!playing && far < (stop !== undefined ? 0.02 : 1)) { settle(); return; }
+    const clip = clipFrom(pos, dir);
+    if (!clip || !clip.ready) { seekTo(to); return; }
+    if (clip !== playing) {
+      halt();
+      active = clip; // drawn once it shows the frame the stage is on
+      if (clip.video.seeking) return;
+      if (Math.abs(frameOf(clip) - pos) > 0.6) {
+        // a swing turning back halfway: one seek, while the stage holds its frame
+        if (!clip.video.paused) clip.video.pause();
+        clip.video.currentTime = timeIn(clip, pos) + 0.001;
+        return;
+      }
+      if (clip.video.ended) return;
+      playing = clip;
+    }
+    // the clip after this one waits on its first frame
+    const k = parts.indexOf(clip.part);
+    if (clip.rev) { if (parts[k - 1]) park(parts[k - 1].r); } else if (parts[k + 1]) park(parts[k + 1].f);
+    const rate = Math.min(RATE_MAX, Math.max(0.1, far / FPS / LAG));
+    if (Math.abs(clip.video.playbackRate - rate) > rate * 0.08) clip.video.playbackRate = rate;
+    if (clip.video.paused && !clip.video.ended) {
+      const pr = clip.video.play();
+      if (pr && pr.catch) pr.catch((e) => { if (e && e.name === 'NotAllowedError') canPlay = false; if (playing === clip) playing = null; });
+    }
   };
   // A host may answer a missing file with a page of its own (200, text/html): any text
   // answer counts as missing, so the claude.ai copy still falls back to the one film.
@@ -1638,7 +1740,7 @@ img{max-width:100%}
     return pump();
   })).then((b) => URL.createObjectURL(b));
   /** The parts' sizes, for the loader's progress when the host sends no length. */
-  const SIZES = { d: [6550256, 8550311, 11204827, 7017448], m: [2214333, 2803606, 3621330, 2361015] };
+  const SIZES = { d: [6550256, 8550311, 11204827, 7017448, 4339284, 5188016, 6901768, 4444963], m: [2214333, 2803606, 3621330, 2361015, 1440159, 1515212, 2158577, 1401849] };
   /** Loads the current layout's poster, cut-out and four parts. Called again when the layout
    *  changes: the other layout's film is dropped (downloads stopped, videos removed), so the film,
    *  the cut-out and the numbers above always belong to the same layout. */
@@ -1647,18 +1749,19 @@ img{max-width:100%}
     const g = ++gen;
     // While the loader is up it counts this layout's download, from zero.
     if (loader && loading()) loader.show();
-    const got = [0, 0, 0, 0], want = SIZES[set].slice();
+    const got = [0, 0, 0, 0, 0, 0, 0, 0], want = SIZES[set].slice();
     const report = () => {
       if (g === gen && loader && loading()) loader.progress(0.96 * got.reduce((a, b) => a + b, 0) / want.reduce((a, b) => a + b, 0));
     };
     if (stop) stop.abort();
     stop = typeof AbortController === 'function' ? new AbortController() : null;
     const signal = stop && stop.signal;
-    for (const pt of parts) {
-      pt.video.pause(); pt.video.removeAttribute('src'); pt.video.load(); pt.video.remove();
-      if (pt.src.startsWith('blob:')) URL.revokeObjectURL(pt.src);
+    for (const pt of parts) for (const c of [pt.f, pt.r]) {
+      if (!c) continue;
+      c.video.pause(); c.video.removeAttribute('src'); c.video.load(); c.video.remove();
+      if (c.src.startsWith('blob:')) URL.revokeObjectURL(c.src);
     }
-    parts = []; active = null; everLive = false; dirty = true;
+    parts = []; active = null; playing = null; pos = 0; everLive = false; dirty = true;
     if (g > 1) { swapping = true; scene.classList.add('swap'); ctx.fillStyle = '#141414'; ctx.fillRect(0, 0, canvas.width, canvas.height); }
     poster = new Image();
     poster.onload = () => { if (g === gen) dirty = true; };
@@ -1680,6 +1783,18 @@ img{max-width:100%}
         if (g !== gen) { if (src.startsWith('blob:')) URL.revokeObjectURL(src); return; }
         got[k] = want[k]; report();
         addPart(cuts[k], cuts[k + 1], src);
+      }
+      // then the reversed parts: a swing back plays one of these
+      for (let k = 0; k < 4; k++) {
+        const j = 4 + k, url = 'media/hero-' + set + '-' + k + '-r.mp4';
+        const onBytes = (n, total) => { if (total) want[j] = total; got[j] = Math.min(n, want[j]); report(); };
+        const src = await blobOf(url, null, signal, onBytes).catch(() => null);
+        if (g !== gen) { if (src) URL.revokeObjectURL(src); return; }
+        got[j] = want[j]; report();
+        const pt = parts[k];
+        if (!pt) continue;
+        if (src) pt.r = makeClip(pt, true, src);
+        pt.rDone = true;
       }
     })();
   };
@@ -1842,12 +1957,11 @@ img{max-width:100%}
     words.forEach((el, i) => {
       const k = smooth(clamp(t * span - i * 0.9, 0, 6) / 6);
       el.style.opacity = String(k);
-      el.style.transform = k < 1 ? 'translate3d(0,' + ((1 - k) * 0.6).toFixed(3) + 'em,0)' : '';
-      el.style.filter = k < 1 ? 'blur(' + ((1 - k) * 8).toFixed(2) + 'px)' : '';
+      el.style.transform = k < 1 ? 'translate(0,' + ((1 - k) * 0.6).toFixed(3) + 'em)' : '';
     });
   };
 
-  let playhead = 0, lastTime = 0, lastIdx = -1;
+  let playhead = 0, lastTime = 0, lastIdx = -1, again = false;
   const drift = { x: 0, y: 0, tx: 0, ty: 0 };
   window.addEventListener('pointermove', (e) => {
     drift.tx = (e.clientX / window.innerWidth - 0.5) * 2;
@@ -1866,9 +1980,10 @@ img{max-width:100%}
       const lr = logo.getBoundingClientRect();
       window.__ldTarget = lr.width > 0 && r.top < vh && r.bottom > 0 ? { left: lr.left, top: lr.top, width: lr.width } : null;
       // Open the page once every part can play and the first frame and the cut-out are up.
-      if (loader && parts.length === 4 && parts.every((pt) => pt.ready) && crownIn && (everLive || r.bottom < 0 || r.top > vh)) loader.done();
+      const filmIn = parts.length === 4 && parts.every((pt) => pt.f.ready && pt.rDone && (!pt.r || pt.r.ready || pt.r.failed));
+      if (loader && filmIn && crownIn && (everLive || r.bottom < 0 || r.top > vh)) loader.done();
     }
-    if (r.bottom < 0 || r.top > vh) return;
+    if (r.bottom < 0 || r.top > vh) { halt(); return; }
     const scrolled = pinTop - r.top;
     const p = clamp(scrolled / span());
     // As the contents sheet rises, the stage sinks back and dims beneath it.
@@ -1877,37 +1992,22 @@ img{max-width:100%}
     dim.style.opacity = String((sheet * 0.65).toFixed(3));
     const sp = remap.speed(p);
 
-    // Playhead chases the scroll, but never slower than the footage plays — and
-    // tightly enough that the camera arrives with the text, not after it.
+    // The film follows the scroll: it plays toward the frame the scroll asks for (see follow).
     const target = (remap.at(p) / FILM) * (N - 1);
-    const diff = target - playhead;
-    if (reduce) playhead = target;
-    else if (Math.abs(diff) > 0.001) {
-      const step = Math.max(FPS * 1.25, Math.abs(diff) * 10) * dt;
-      playhead = Math.abs(diff) <= step ? target : playhead + Math.sign(diff) * step;
-    }
+    follow(target);
     // Pointer drift: strongest while resting, gone while swinging.
     const calm = reduce ? 0 : clamp(1 - (sp - 0.3) / 1.2);
     drift.x += (drift.tx * calm - drift.x) * 0.05;
     drift.y += (drift.ty * calm - drift.y) * 0.05;
     const moving = Math.abs(drift.x - drift.tx * calm) > 0.002 || Math.abs(drift.y - drift.ty * calm) > 0.002;
 
-    const want = Math.round(playhead);
-    const part = parts.find((pt) => pt.ready && want >= pt.start && want <= pt.end);
-    if (part) {
-      const local = want - part.start;
-      if (part.shown !== local && !part.video.seeking && part.video.readyState >= 2) {
-        part.seekingTo = local;
-        part.video.currentTime = (local + 0.5) / FPS;
-      }
-      // Draw from a part once it shows a frame near the playhead; until then the last
-      // part keeps the stage, so moving between parts never flashes a far-off frame.
-      if (part.shown >= 0 && Math.abs(part.start + part.shown - want) <= 4) active = part;
-    }
-
-    const live = !!active && active.video.videoWidth > 0;
-    if (live) everLive = true;
-    const shown = live ? active.start + active.shown : -1;
+    // The stage draws a clip only once it shows the frame wanted (not while it seeks), so moving
+    // between clips never flashes a far-off frame; until then the stage keeps its last frame.
+    const live = !!active && active.ready && !active.video.seeking && active.video.readyState >= 2 && active.video.videoWidth > 0;
+    if (live) { pos = frameOf(active); everLive = true; }
+    const shown = live ? Math.round(pos) : -1;
+    if (live && hero.dataset.frame !== String(shown)) hero.dataset.frame = shown;
+    const key = live ? parts.indexOf(active.part) * 4000 + (active.rev ? 2000 : 0) + Math.floor(active.video.currentTime * FPS + 0.001) : -1;
     // The still of frame 0 holds the stage until the first part is in.
     const frame = live ? active.video : !everLive && poster.naturalWidth > 0 ? poster : null;
     if (frame) {
@@ -1918,9 +2018,12 @@ img{max-width:100%}
       const x = (cw - w) / 2 - drift.x * cw * 0.012, y = (ch - h) / 2 - drift.y * ch * 0.01;
       const k = cw / (canvas.clientWidth || cw);
       place(x / k, y / k, w / k, h / k);
-      if (dirty || shown !== lastIdx || moving) {
-        lastIdx = shown; dirty = false;
-        // Every frame is drawn whole and sharp: no smear between frames.
+      // a new film frame is drawn, and once more on the next tick in case the video shows it a beat late
+      const fresh = key !== lastIdx;
+      if (dirty || fresh || again || moving) {
+        again = fresh && !!playing; lastIdx = key; dirty = false;
+        // Every frame is drawn whole and sharp: no smear between frames (finest filtering at rest).
+        ctx.imageSmoothingQuality = playing ? 'low' : 'high';
         ctx.drawImage(frame, x, y, w, h);
         crownDirty = true;
         if (swapping) { swapping = false; scene.classList.remove('swap'); }
@@ -1938,7 +2041,7 @@ img{max-width:100%}
     // Logo lifts out of its mask; the cut-out is only true to the film before it moves.
     const mk = easeOut(range(p, BEATS.mark[0], BEATS.mark[1]));
     logo.style.transform = mk ? 'translate3d(0,' + (-mk * 105).toFixed(2) + '%,0)' : '';
-    logo.style.filter = mk ? 'blur(' + (mk * 6).toFixed(2) + 'px)' : '';
+    logo.style.opacity = mk ? (1 - mk).toFixed(3) : '';
     mark.style.visibility = mk >= 1 ? 'hidden' : 'visible';
     const crownOn = 1 - range(p, BEATS.mark[1] - 0.01, BEATS.mark[1] + 0.004);
     crown.style.opacity = String(crownOn);
@@ -1956,7 +2059,6 @@ img{max-width:100%}
       reveal(b.words, a);
       b.el.style.opacity = String(1 - out);
       b.el.style.transform = 'translate3d(0,' + (-out * 36).toFixed(2) + 'px,0)';
-      b.el.style.filter = out > 0 ? 'blur(' + (out * 10).toFixed(2) + 'px)' : '';
       // Cards open from the bottom like a sliding plate, then settle.
       for (const c of b.cards) {
         c.style.clipPath = 'inset(' + ((1 - a) * 100).toFixed(2) + '% 0 0 0 round var(--r-md))';
@@ -1966,7 +2068,6 @@ img{max-width:100%}
       for (const m of b.marks) {
         m.style.opacity = a.toFixed(3);
         m.style.transform = a < 1 ? 'translate3d(0,' + ((1 - a) * 18).toFixed(2) + 'px,0)' : '';
-        m.style.filter = a < 1 ? 'blur(' + ((1 - a) * 10).toFixed(2) + 'px)' : '';
       }
     }
   };
