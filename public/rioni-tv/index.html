@@ -1624,7 +1624,7 @@ img{max-width:100%}
     video.muted = true; video.defaultMuted = true; video.playsInline = true; video.preload = 'auto'; video.tabIndex = -1;
     video.setAttribute('playsinline', ''); video.setAttribute('aria-hidden', 'true');
     scene.prepend(video);
-    const clip = { part, rev, video, src, ready: false, failed: false };
+    const clip = { part, rev, video, src, ready: false, failed: false, wokeAt: 0, flip: false };
     video.addEventListener('loadeddata', () => { clip.ready = true; dirty = true; });
     video.addEventListener('seeked', () => { dirty = true; });
     video.addEventListener('error', () => { clip.failed = true; });
@@ -1658,11 +1658,21 @@ img{max-width:100%}
     const c = parts[k].r;
     return c && !c.failed ? c : null;
   };
-  /** A clip nobody is watching waits on its first frame, so a swing out of a stop starts at once. */
+  /** A clip waiting for the next swing sits on its first frame, and is kept awake: Chrome puts a paused
+   *  video to sleep after a few seconds (it frees the decoder), and waking it at the start of a swing
+   *  showed as a stop before the camera moved. So every WAKE ms a waiting clip is seeked onto its first
+   *  frame again (to 0 or 1 ms, which show the same frame: a seek to where a paused video already is
+   *  does nothing). The clip on the stage is woken too, while it waits on its first frame. */
+  const WAKE = 4000;
   const park = (c) => {
-    if (!c || c === active || c === playing || !c.ready || c.video.seeking) return;
+    if (!c || c === playing || !c.ready || c.video.seeking) return;
+    const first = c.rev ? c.part.end : c.part.start, atFirst = !c.video.ended && Math.abs(frameOf(c) - first) < 0.5;
+    if (c === active && !atFirst) return;
+    const now = performance.now();
+    if (atFirst && now - c.wokeAt < WAKE) return;
+    c.wokeAt = now;
     if (!c.video.paused) c.video.pause();
-    if (c.video.currentTime > 0.001) c.video.currentTime = 0;
+    c.video.currentTime = (c.flip = !c.flip) ? 0.001 : 0;
   };
   const halt = () => {
     if (!playing) return;
@@ -1690,20 +1700,27 @@ img{max-width:100%}
     const t = want === c.part.start ? 0 : (want - c.part.start + 0.5) / FPS;
     if (Math.abs(c.video.currentTime - t) > 0.4 / FPS) c.video.currentTime = t;
   };
-  /** The film trails the scroll by about LAG seconds of its own motion, and never runs faster than RATE_MAX. */
+  /** The film trails its target by about LAG seconds of its own motion, and never runs faster than
+   *  RATE_MAX. `vel` is the target's own speed (frames a second) while a glide carries it: the film then
+   *  runs at that speed, plus whatever closes the gap. */
   const LAG = 0.12, RATE_MAX = 8, JUMP = 90;
-  const follow = (to) => {
+  const follow = (to, vel, way) => {
     if (!canPlay || !active) { seekTo(to); return; }
-    // a stop is a part's first or last frame: the film lands on it exactly (the clip plays out)
-    const stop = CUTS.find((c) => Math.abs(to - c) < 0.6);
+    // `way` is the direction of a glide's swing while it runs (0 otherwise)
+    const moving = way !== 0;
+    // at rest, a stop is a part's first or last frame: the film lands on it exactly (the clip plays out)
+    const stop = moving ? undefined : CUTS.find((c) => Math.abs(to - c) < 0.6);
     if (stop !== undefined) to = stop;
-    const d = to - pos, far = Math.abs(d), dir = Math.sign(d);
+    const d = to - pos, far = Math.abs(d);
     // a jump (back into the hero from elsewhere, the scrollbar dragged far) cuts straight to the frame
     if (far > JUMP) { seekTo(to); return; }
-    // once moving, the film runs until it reaches the scroll; from rest it moves for a whole frame or
-    // more (or to its stop)
-    if (playing && (far < (stop !== undefined ? 0.02 : 0.3) || dir !== (playing.rev ? -1 : 1))) halt();
-    if (!playing && far < (stop !== undefined ? 0.02 : 1)) { settle(); return; }
+    const dir = moving ? way : Math.sign(d);
+    // past a target that is still on its way: slow down until it catches up (stopping and starting
+    // again costs the video a moment), and never turn back for that
+    const ahead = moving && d * dir < 0;
+    const near = stop !== undefined ? 0.1 : 0.3;
+    if (playing && ((playing.rev ? -1 : 1) !== dir || (!moving && far < near))) halt();
+    if (!playing && (ahead || (!moving && far < near))) { settle(); return; }
     // the clip already playing carries on to the end of its span; past it, the next one takes over
     const within = playing && !playing.video.ended && dir === (playing.rev ? -1 : 1) &&
       (playing.rev ? to >= playing.part.start - 0.01 : to <= playing.part.end + 0.01);
@@ -1722,15 +1739,40 @@ img{max-width:100%}
       if (clip.video.ended) return;
       playing = clip;
     }
-    // the clip after this one waits on its first frame
+    // the clips that leave the stop this swing is heading for wait on their first frames, awake
     const k = parts.indexOf(clip.part);
-    if (clip.rev) { if (parts[k - 1]) park(parts[k - 1].r); } else if (parts[k + 1]) park(parts[k + 1].f);
-    const rate = Math.min(RATE_MAX, Math.max(0.1, far / FPS / LAG));
+    if (clip.rev) { park(parts[k].f); if (parts[k - 1]) park(parts[k - 1].r); } else { park(parts[k].r); if (parts[k + 1]) park(parts[k + 1].f); }
+    // the target's own speed, plus (or minus, when a little ahead) what closes the gap
+    const speed = (moving ? Math.abs(vel) : 0) + (d * dir) / LAG;
+    const rate = Math.min(RATE_MAX, Math.max(0.1, speed / FPS));
     if (Math.abs(clip.video.playbackRate - rate) > rate * 0.08) clip.video.playbackRate = rate;
     if (clip.video.paused && !clip.video.ended) {
       const pr = clip.video.play();
       if (pr && pr.catch) pr.catch((e) => { if (e && e.name === 'NotAllowedError') canPlay = false; if (playing === clip) playing = null; });
     }
+  };
+  /** A glide's own swing for the film: from the frame it is on to the destination's, eased in and out
+   *  over the glide. (The scroll front-loads its motion and the camera's swing sits in the middle of
+   *  each stretch, so following the scroll frame for frame asked the film for 300 to 600 frames a
+   *  second for a moment, and it stalled.) Leaving the logo it waits until the crown cut-out is gone;
+   *  going back to the logo it arrives before the cut-out returns. */
+  let filmSwing = null;
+  const RAMP = 0.25, LOGO_P = 0.09;
+  /** The swing's speed profile over T seconds: from v0 (the speed the film already has, when a flick
+   *  carries a swing straight on into the next) easing to a cruise, then easing to rest on the
+   *  destination; d frames in all, in one direction. Returns where and how fast at t seconds. */
+  const profile = (d, T, v0) => {
+    const a = RAMP * T, b = RAMP * T;
+    v0 = Math.min(Math.max(0, v0), (2 * d) / a);
+    const vc = Math.max(0, (d - (v0 * a) / 2) / (T - a / 2 - b / 2));
+    const pa = ((v0 + vc) * a) / 2, pb = pa + vc * (T - a - b);
+    return (t) => {
+      if (t <= 0) return [0, v0];
+      if (t < a) { const k = Math.PI / a; return [v0 * t + (vc - v0) * (t / 2 - Math.sin(k * t) / (2 * k)), v0 + ((vc - v0) * (1 - Math.cos(k * t))) / 2]; }
+      if (t < T - b) return [pa + vc * (t - a), vc];
+      if (t < T) { const q = t - (T - b), k = Math.PI / b; return [pb + vc * (q / 2 + Math.sin(k * q) / (2 * k)), (vc * (1 + Math.cos(k * q))) / 2]; }
+      return [d, 0];
+    };
   };
   // A host may answer a missing file with a page of its own (200, text/html): any text
   // answer counts as missing, so the claude.ai copy still falls back to the one film.
@@ -1906,6 +1948,21 @@ img{max-width:100%}
     const from = glideLive() && dir === glideDir ? glideTo : y;
     return dir > 0 ? ys.find((v) => v > from + 4) : ys.slice().reverse().find((v) => v < from - 4);
   };
+  /** Where the scroll would put the film's progress p at page position y. */
+  const pAtY = (y) => clamp((pinTop - hero.getBoundingClientRect().top + (y - window.scrollY)) / span());
+  const swingFor = (toY) => {
+    const p0 = pAtY(window.scrollY), p1 = pAtY(toY), now = performance.now();
+    let to = (remap.at(p1) / FILM) * (N - 1);
+    const stop = CUTS.find((c) => Math.abs(to - c) < 0.6);
+    if (stop !== undefined) to = stop;
+    let endAt = now + glideMs;
+    // back to the logo: done before the scroll reaches the cut-out (the glide eases as sin(t·π/2))
+    if (to < 0.5 && pos > to && p1 < p0) endAt = now + glideMs * (2 / Math.PI) * Math.asin(clamp((LOGO_P - p0) / (p1 - p0)));
+    // a flick that carries a swing on in the same direction keeps the speed the film has
+    const way = Math.sign(to - pos), last = filmSwing && filmSwing.released && filmSwing.vel;
+    const v0 = last && Math.sign(last) === way ? Math.abs(last) : 0;
+    filmSwing = { from: pos, to, at: now, endAt, released: pos < 0.5 && to > pos ? 0 : now, v0, vel: 0, run: null };
+  };
   const glide = (to, dir) => {
     gliding = true; glideTo = to; glideDir = dir; glideAt = performance.now();
     const done = () => { if (glideTo === to) gliding = false; };
@@ -1913,6 +1970,7 @@ img{max-width:100%}
     // wind-up, which read as a load delay) and settling softly at the text.
     const dur = Math.min(2.6, 1.2 + Math.abs(to - window.scrollY) / 2600);
     glideMs = dur * 1000;
+    swingFor(to);
     const smooth = scroller();
     if (smooth) smooth.scrollTo(to, { duration: dur, lock: true, force: true, onComplete: done, easing: (t) => Math.sin((t * Math.PI) / 2) });
     else { window.scrollTo({ top: to, behavior: reduce ? 'auto' : 'smooth' }); setTimeout(done, reduce ? 60 : 1000); }
@@ -2005,9 +2063,23 @@ img{max-width:100%}
     dim.style.opacity = String((sheet * 0.65).toFixed(3));
     const sp = remap.speed(p);
 
-    // The film follows the scroll: it plays toward the frame the scroll asks for (see follow).
-    const target = (remap.at(p) / FILM) * (N - 1);
-    follow(target);
+    // The film follows the scroll: it plays toward the frame the scroll asks for (see follow); while a
+    // glide runs, toward the glide's own eased swing instead (see swingFor).
+    let target = (remap.at(p) / FILM) * (N - 1), vel = 0, way = 0;
+    const sw = filmSwing;
+    if (sw && sw.at >= glideAt && glideLive()) {
+      const now = performance.now();
+      if (!sw.released && target - sw.from > 1) { sw.released = now; sw.from = pos; }
+      if (sw.released) {
+        const T = Math.max(300, sw.endAt - sw.released) / 1000, t = (now - sw.released) / 1000, dir = Math.sign(sw.to - sw.from);
+        if (!sw.run) sw.run = profile(Math.abs(sw.to - sw.from), T, sw.v0);
+        const [d, v] = sw.run(t);
+        target = sw.from + dir * d;
+        vel = sw.vel = t < T ? dir * v : 0;
+        way = t < T && dir ? dir : 0;
+      }
+    } else if (sw) filmSwing = null;
+    follow(target, vel, way);
     // Pointer drift: strongest while resting, gone while swinging.
     const calm = reduce ? 0 : clamp(1 - (sp - 0.3) / 1.2);
     drift.x += (drift.tx * calm - drift.x) * 0.05;
